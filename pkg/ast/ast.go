@@ -11,33 +11,16 @@ type Program struct {
 	Body []Stmt
 }
 
+type Identifier struct {
+	Kind   astTypes.NodeType
+	Symbol string
+}
+
 type VariableDeclaration struct {
 	Kind       astTypes.NodeType
 	Constant   bool
 	Identifier string
 	Value      Expr
-}
-
-type AssigmentExpr struct {
-	Kind    astTypes.NodeType
-	Assigne Expr
-	Value   Expr
-}
-
-type Expr interface {
-	Stmt
-}
-
-type BinaryExpr struct {
-	Kind     astTypes.NodeType
-	Left     Expr
-	Right    Expr
-	Operator string
-}
-
-type Identifier struct {
-	Kind   astTypes.NodeType
-	Symbol string
 }
 
 type NumericLiteral struct {
@@ -49,16 +32,8 @@ func (p Program) GetKind() astTypes.NodeType {
 	return p.Kind
 }
 
-func (a AssigmentExpr) GetKind() astTypes.NodeType {
-	return a.Kind
-}
-
 func (vd VariableDeclaration) GetKind() astTypes.NodeType {
 	return vd.Kind
-}
-
-func (b BinaryExpr) GetKind() astTypes.NodeType {
-	return b.Kind
 }
 
 func (i Identifier) GetKind() astTypes.NodeType {
