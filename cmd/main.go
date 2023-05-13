@@ -1,29 +1,11 @@
 package main
 
-import (
-	"bufio"
-	"fmt"
-	"os"
-	"pikalang/pkg/parser"
-)
+import "pika/pkg/cli"
 
 func main() {
-	file, err := os.Open("../test.txt")
+	err := cli.New()
+
 	if err != nil {
-		panic("There was an error opening the file: " + err.Error())
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
-	for scanner.Scan() {
-		line := scanner.Text()
-		// tokens := lexer.Tokenize(line)
-		parser := parser.Parser{}
-		fmt.Println(parser.ProduceAST(line), line)
-	}
-
-	if err := scanner.Err(); err != nil {
-		panic("There was an error reading the file: " + err.Error())
+		panic("Something went wrong")
 	}
 }
