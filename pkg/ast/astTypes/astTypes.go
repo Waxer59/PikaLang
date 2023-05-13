@@ -3,7 +3,11 @@ package astTypes
 type NodeType string
 
 const (
-	Program        NodeType = "Program"
+	// STATEMENTS
+	Program             NodeType = "Program"
+	VariableDeclaration NodeType = "VariableDeclaration"
+
+	// EXPRESSIONS
 	NumericLiteral NodeType = "NumericLiteral"
 	Identifier     NodeType = "Identifier"
 	BinaryExpr     NodeType = "BinaryExpr"

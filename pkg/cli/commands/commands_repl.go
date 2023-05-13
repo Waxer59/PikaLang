@@ -6,6 +6,7 @@ import (
 	"os"
 	"pika/pkg/cli/exitCodes"
 	"pika/pkg/interpreter"
+	"pika/pkg/interpreter/interpreterEnvironment"
 	"pika/pkg/parser"
 
 	"github.com/urfave/cli/v2"
@@ -22,6 +23,9 @@ func SetUpRepl(app *cli.App) *cli.Command {
 }
 
 func startRepl(cCtx *cli.Context) error {
+	parser := parser.New()
+	env := interpreterEnvironment.New(nil)
+
 	for {
 		fmt.Print("> ")
 		scanner := bufio.NewScanner(os.Stdin)
@@ -33,10 +37,9 @@ func startRepl(cCtx *cli.Context) error {
 			return cli.Exit("exit", int(exitCodes.Success))
 		}
 
-		parser := parser.New()
 		program := parser.ProduceAST(code)
 
-		result := interpreter.Evaluate(program)
+		result := interpreter.Evaluate(program, env)
 
 		fmt.Println(result)
 	}

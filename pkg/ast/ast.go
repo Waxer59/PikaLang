@@ -11,8 +11,11 @@ type Program struct {
 	Body []Stmt
 }
 
-func (p Program) GetKind() astTypes.NodeType {
-	return p.Kind
+type VariableDeclaration struct {
+	Kind       astTypes.NodeType
+	Constant   bool
+	Identifier string
+	Value      Expr
 }
 
 type Expr interface {
@@ -26,22 +29,30 @@ type BinaryExpr struct {
 	Operator string
 }
 
-func (b BinaryExpr) GetKind() astTypes.NodeType {
-	return b.Kind
-}
-
 type Identifier struct {
 	Kind   astTypes.NodeType
 	Symbol string
 }
 
-func (i Identifier) GetKind() astTypes.NodeType {
-	return i.Kind
-}
-
 type NumericLiteral struct {
 	Kind  astTypes.NodeType
 	Value int
+}
+
+func (p Program) GetKind() astTypes.NodeType {
+	return p.Kind
+}
+
+func (vd VariableDeclaration) GetKind() astTypes.NodeType {
+	return vd.Kind
+}
+
+func (b BinaryExpr) GetKind() astTypes.NodeType {
+	return b.Kind
+}
+
+func (i Identifier) GetKind() astTypes.NodeType {
+	return i.Kind
 }
 
 func (n NumericLiteral) GetKind() astTypes.NodeType {
@@ -50,13 +61,4 @@ func (n NumericLiteral) GetKind() astTypes.NodeType {
 
 func (n NumericLiteral) GetValue() interface{} {
 	return n.Value
-}
-
-type NullLiteral struct {
-	Kind  astTypes.NodeType
-	Value string
-}
-
-func (nl NullLiteral) GetKind() astTypes.NodeType {
-	return nl.Kind
 }

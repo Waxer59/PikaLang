@@ -3,18 +3,20 @@ package interpreter
 import (
 	"pika/pkg/ast"
 	"pika/pkg/ast/astTypes"
+	"pika/pkg/interpreter/interpreterEnvironment"
+	"pika/pkg/interpreter/interpreterMakers"
 	"pika/pkg/interpreter/interpreterValues"
 )
 
-func evaluateBinaryExpr(binop ast.BinaryExpr) interpreterValues.RuntimeValue {
-	lhs := Evaluate(binop.Left)
-	rhs := Evaluate(binop.Right)
+func evaluateBinaryExpr(binop ast.BinaryExpr, env interpreterEnvironment.Environment) interpreterValues.RuntimeValue {
+	lhs := Evaluate(binop.Left, env)
+	rhs := Evaluate(binop.Right, env)
 
 	if lhs.GetType() == interpreterValues.Number && rhs.GetType() == interpreterValues.Number {
 		return evaluateNumericBinaryExpr(binop.Operator, lhs, rhs)
 	}
 
-	return interpreterValues.NullVal{Type: "null", Value: "null"}
+	return interpreterMakers.MK_NULL()
 }
 
 func evaluateNumericBinaryExpr(operator string, lhs interpreterValues.RuntimeValue, rhs interpreterValues.RuntimeValue) interpreterValues.RuntimeValue {
@@ -44,27 +46,43 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreterValues.RuntimeVal
 	return interpreterValues.NumberVal{Value: result, Type: interpreterValues.Number}
 }
 
-func evaluateProgram(program ast.Program) interpreterValues.RuntimeValue {
-	var lastEvaluated interpreterValues.RuntimeValue = interpreterValues.NullVal{Type: "null", Value: "null"}
+func evaluateProgram(program ast.Program, env interpreterEnvironment.Environment) interpreterValues.RuntimeValue {
+	var lastEvaluated interpreterValues.RuntimeValue = interpreterMakers.MK_NULL()
 
 	for _, statement := range program.Body {
-		lastEvaluated = Evaluate(statement)
+		lastEvaluated = Evaluate(statement, env)
 	}
 
 	return lastEvaluated
 }
 
-func Evaluate(astNode ast.Stmt) interpreterValues.RuntimeValue {
+func evalIdentifier(ident ast.Identifier, env interpreterEnvironment.Environment) interpreterValues.RuntimeValue {
+	val := env.LookupVar(ident.Symbol)
+	return val
+}
+
+func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env interpreterEnvironment.Environment) interpreterValues.RuntimeValue {
+	var value interpreterValues.RuntimeValue = interpreterMakers.MK_NULL()
+
+	if variableDeclaration.Value != nil {
+		value = Evaluate(variableDeclaration.Value, env)
+	}
+	return env.DeclareVar(variableDeclaration.Identifier, value, variableDeclaration.Constant)
+}
+
+func Evaluate(astNode ast.Stmt, env interpreterEnvironment.Environment) interpreterValues.RuntimeValue {
 	switch astNode.GetKind() {
 	case astTypes.NumericLiteral:
 		value := astNode.(ast.NumericLiteral).GetValue().(int)
-		return interpreterValues.NumberVal{Value: value, Type: "number"}
+		return interpreterValues.NumberVal{Value: value, Type: interpreterValues.Number}
 	case astTypes.BinaryExpr:
-		return evaluateBinaryExpr(astNode.(ast.BinaryExpr))
+		return evaluateBinaryExpr(astNode.(ast.BinaryExpr), env)
 	case astTypes.Program:
-		return evaluateProgram(astNode.(ast.Program))
-	case astTypes.NullLiteral:
-		return interpreterValues.NullVal{Type: "null", Value: "null"}
+		return evaluateProgram(astNode.(ast.Program), env)
+	case astTypes.Identifier:
+		return evalIdentifier(astNode.(ast.Identifier), env)
+	case astTypes.VariableDeclaration:
+		return evalVariableDeclaration(astNode.(ast.VariableDeclaration), env)
 	default:
 		panic("This AST node is not supported")
 	}
