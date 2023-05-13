@@ -2,10 +2,10 @@ package parser
 
 import (
 	"fmt"
-	"pikalang/pkg/ast"
-	"pikalang/pkg/ast/astTypes"
-	"pikalang/pkg/lexer"
-	"pikalang/pkg/lexer/lexerTypes"
+	"pika/pkg/ast"
+	"pika/pkg/ast/astTypes"
+	"pika/pkg/lexer"
+	"pika/pkg/lexer/lexerTypes"
 	"strconv"
 
 	"golang.org/x/exp/slices"
@@ -34,13 +34,17 @@ func (p *Parser) expect(typeExpected lexerTypes.TokenType, errMsg string) lexerT
 	return prev
 }
 
+func New() *Parser {
+	return &Parser{}
+}
+
 func (p *Parser) ProduceAST(input string) ast.Program {
 	p.tokens = lexer.Tokenize(input)
 	fmt.Println(p.tokens)
 
 	program := ast.Program{
 		Kind: astTypes.Program,
-		Body: []interface{}{},
+		Body: []ast.Stmt{},
 	}
 
 	for p.notEOF() {
@@ -54,7 +58,7 @@ func (p *Parser) notEOF() bool {
 	return p.at().Type != lexerTypes.EOF
 }
 
-func (p *Parser) parseStmt() interface{} {
+func (p *Parser) parseStmt() ast.Stmt {
 	parseExpr := p.parseExpr()
 	return parseExpr
 }
@@ -104,6 +108,9 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 	switch tk {
 	case lexerTypes.Identifier:
 		return ast.Identifier{Kind: astTypes.Identifier, Symbol: p.next().Value}
+	case lexerTypes.Null:
+		p.next()
+		return ast.NullLiteral{Kind: astTypes.NullLiteral, Value: "null"}
 	case lexerTypes.Number:
 		n, err := strconv.Atoi(p.next().Value)
 		if err != nil {

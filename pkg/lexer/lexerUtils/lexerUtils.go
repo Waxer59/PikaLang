@@ -1,7 +1,7 @@
 package lexerUtils
 
 import (
-	"pikalang/pkg/lexer/lexerTypes"
+	"pika/pkg/lexer/lexerTypes"
 	"strconv"
 	"strings"
 

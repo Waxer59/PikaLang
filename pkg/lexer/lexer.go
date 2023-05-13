@@ -1,8 +1,8 @@
 package lexer
 
 import (
-	"pikalang/pkg/lexer/lexerTypes"
-	"pikalang/pkg/lexer/lexerUtils"
+	"pika/pkg/lexer/lexerTypes"
+	"pika/pkg/lexer/lexerUtils"
 	"strings"
 )
 

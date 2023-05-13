@@ -7,6 +7,7 @@ const (
 	NumericLiteral NodeType = "NumericLiteral"
 	Identifier     NodeType = "Identifier"
 	BinaryExpr     NodeType = "BinaryExpr"
+	NullLiteral    NodeType = "NullLiteral"
 )
 
 var (

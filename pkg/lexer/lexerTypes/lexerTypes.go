@@ -6,6 +6,7 @@ const (
 	// Literal types
 	Number TokenType = iota
 	Identifier
+	Null
 
 	// Keywords
 	Var
@@ -30,6 +31,7 @@ var KEYWORDS = map[string]TokenType{
 	"var":   Var,
 	"const": Const,
 	"func":  Func,
+	"null":  Null,
 }
 
 var SkippableChars = []string{" ", "\t", "\n"}
