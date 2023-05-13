@@ -34,7 +34,7 @@ func startRepl(cCtx *cli.Context) error {
 		code := scanner.Text()
 
 		if code == "exit" {
-			return cli.Exit("exit", int(exitCodes.Success))
+			return cli.Exit("Goodbye! :)", int(exitCodes.Success))
 		}
 
 		program := parser.ProduceAST(code)

@@ -9,6 +9,7 @@ const (
 
 	// EXPRESSIONS
 	NumericLiteral NodeType = "NumericLiteral"
+	AssigmentExpr  NodeType = "AssigmentExpr"
 	Identifier     NodeType = "Identifier"
 	BinaryExpr     NodeType = "BinaryExpr"
 	NullLiteral    NodeType = "NullLiteral"

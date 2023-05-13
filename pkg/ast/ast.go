@@ -18,6 +18,12 @@ type VariableDeclaration struct {
 	Value      Expr
 }
 
+type AssigmentExpr struct {
+	Kind    astTypes.NodeType
+	Assigne Expr
+	Value   Expr
+}
+
 type Expr interface {
 	Stmt
 }
@@ -41,6 +47,10 @@ type NumericLiteral struct {
 
 func (p Program) GetKind() astTypes.NodeType {
 	return p.Kind
+}
+
+func (a AssigmentExpr) GetKind() astTypes.NodeType {
+	return a.Kind
 }
 
 func (vd VariableDeclaration) GetKind() astTypes.NodeType {

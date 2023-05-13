@@ -132,7 +132,23 @@ func (p *Parser) parseMultiplicativeExpr() ast.Expr {
 }
 
 func (p *Parser) parseExpr() ast.Expr {
-	return p.parseAdditiveExpr()
+	return p.parseAssigmentExpr()
+}
+
+func (p *Parser) parseAssigmentExpr() ast.Expr {
+	var left = p.parseAdditiveExpr()
+
+	if p.at().Type == lexerTypes.Equals {
+		p.subtract() // consume '='
+		value := p.parseAssigmentExpr()
+		return ast.AssigmentExpr{
+			Kind:    astTypes.AssigmentExpr,
+			Assigne: left,
+			Value:   value,
+		}
+	}
+
+	return left
 }
 
 func (p *Parser) parsePrimaryExpr() ast.Expr {

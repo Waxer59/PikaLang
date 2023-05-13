@@ -70,6 +70,15 @@ func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env in
 	return env.DeclareVar(variableDeclaration.Identifier, value, variableDeclaration.Constant)
 }
 
+func evalAssignment(assignment ast.AssigmentExpr, env interpreterEnvironment.Environment) interpreterValues.RuntimeValue {
+	if assignment.Assigne.GetKind() != astTypes.Identifier {
+		panic("Invalid assignment target")
+	}
+
+	varName := assignment.Assigne.(ast.Identifier).Symbol
+	return env.AssignVar(varName, Evaluate(assignment.Value, env))
+}
+
 func Evaluate(astNode ast.Stmt, env interpreterEnvironment.Environment) interpreterValues.RuntimeValue {
 	switch astNode.GetKind() {
 	case astTypes.NumericLiteral:
@@ -83,6 +92,8 @@ func Evaluate(astNode ast.Stmt, env interpreterEnvironment.Environment) interpre
 		return evalIdentifier(astNode.(ast.Identifier), env)
 	case astTypes.VariableDeclaration:
 		return evalVariableDeclaration(astNode.(ast.VariableDeclaration), env)
+	case astTypes.AssigmentExpr:
+		return evalAssignment(astNode.(ast.AssigmentExpr), env)
 	default:
 		panic("This AST node is not supported")
 	}
