@@ -202,6 +202,15 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 	errorMsg := ""
 
 	switch tk {
+	case token_type.BooleanLiteral:
+		b, err := strconv.ParseBool(p.subtract().Value)
+		if err != nil {
+			panic("Something went wrong with parsing: " + err.Error())
+		}
+		return ast.BooleanLiteral{Kind: ast_types.BooleanLiteral, Value: b}
+	case token_type.Null:
+		p.subtract() // consume 'null'
+		return ast.NullLiteral{Kind: ast_types.NullLiteral, Value: nil}
 	case token_type.Identifier:
 		return ast.Identifier{Kind: ast_types.Identifier, Symbol: p.subtract().Value}
 	case token_type.Number:

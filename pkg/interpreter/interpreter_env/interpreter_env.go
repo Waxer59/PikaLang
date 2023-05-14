@@ -1,9 +1,5 @@
 package interpreter_env
 
-import (
-	"fmt"
-)
-
 type Environment struct {
 	parent    *Environment
 	variables map[string]interface{}
@@ -19,7 +15,6 @@ func New(parentENV *Environment) Environment {
 }
 
 func (e *Environment) DeclareVar(varName string, value RuntimeValue, constant bool) RuntimeValue {
-	fmt.Println("Declaring variable " + varName)
 
 	if _, ok := e.variables[varName]; ok {
 		panic("Variable already exists")

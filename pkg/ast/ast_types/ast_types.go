@@ -20,6 +20,8 @@ const (
 	Property       NodeType = "Property"
 	NumericLiteral NodeType = "NumericLiteral"
 	NullLiteral    NodeType = "NullLiteral"
+	BooleanLiteral NodeType = "BooleanLiteral"
+	StringLiteral  NodeType = "StringLiteral"
 )
 
 var (

@@ -12,6 +12,10 @@ type AssigmentExpr struct {
 	Value   Expr
 }
 
+func (a AssigmentExpr) GetKind() ast_types.NodeType {
+	return a.Kind
+}
+
 type BinaryExpr struct {
 	Kind     ast_types.NodeType
 	Left     Expr
@@ -19,10 +23,18 @@ type BinaryExpr struct {
 	Operator string
 }
 
+func (b BinaryExpr) GetKind() ast_types.NodeType {
+	return b.Kind
+}
+
 type CallExpr struct {
 	Kind   ast_types.NodeType
 	Args   []Expr
 	Caller Expr
+}
+
+func (c CallExpr) GetKind() ast_types.NodeType {
+	return c.Kind
 }
 
 type MemberExpr struct {
@@ -32,6 +44,10 @@ type MemberExpr struct {
 	Computed bool
 }
 
+func (m MemberExpr) GetKind() ast_types.NodeType {
+	return m.Kind
+}
+
 type Identifier struct {
 	Kind   ast_types.NodeType
 	Symbol string
@@ -39,20 +55,4 @@ type Identifier struct {
 
 func (i Identifier) GetKind() ast_types.NodeType {
 	return i.Kind
-}
-
-func (m MemberExpr) GetKind() ast_types.NodeType {
-	return m.Kind
-}
-
-func (c CallExpr) GetKind() ast_types.NodeType {
-	return c.Kind
-}
-
-func (a AssigmentExpr) GetKind() ast_types.NodeType {
-	return a.Kind
-}
-
-func (b BinaryExpr) GetKind() ast_types.NodeType {
-	return b.Kind
 }

@@ -21,7 +21,7 @@ type RuntimeValue interface {
 
 type NullVal struct {
 	Type  ValueType
-	Value interface{} // <-- nil
+	Value interface{} // nil
 }
 
 type BooleanVal struct {

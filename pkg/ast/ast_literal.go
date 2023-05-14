@@ -2,15 +2,27 @@ package ast
 
 import "pika/pkg/ast/ast_types"
 
+type Property struct {
+	Kind  ast_types.NodeType
+	Key   string
+	Value Expr
+}
+
+func (p Property) GetKind() ast_types.NodeType {
+	return p.Kind
+}
+
 type NumericLiteral struct {
 	Kind  ast_types.NodeType
 	Value int
 }
 
-type Property struct {
-	Kind  ast_types.NodeType
-	Key   string
-	Value Expr
+func (n NumericLiteral) GetKind() ast_types.NodeType {
+	return n.Kind
+}
+
+func (n NumericLiteral) GetValue() interface{} {
+	return n.Value
 }
 
 type ObjectLiteral struct {
@@ -22,14 +34,20 @@ func (o ObjectLiteral) GetKind() ast_types.NodeType {
 	return o.Kind
 }
 
-func (p Property) GetKind() ast_types.NodeType {
-	return p.Kind
+type NullLiteral struct {
+	Kind  ast_types.NodeType
+	Value interface{} // nil
 }
 
-func (n NumericLiteral) GetKind() ast_types.NodeType {
+func (n NullLiteral) GetKind() ast_types.NodeType {
 	return n.Kind
 }
 
-func (n NumericLiteral) GetValue() interface{} {
-	return n.Value
+type BooleanLiteral struct {
+	Kind  ast_types.NodeType
+	Value bool
+}
+
+func (b BooleanLiteral) GetKind() ast_types.NodeType {
+	return b.Kind
 }
