@@ -210,10 +210,10 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 			panic("Something went wrong with parsing: " + err.Error())
 		}
 		return ast.NumericLiteral{Kind: ast_types.NumericLiteral, Value: n}
-	case token_type.RightParen:
-		p.subtract()
+	case token_type.LeftParen:
+		p.subtract() // consume '('
 		value := p.parseExpr()
-		p.expect(token_type.LeftParen, "Expected ')'")
+		p.expect(token_type.RightParen, "Expected ')'")
 		return value
 	default:
 		errorMsg = "Expected an expression"
