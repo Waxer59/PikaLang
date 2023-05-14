@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"pika/pkg/ast"
 	"pika/pkg/ast/astTypes"
 	"pika/pkg/lexer/lexerTypes"
@@ -19,8 +18,6 @@ func (p *Parser) parseStmt() ast.Stmt {
 func (p *Parser) parseVarDeclaration() ast.Stmt {
 	isConstant := p.subtract().Type == lexerTypes.Const
 	identifier := p.expect(lexerTypes.Identifier, "Expected identifier name following 'const' or 'var'").Value
-
-	fmt.Println(p)
 
 	if p.at().Type != lexerTypes.Equals {
 		if isConstant {

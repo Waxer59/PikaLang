@@ -59,6 +59,14 @@ func Tokenize(line string) []lexerTypes.Token {
 			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.RightParen, Value: tokenStr})
 		case ")":
 			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.LeftParen, Value: tokenStr})
+		case "{":
+			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.LeftBrace, Value: tokenStr})
+		case "}":
+			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.RightBrace, Value: tokenStr})
+		case ",":
+			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.Comma, Value: tokenStr})
+		case ":":
+			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.Colon, Value: tokenStr})
 		default:
 			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.Identifier, Value: tokenStr})
 		}

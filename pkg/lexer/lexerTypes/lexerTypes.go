@@ -13,15 +13,17 @@ const (
 	Func
 
 	// Operators
-	BinaryOperator
-	Equals
+	BinaryOperator // + - * /
+	Equals         // =
 
 	// Grouping
-	RightParen
-	LeftParen
-	RightBrace
-	LeftBrace
-	SemiColon
+	RightParen // )
+	LeftParen  // (
+	RightBrace // }
+	LeftBrace  // {
+	Colon      // :
+	SemiColon  // ;
+	Comma      // ,
 
 	// End Of File
 	EOF
@@ -33,7 +35,7 @@ var KEYWORDS = map[string]TokenType{
 	"func":  Func,
 }
 
-var SkippableChars = []string{" ", "\t", "\n"}
+var SkippableChars = []string{" ", "\t", "\n", "\r"}
 
 type Token struct {
 	Value string

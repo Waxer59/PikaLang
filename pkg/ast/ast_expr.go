@@ -19,6 +19,15 @@ type BinaryExpr struct {
 	Operator string
 }
 
+type Identifier struct {
+	Kind   astTypes.NodeType
+	Symbol string
+}
+
+func (i Identifier) GetKind() astTypes.NodeType {
+	return i.Kind
+}
+
 func (a AssigmentExpr) GetKind() astTypes.NodeType {
 	return a.Kind
 }

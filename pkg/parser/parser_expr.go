@@ -47,8 +47,60 @@ func (p *Parser) parseExpr() ast.Expr {
 	return p.parseAssigmentExpr()
 }
 
+func (p *Parser) parseObjectExpr() ast.Expr {
+	if p.at().Type != lexerTypes.LeftBrace {
+		return p.parseAdditiveExpr()
+	}
+
+	p.subtract() // advance post open brace
+
+	properties := []ast.Property{}
+
+	for p.notEOF() && p.at().Type != lexerTypes.RightBrace {
+		key := p.expect(lexerTypes.Identifier, "Expected a key").Value
+
+		// Allows shorthand syntax: { key, } && { key }
+		switch p.at().Type {
+		case lexerTypes.Comma:
+			p.subtract()
+			properties = append(properties, ast.Property{
+				Kind:  astTypes.Property,
+				Key:   key,
+				Value: nil,
+			})
+			continue
+		case lexerTypes.RightBrace:
+			properties = append(properties, ast.Property{
+				Kind:  astTypes.Property,
+				Key:   key,
+				Value: nil,
+			})
+			continue
+		}
+
+		p.expect(lexerTypes.Colon, "Expected ':'")
+		value := p.parseExpr()
+
+		properties = append(properties, ast.Property{
+			Kind:  astTypes.Property,
+			Key:   key,
+			Value: value,
+		})
+
+		if p.at().Type != lexerTypes.RightBrace {
+			p.expect(lexerTypes.Comma, "Expected ',' or '}'")
+		}
+	}
+
+	p.expect(lexerTypes.RightBrace, "Expected '}'")
+	return ast.ObjectLiteral{
+		Kind:       astTypes.ObjectLiteral,
+		Properties: properties,
+	}
+}
+
 func (p *Parser) parseAssigmentExpr() ast.Expr {
-	var left = p.parseAdditiveExpr()
+	var left = p.parseObjectExpr()
 
 	if p.at().Type == lexerTypes.Equals {
 		p.subtract() // consume '='

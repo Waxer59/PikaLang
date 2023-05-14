@@ -8,10 +8,14 @@ const (
 	VariableDeclaration NodeType = "VariableDeclaration"
 
 	// EXPRESSIONS
+	AssigmentExpr NodeType = "AssigmentExpr"
+	BinaryExpr    NodeType = "BinaryExpr"
+	Identifier    NodeType = "Identifier"
+
+	// LITERALS
+	ObjectLiteral  NodeType = "ObjectLiteral"
+	Property       NodeType = "Property"
 	NumericLiteral NodeType = "NumericLiteral"
-	AssigmentExpr  NodeType = "AssigmentExpr"
-	Identifier     NodeType = "Identifier"
-	BinaryExpr     NodeType = "BinaryExpr"
 	NullLiteral    NodeType = "NullLiteral"
 )
 

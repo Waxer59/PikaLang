@@ -6,6 +6,7 @@ const (
 	Null    ValueType = "null"
 	Number  ValueType = "number"
 	Boolean ValueType = "boolean"
+	Object  ValueType = "object"
 )
 
 type RuntimeValue interface {
@@ -25,6 +26,15 @@ type BooleanVal struct {
 type NumberVal struct {
 	Type  ValueType
 	Value int
+}
+
+type ObjectVal struct {
+	Type       ValueType
+	Properties map[string]RuntimeValue
+}
+
+func (o ObjectVal) GetType() ValueType {
+	return o.Type
 }
 
 func (n NullVal) GetType() ValueType {

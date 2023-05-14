@@ -1,7 +1,6 @@
 package interpreterEnvironment
 
 import (
-	"fmt"
 	"pika/pkg/interpreter/interpreterValues"
 )
 
@@ -46,7 +45,6 @@ func (e *Environment) AssignVar(varName string, value interpreterValues.RuntimeV
 
 // Returns the environment that contains the variable
 func (e *Environment) Resolve(varName string) Environment {
-	fmt.Println(*e)
 	if _, ok := e.variables[varName]; ok {
 		return *e
 	}

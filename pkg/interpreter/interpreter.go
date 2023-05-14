@@ -79,6 +79,30 @@ func evalAssignment(assignment ast.AssigmentExpr, env interpreterEnvironment.Env
 	return env.AssignVar(varName, Evaluate(assignment.Value, env))
 }
 
+func evalObjectExpr(objectExpr ast.ObjectLiteral, env interpreterEnvironment.Environment) interpreterValues.RuntimeValue {
+	obj := interpreterValues.ObjectVal{
+		Type:       interpreterValues.Object,
+		Properties: make(map[string]interpreterValues.RuntimeValue),
+	}
+
+	for _, property := range objectExpr.Properties {
+		key := property.Key
+		value := property.Value
+
+		var runtimeValue interpreterValues.RuntimeValue
+
+		if value == nil {
+			runtimeValue = env.LookupVar(key)
+		} else {
+			runtimeValue = Evaluate(value, env)
+		}
+
+		obj.Properties[key] = runtimeValue
+	}
+
+	return obj
+}
+
 func Evaluate(astNode ast.Stmt, env interpreterEnvironment.Environment) interpreterValues.RuntimeValue {
 	switch astNode.GetKind() {
 	case astTypes.NumericLiteral:
@@ -92,6 +116,8 @@ func Evaluate(astNode ast.Stmt, env interpreterEnvironment.Environment) interpre
 		return evalIdentifier(astNode.(ast.Identifier), env)
 	case astTypes.VariableDeclaration:
 		return evalVariableDeclaration(astNode.(ast.VariableDeclaration), env)
+	case astTypes.ObjectLiteral:
+		return evalObjectExpr(astNode.(ast.ObjectLiteral), env)
 	case astTypes.AssigmentExpr:
 		return evalAssignment(astNode.(ast.AssigmentExpr), env)
 	default:

@@ -6,4 +6,5 @@ const (
 	Success ExitCode = iota
 	FileNameError
 	FileReadError
+	GetWDError
 )
