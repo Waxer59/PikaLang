@@ -1,7 +1,7 @@
-package lexerUtils
+package lexer
 
 import (
-	"pika/pkg/lexer/lexerTypes"
+	"pika/pkg/lexer/token_type"
 	"strconv"
 	"strings"
 
@@ -9,7 +9,7 @@ import (
 )
 
 func IsSkippable(char string) bool {
-	return slices.Contains(lexerTypes.SkippableChars, char)
+	return slices.Contains(token_type.SkippableChars, char)
 }
 
 func NextChar(src *[]string) string {
@@ -20,7 +20,7 @@ func NextChar(src *[]string) string {
 
 /*  FirstReturn: Number extracted
  * 	SecondReturn: Rest of the string
- **/
+ */
 func ExtractInt(src []string) (string, []string) {
 	var num = ""
 
@@ -33,7 +33,7 @@ func ExtractInt(src []string) (string, []string) {
 
 /*  FirstReturn: String extracted
  * 	SecondReturn: Rest of the string
- **/
+ */
 func ExtractAlpha(src []string) (string, []string) {
 	var str = ""
 
@@ -50,9 +50,9 @@ func IsAlpha(char string) bool {
 
 /*  FirstReturn: Keyword extracted
  * 	SecondReturn: Is the keyword valid
- **/
-func IsKeyword(src string) (lexerTypes.TokenType, bool) {
-	keyword, ok := lexerTypes.KEYWORDS[src]
+ */
+func IsKeyword(src string) (token_type.TokenType, bool) {
+	keyword, ok := token_type.KEYWORDS[src]
 
 	return keyword, ok
 }

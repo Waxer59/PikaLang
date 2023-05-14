@@ -1,32 +1,32 @@
 package ast
 
-import "pika/pkg/ast/astTypes"
+import "pika/pkg/ast/ast_types"
 
 type NumericLiteral struct {
-	Kind  astTypes.NodeType
+	Kind  ast_types.NodeType
 	Value int
 }
 
 type Property struct {
-	Kind  astTypes.NodeType
+	Kind  ast_types.NodeType
 	Key   string
 	Value Expr
 }
 
 type ObjectLiteral struct {
-	Kind       astTypes.NodeType
+	Kind       ast_types.NodeType
 	Properties []Property
 }
 
-func (o ObjectLiteral) GetKind() astTypes.NodeType {
+func (o ObjectLiteral) GetKind() ast_types.NodeType {
 	return o.Kind
 }
 
-func (p Property) GetKind() astTypes.NodeType {
+func (p Property) GetKind() ast_types.NodeType {
 	return p.Kind
 }
 
-func (n NumericLiteral) GetKind() astTypes.NodeType {
+func (n NumericLiteral) GetKind() ast_types.NodeType {
 	return n.Kind
 }
 

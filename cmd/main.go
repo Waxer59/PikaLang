@@ -1,6 +1,8 @@
 package main
 
-import "pika/pkg/cli"
+import (
+	"pika/pkg/cli"
+)
 
 func main() {
 	err := cli.New()

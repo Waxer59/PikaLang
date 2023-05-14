@@ -1,4 +1,4 @@
-package lexerTypes
+package token_type
 
 type TokenType int
 
@@ -10,20 +10,25 @@ const (
 	// Keywords
 	Var
 	Const
-	Func
+	Fn
 
 	// Operators
 	BinaryOperator // + - * /
 	Equals         // =
 
 	// Grouping
-	RightParen // )
-	LeftParen  // (
-	RightBrace // }
-	LeftBrace  // {
-	Colon      // :
-	SemiColon  // ;
-	Comma      // ,
+	LeftParen    // (
+	RightParen   // )
+	RightBrace   // }
+	LeftBrace    // {
+	RightBracket // ]
+	LeftBracket  // [
+	Colon        // :
+	SemiColon    // ;
+	Comma        // ,
+	Dot          // .
+	DoubleQoute  // "
+	SingleQoute  // '
 
 	// End Of File
 	EOF
@@ -32,7 +37,7 @@ const (
 var KEYWORDS = map[string]TokenType{
 	"var":   Var,
 	"const": Const,
-	"func":  Func,
+	"fn":    Fn,
 }
 
 var SkippableChars = []string{" ", "\t", "\n", "\r"}

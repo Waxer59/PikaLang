@@ -1,20 +1,20 @@
 package parser
 
-import "pika/pkg/lexer/lexerTypes"
+import "pika/pkg/lexer/token_type"
 
-func (p *Parser) at() lexerTypes.Token {
+func (p *Parser) at() token_type.Token {
 	return p.tokens[0]
 }
 
-func (p *Parser) subtract() lexerTypes.Token {
+func (p *Parser) subtract() token_type.Token {
 	prev := p.at()
 	p.tokens = p.tokens[1:]
 	return prev
 }
 
-func (p *Parser) expect(typeExpected lexerTypes.TokenType, errMsg string) lexerTypes.Token {
+func (p *Parser) expect(typeExpected token_type.TokenType, errMsg string) token_type.Token {
 	prev := p.subtract()
-	if (prev == lexerTypes.Token{} || prev.Type != typeExpected) {
+	if (prev == token_type.Token{} || prev.Type != typeExpected) {
 		panic("Parser Error:\n" + errMsg)
 	}
 
@@ -22,5 +22,5 @@ func (p *Parser) expect(typeExpected lexerTypes.TokenType, errMsg string) lexerT
 }
 
 func (p *Parser) notEOF() bool {
-	return p.at().Type != lexerTypes.EOF
+	return p.at().Type != token_type.EOF
 }

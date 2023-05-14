@@ -2,8 +2,8 @@ package parser
 
 import (
 	"pika/pkg/ast"
-	"pika/pkg/ast/astTypes"
-	"pika/pkg/lexer/lexerTypes"
+	"pika/pkg/ast/ast_types"
+	"pika/pkg/lexer/token_type"
 	"strconv"
 
 	"golang.org/x/exp/slices"
@@ -12,11 +12,11 @@ import (
 func (p *Parser) parseAdditiveExpr() ast.Expr {
 	var left = p.parseMultiplicativeExpr()
 
-	for slices.Contains(astTypes.AdditiveExpr, p.at().Value) {
+	for slices.Contains(ast_types.AdditiveExpr, p.at().Value) {
 		var op = p.subtract().Value
 		var right = p.parseMultiplicativeExpr()
 		left = ast.BinaryExpr{
-			Kind:     astTypes.BinaryExpr,
+			Kind:     ast_types.BinaryExpr,
 			Left:     left,
 			Right:    right,
 			Operator: op,
@@ -27,13 +27,13 @@ func (p *Parser) parseAdditiveExpr() ast.Expr {
 }
 
 func (p *Parser) parseMultiplicativeExpr() ast.Expr {
-	var left = p.parsePrimaryExpr()
+	var left = p.parseCallMemberExpr()
 
-	for slices.Contains(astTypes.MultiplicativeExpr, p.at().Value) {
+	for slices.Contains(ast_types.MultiplicativeExpr, p.at().Value) {
 		var op = p.subtract().Value
-		var right = p.parsePrimaryExpr()
+		var right = p.parseCallMemberExpr()
 		left = ast.BinaryExpr{
-			Kind:     astTypes.BinaryExpr,
+			Kind:     ast_types.BinaryExpr,
 			Left:     left,
 			Right:    right,
 			Operator: op,
@@ -43,12 +43,94 @@ func (p *Parser) parseMultiplicativeExpr() ast.Expr {
 	return left
 }
 
+func (p *Parser) parseCallMemberExpr() ast.Expr {
+	member := p.parseMemberExpr()
+
+	if p.at().Type == token_type.LeftParen {
+		return p.parseCallExpr(member)
+	}
+
+	return member
+}
+
+func (p *Parser) parseCallExpr(caller ast.Expr) ast.Expr {
+	var callExpr ast.Expr = ast.CallExpr{
+		Kind:   ast_types.CallExpr,
+		Caller: caller,
+		Args:   p.parseArgs(),
+	}
+
+	if p.at().Type == token_type.LeftParen {
+		callExpr = p.parseCallExpr(callExpr)
+	}
+
+	return callExpr
+}
+
+func (p *Parser) parseArgs() []ast.Expr {
+	p.expect(token_type.LeftParen, "Expected '('")
+
+	args := []ast.Expr{}
+
+	if p.at().Type != token_type.RightParen {
+		args = p.parseArgsList()
+	}
+
+	p.expect(token_type.RightParen, "Expected ')'")
+
+	return args
+}
+
+func (p *Parser) parseArgsList() []ast.Expr {
+	args := []ast.Expr{p.parseAssigmentExpr()}
+
+	for p.at().Type == token_type.Comma && p.subtract().Type == token_type.Comma {
+		args = append(args, p.parseAssigmentExpr())
+	}
+
+	return args
+}
+
+func (p *Parser) parseMemberExpr() ast.Expr {
+	obj := p.parsePrimaryExpr()
+
+	for p.at().Type == token_type.Dot || p.at().Type == token_type.LeftBracket {
+		operator := p.subtract()
+		var property ast.Expr
+		var computed bool
+
+		switch operator.Type {
+		case token_type.Dot:
+			computed = false
+			property = p.parsePrimaryExpr()
+
+			if property.GetKind() != ast_types.Identifier {
+				panic("Expected identifier")
+			}
+		case token_type.LeftBracket:
+			computed = true
+			property = p.parseExpr()
+
+			p.expect(token_type.RightBracket, "Expected ']'")
+		}
+
+		obj = ast.MemberExpr{
+			Kind:     ast_types.MemberExpr,
+			Object:   obj,
+			Property: property,
+			Computed: computed,
+		}
+	}
+
+	return obj
+}
+
 func (p *Parser) parseExpr() ast.Expr {
 	return p.parseAssigmentExpr()
 }
 
 func (p *Parser) parseObjectExpr() ast.Expr {
-	if p.at().Type != lexerTypes.LeftBrace {
+	if p.at().Type != token_type.LeftBrace {
 		return p.parseAdditiveExpr()
 	}
 
@@ -56,45 +138,45 @@ func (p *Parser) parseObjectExpr() ast.Expr {
 
 	properties := []ast.Property{}
 
-	for p.notEOF() && p.at().Type != lexerTypes.RightBrace {
-		key := p.expect(lexerTypes.Identifier, "Expected a key").Value
+	for p.notEOF() && p.at().Type != token_type.RightBrace {
+		key := p.expect(token_type.Identifier, "Expected a key").Value
 
 		// Allows shorthand syntax: { key, } && { key }
 		switch p.at().Type {
-		case lexerTypes.Comma:
+		case token_type.Comma:
 			p.subtract()
 			properties = append(properties, ast.Property{
-				Kind:  astTypes.Property,
+				Kind:  ast_types.Property,
 				Key:   key,
 				Value: nil,
 			})
 			continue
-		case lexerTypes.RightBrace:
+		case token_type.RightBrace:
 			properties = append(properties, ast.Property{
-				Kind:  astTypes.Property,
+				Kind:  ast_types.Property,
 				Key:   key,
 				Value: nil,
 			})
 			continue
 		}
 
-		p.expect(lexerTypes.Colon, "Expected ':'")
+		p.expect(token_type.Colon, "Expected ':'")
 		value := p.parseExpr()
 
 		properties = append(properties, ast.Property{
-			Kind:  astTypes.Property,
+			Kind:  ast_types.Property,
 			Key:   key,
 			Value: value,
 		})
 
-		if p.at().Type != lexerTypes.RightBrace {
-			p.expect(lexerTypes.Comma, "Expected ',' or '}'")
+		if p.at().Type != token_type.RightBrace {
+			p.expect(token_type.Comma, "Expected ',' or '}'")
 		}
 	}
 
-	p.expect(lexerTypes.RightBrace, "Expected '}'")
+	p.expect(token_type.RightBrace, "Expected '}'")
 	return ast.ObjectLiteral{
-		Kind:       astTypes.ObjectLiteral,
+		Kind:       ast_types.ObjectLiteral,
 		Properties: properties,
 	}
 }
@@ -102,11 +184,11 @@ func (p *Parser) parseObjectExpr() ast.Expr {
 func (p *Parser) parseAssigmentExpr() ast.Expr {
 	var left = p.parseObjectExpr()
 
-	if p.at().Type == lexerTypes.Equals {
+	if p.at().Type == token_type.Equals {
 		p.subtract() // consume '='
 		value := p.parseAssigmentExpr()
 		return ast.AssigmentExpr{
-			Kind:    astTypes.AssigmentExpr,
+			Kind:    ast_types.AssigmentExpr,
 			Assigne: left,
 			Value:   value,
 		}
@@ -120,18 +202,18 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 	errorMsg := ""
 
 	switch tk {
-	case lexerTypes.Identifier:
-		return ast.Identifier{Kind: astTypes.Identifier, Symbol: p.subtract().Value}
-	case lexerTypes.Number:
+	case token_type.Identifier:
+		return ast.Identifier{Kind: ast_types.Identifier, Symbol: p.subtract().Value}
+	case token_type.Number:
 		n, err := strconv.Atoi(p.subtract().Value)
 		if err != nil {
 			panic("Something went wrong with parsing: " + err.Error())
 		}
-		return ast.NumericLiteral{Kind: astTypes.NumericLiteral, Value: n}
-	case lexerTypes.RightParen:
+		return ast.NumericLiteral{Kind: ast_types.NumericLiteral, Value: n}
+	case token_type.RightParen:
 		p.subtract()
 		value := p.parseExpr()
-		p.expect(lexerTypes.LeftParen, "Expected ')'")
+		p.expect(token_type.LeftParen, "Expected ')'")
 		return value
 	default:
 		errorMsg = "Expected an expression"

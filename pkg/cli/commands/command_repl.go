@@ -6,7 +6,6 @@ import (
 	"os"
 	"pika/pkg/cli/exitCodes"
 	"pika/pkg/interpreter"
-	"pika/pkg/interpreter/interpreterEnvironment"
 	"pika/pkg/parser"
 
 	"github.com/urfave/cli/v2"
@@ -24,7 +23,7 @@ func SetUpRepl(app *cli.App) *cli.Command {
 
 func startRepl(cCtx *cli.Context) error {
 	parser := parser.New()
-	env := interpreterEnvironment.New(nil)
+	env := interpreter.NewEnvironment(nil)
 
 	for {
 		fmt.Print("> ")

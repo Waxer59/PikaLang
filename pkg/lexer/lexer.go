@@ -1,47 +1,46 @@
 package lexer
 
 import (
-	"pika/pkg/lexer/lexerTypes"
-	"pika/pkg/lexer/lexerUtils"
+	"pika/pkg/lexer/token_type"
 	"strings"
 )
 
-func Tokenize(line string) []lexerTypes.Token {
-	tokens := []lexerTypes.Token{}
+func Tokenize(line string) []token_type.Token {
+	tokens := []token_type.Token{}
 	src := strings.Split(line, "")
 
 	for len(src) > 0 {
 		tokenStr := src[0]
 		// Check if token is skippable
-		if lexerUtils.IsSkippable(tokenStr) {
+		if IsSkippable(tokenStr) {
 			src = src[1:]
 			continue
 		}
 
 		// Check for keywords
-		if keyword, ok := lexerTypes.KEYWORDS[tokenStr]; ok {
-			tokens = append(tokens, lexerTypes.Token{Type: keyword, Value: tokenStr})
+		if keyword, ok := token_type.KEYWORDS[tokenStr]; ok {
+			tokens = append(tokens, token_type.Token{Type: keyword, Value: tokenStr})
 			continue
 		}
 
 		// Check for number
-		if lexerUtils.IsInt(tokenStr) {
-			num, rest := lexerUtils.ExtractInt(src)
-			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.Number, Value: num})
+		if IsInt(tokenStr) {
+			num, rest := ExtractInt(src)
+			tokens = append(tokens, token_type.Token{Type: token_type.Number, Value: num})
 			src = rest
 			continue
 		}
 
 		// Check for alpha
-		if lexerUtils.IsAlpha(tokenStr) {
-			alpha, rest := lexerUtils.ExtractAlpha(src)
-			alphaType := lexerTypes.Identifier
+		if IsAlpha(tokenStr) {
+			alpha, rest := ExtractAlpha(src)
+			alphaType := token_type.Identifier
 
-			if keyword, ok := lexerUtils.IsKeyword(alpha); ok {
+			if keyword, ok := IsKeyword(alpha); ok {
 				alphaType = keyword
 			}
 
-			tokens = append(tokens, lexerTypes.Token{Type: alphaType, Value: alpha})
+			tokens = append(tokens, token_type.Token{Type: alphaType, Value: alpha})
 
 			src = rest
 			continue
@@ -50,30 +49,40 @@ func Tokenize(line string) []lexerTypes.Token {
 		// Check for operators
 		switch tokenStr {
 		case "+", "-", "*", "/", "%":
-			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.BinaryOperator, Value: tokenStr})
+			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: tokenStr})
 		case "=":
-			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.Equals, Value: tokenStr})
+			tokens = append(tokens, token_type.Token{Type: token_type.Equals, Value: tokenStr})
 		case ";":
-			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.SemiColon, Value: tokenStr})
+			tokens = append(tokens, token_type.Token{Type: token_type.SemiColon, Value: tokenStr})
 		case "(":
-			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.RightParen, Value: tokenStr})
+			tokens = append(tokens, token_type.Token{Type: token_type.LeftParen, Value: tokenStr})
 		case ")":
-			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.LeftParen, Value: tokenStr})
+			tokens = append(tokens, token_type.Token{Type: token_type.RightParen, Value: tokenStr})
 		case "{":
-			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.LeftBrace, Value: tokenStr})
+			tokens = append(tokens, token_type.Token{Type: token_type.LeftBrace, Value: tokenStr})
 		case "}":
-			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.RightBrace, Value: tokenStr})
+			tokens = append(tokens, token_type.Token{Type: token_type.RightBrace, Value: tokenStr})
+		case "[":
+			tokens = append(tokens, token_type.Token{Type: token_type.LeftBracket, Value: tokenStr})
+		case "]":
+			tokens = append(tokens, token_type.Token{Type: token_type.RightBracket, Value: tokenStr})
 		case ",":
-			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.Comma, Value: tokenStr})
+			tokens = append(tokens, token_type.Token{Type: token_type.Comma, Value: tokenStr})
 		case ":":
-			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.Colon, Value: tokenStr})
+			tokens = append(tokens, token_type.Token{Type: token_type.Colon, Value: tokenStr})
+		case ".":
+			tokens = append(tokens, token_type.Token{Type: token_type.Dot, Value: tokenStr})
+		case "\"":
+			tokens = append(tokens, token_type.Token{Type: token_type.DoubleQoute, Value: tokenStr})
+		case "'":
+			tokens = append(tokens, token_type.Token{Type: token_type.SingleQoute, Value: tokenStr})
 		default:
-			tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.Identifier, Value: tokenStr})
+			tokens = append(tokens, token_type.Token{Type: token_type.Identifier, Value: tokenStr})
 		}
 
 		// Remove token
 		src = src[1:]
 	}
-	tokens = append(tokens, lexerTypes.Token{Type: lexerTypes.EOF, Value: "EndOfFile"})
+	tokens = append(tokens, token_type.Token{Type: token_type.EOF, Value: "EndOfFile"})
 	return tokens
 }

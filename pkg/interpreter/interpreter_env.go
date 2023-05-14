@@ -1,7 +1,7 @@
-package interpreterEnvironment
+package interpreter
 
 import (
-	"pika/pkg/interpreter/interpreterValues"
+	"fmt"
 )
 
 type Environment struct {
@@ -10,7 +10,7 @@ type Environment struct {
 	constants map[string]interface{}
 }
 
-func New(parentENV *Environment) Environment {
+func NewEnvironment(parentENV *Environment) Environment {
 	return Environment{
 		parent:    parentENV,
 		variables: make(map[string]interface{}),
@@ -18,7 +18,9 @@ func New(parentENV *Environment) Environment {
 	}
 }
 
-func (e *Environment) DeclareVar(varName string, value interpreterValues.RuntimeValue, constant bool) interpreterValues.RuntimeValue {
+func (e *Environment) DeclareVar(varName string, value RuntimeValue, constant bool) RuntimeValue {
+	fmt.Println("Declaring variable " + varName)
+
 	if _, ok := e.variables[varName]; ok {
 		panic("Variable already exists")
 	}
@@ -32,7 +34,7 @@ func (e *Environment) DeclareVar(varName string, value interpreterValues.Runtime
 	return value
 }
 
-func (e *Environment) AssignVar(varName string, value interpreterValues.RuntimeValue) interpreterValues.RuntimeValue {
+func (e *Environment) AssignVar(varName string, value RuntimeValue) RuntimeValue {
 	if _, ok := e.constants[varName]; ok {
 		panic("Cannot reassign to a constant: " + varName)
 	}
@@ -56,7 +58,7 @@ func (e *Environment) Resolve(varName string) Environment {
 	return e.parent.Resolve(varName)
 }
 
-func (e *Environment) LookupVar(varName string) interpreterValues.RuntimeValue {
+func (e *Environment) LookupVar(varName string) RuntimeValue {
 	env := e.Resolve(varName)
-	return env.variables[varName].(interpreterValues.RuntimeValue)
+	return env.variables[varName].(RuntimeValue)
 }
