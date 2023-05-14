@@ -6,7 +6,8 @@ import (
 	"path/filepath"
 	"pika/internal/utils"
 	"pika/pkg/cli/exitCodes"
-	"pika/pkg/interpreter"
+	"pika/pkg/interpreter/interpreter_env"
+	"pika/pkg/interpreter/interpreter_eval"
 	"pika/pkg/parser"
 
 	"github.com/urfave/cli/v2"
@@ -26,7 +27,7 @@ func SetUpRunCommand(app *cli.App) *cli.Command {
 
 func runApp(cCtx *cli.Context) error {
 	fileName := cCtx.Args().Get(0)
-	env := interpreter.NewEnvironment(nil)
+	env := interpreter_env.New(nil)
 	wd, err := os.Getwd()
 
 	if err != nil {
@@ -56,7 +57,7 @@ func runApp(cCtx *cli.Context) error {
 
 	fmt.Println("AST: ", program)
 
-	result := interpreter.Evaluate(program, env)
+	result := interpreter_eval.Evaluate(program, env)
 
 	fmt.Println("RESULT: ", result)
 

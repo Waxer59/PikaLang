@@ -1,6 +1,8 @@
-package interpreter
+package interpreter_env
 
-import "pika/pkg/ast"
+import (
+	"pika/pkg/ast"
+)
 
 type ValueType string
 

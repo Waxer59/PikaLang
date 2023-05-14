@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"os"
 	"pika/pkg/cli/exitCodes"
-	"pika/pkg/interpreter"
+	"pika/pkg/interpreter/interpreter_env"
+	"pika/pkg/interpreter/interpreter_eval"
 	"pika/pkg/parser"
 
 	"github.com/urfave/cli/v2"
@@ -23,7 +24,7 @@ func SetUpRepl(app *cli.App) *cli.Command {
 
 func startRepl(cCtx *cli.Context) error {
 	parser := parser.New()
-	env := interpreter.NewEnvironment(nil)
+	env := interpreter_env.New(nil)
 
 	for {
 		fmt.Print("> ")
@@ -38,7 +39,7 @@ func startRepl(cCtx *cli.Context) error {
 
 		program := parser.ProduceAST(code)
 
-		result := interpreter.Evaluate(program, env)
+		result := interpreter_eval.Evaluate(program, env)
 
 		fmt.Println(result)
 	}

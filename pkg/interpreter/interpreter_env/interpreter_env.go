@@ -1,4 +1,4 @@
-package interpreter
+package interpreter_env
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ type Environment struct {
 	constants map[string]interface{}
 }
 
-func NewEnvironment(parentENV *Environment) Environment {
+func New(parentENV *Environment) Environment {
 	return Environment{
 		parent:    parentENV,
 		variables: make(map[string]interface{}),
