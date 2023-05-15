@@ -59,7 +59,7 @@ func runApp(cCtx *cli.Context) error {
 		return fmt.Errorf(err.Error())
 	}
 
-	interpreter_eval.Evaluate(program, env)
+	interpreter_eval.Evaluate(*program, env)
 
 	return nil
 }
