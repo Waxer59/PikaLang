@@ -17,6 +17,7 @@ const (
 
 type RuntimeValue interface {
 	GetType() ValueType
+	GetValue() interface{}
 }
 
 type NullVal struct {
@@ -24,9 +25,25 @@ type NullVal struct {
 	Value interface{} // nil
 }
 
+func (n NullVal) GetType() ValueType {
+	return n.Type
+}
+
+func (n NullVal) GetValue() interface{} {
+	return nil
+}
+
 type BooleanVal struct {
 	Type  ValueType
 	Value bool
+}
+
+func (b BooleanVal) GetType() ValueType {
+	return b.Type
+}
+
+func (b BooleanVal) GetValue() interface{} {
+	return b.Value
 }
 
 type NumberVal struct {
@@ -34,9 +51,25 @@ type NumberVal struct {
 	Value int
 }
 
+func (n NumberVal) GetType() ValueType {
+	return n.Type
+}
+
+func (n NumberVal) GetValue() interface{} {
+	return n.Value
+}
+
 type ObjectVal struct {
 	Type       ValueType
 	Properties map[string]RuntimeValue
+}
+
+func (o ObjectVal) GetType() ValueType {
+	return o.Type
+}
+
+func (o ObjectVal) GetValue() interface{} {
+	return o.Properties
 }
 
 type FunctionCall = func(args []RuntimeValue, env Environment) RuntimeValue
@@ -49,22 +82,10 @@ type FunctionVal struct {
 	Body           []ast.Stmt
 }
 
-func (o ObjectVal) GetType() ValueType {
-	return o.Type
-}
-
 func (f FunctionVal) GetType() ValueType {
 	return f.Type
 }
 
-func (n NullVal) GetType() ValueType {
-	return n.Type
-}
-
-func (b BooleanVal) GetType() ValueType {
-	return b.Type
-}
-
-func (n NumberVal) GetType() ValueType {
-	return n.Type
+func (f FunctionVal) GetValue() interface{} {
+	return f.Body
 }

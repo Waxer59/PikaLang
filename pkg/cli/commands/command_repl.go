@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"pika/internal/utils"
 	"pika/pkg/cli/exitCodes"
 	"pika/pkg/interpreter/interpreter_env"
 	"pika/pkg/interpreter/interpreter_eval"
@@ -33,14 +34,14 @@ func startRepl(cCtx *cli.Context) error {
 		scanner.Scan()
 		code := scanner.Text()
 
-		if code == "exit" {
+		switch code {
+		case "exit":
 			return cli.Exit("Goodbye! :)", int(exitCodes.Success))
+		case "clear", "cls":
+			utils.CallClearConsoleSc()
 		}
 
 		program := parser.ProduceAST(code)
-
-		fmt.Println("AST: ", program)
-
 		result, _ := interpreter_eval.Evaluate(program, env)
 
 		fmt.Println(result)
