@@ -89,3 +89,16 @@ func (f FunctionVal) GetType() ValueType {
 func (f FunctionVal) GetValue() interface{} {
 	return f.Body
 }
+
+type StringVal struct {
+	Type  ValueType
+	Value string
+}
+
+func (s StringVal) GetType() ValueType {
+	return s.Type
+}
+
+func (s StringVal) GetValue() interface{} {
+	return s.Value
+}

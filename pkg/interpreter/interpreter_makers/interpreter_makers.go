@@ -22,3 +22,10 @@ func MK_Boolean(b bool) interpreter_env.BooleanVal {
 		Value: b,
 	}
 }
+
+func MK_String(s string) interpreter_env.StringVal {
+	return interpreter_env.StringVal{
+		Type:  interpreter_env.String,
+		Value: s,
+	}
+}

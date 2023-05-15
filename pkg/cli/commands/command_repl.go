@@ -42,6 +42,7 @@ func startRepl(cCtx *cli.Context) error {
 		}
 
 		program := parser.ProduceAST(code)
+		fmt.Println("AST: ", program)
 		result, _ := interpreter_eval.Evaluate(program, env)
 
 		fmt.Println(result)

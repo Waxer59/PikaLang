@@ -8,6 +8,7 @@ const (
 	Identifier
 	Null
 	BooleanLiteral
+	StringLiteral
 
 	// Keywords
 	Var

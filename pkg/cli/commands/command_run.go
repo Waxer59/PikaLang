@@ -55,11 +55,7 @@ func runApp(cCtx *cli.Context) error {
 
 	program := parser.ProduceAST(src)
 
-	fmt.Println("AST: ", program)
-
-	result, _ := interpreter_eval.Evaluate(program, env)
-
-	fmt.Println("RESULT: ", result)
+	interpreter_eval.Evaluate(program, env)
 
 	return nil
 }

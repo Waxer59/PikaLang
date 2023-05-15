@@ -219,6 +219,14 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 			panic("Something went wrong with parsing: " + err.Error())
 		}
 		return ast.NumericLiteral{Kind: ast_types.NumericLiteral, Value: n}
+	case token_type.DoubleQoute:
+		p.subtract() // consume '"'
+		value := p.subtract().Value
+		p.expect(token_type.DoubleQoute, "Expected '\"'")
+		return ast.StringLiteral{
+			Kind:  ast_types.StringLiteral,
+			Value: value,
+		}
 	case token_type.LeftParen:
 		p.subtract() // consume '('
 		value := p.parseExpr()

@@ -51,3 +51,12 @@ type BooleanLiteral struct {
 func (b BooleanLiteral) GetKind() ast_types.NodeType {
 	return b.Kind
 }
+
+type StringLiteral struct {
+	Kind  ast_types.NodeType
+	Value string
+}
+
+func (s StringLiteral) GetKind() ast_types.NodeType {
+	return s.Kind
+}
