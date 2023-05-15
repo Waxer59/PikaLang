@@ -57,7 +57,7 @@ func runApp(cCtx *cli.Context) error {
 
 	fmt.Println("AST: ", program)
 
-	result := interpreter_eval.Evaluate(program, env)
+	result, _ := interpreter_eval.Evaluate(program, env)
 
 	fmt.Println("RESULT: ", result)
 

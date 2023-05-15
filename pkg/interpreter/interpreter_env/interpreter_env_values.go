@@ -9,9 +9,9 @@ type ValueType string
 const (
 	Null     ValueType = "null"
 	Number   ValueType = "number"
+	String   ValueType = "string"
 	Boolean  ValueType = "boolean"
 	Object   ValueType = "object"
-	NativeFn ValueType = "nativeFn"
 	Function ValueType = "function"
 )
 
@@ -41,11 +41,6 @@ type ObjectVal struct {
 
 type FunctionCall = func(args []RuntimeValue, env Environment) RuntimeValue
 
-type NativeFnVal struct {
-	Type ValueType
-	Call FunctionCall
-}
-
 type FunctionVal struct {
 	Type           ValueType
 	Name           string
@@ -60,10 +55,6 @@ func (o ObjectVal) GetType() ValueType {
 
 func (f FunctionVal) GetType() ValueType {
 	return f.Type
-}
-
-func (n NativeFnVal) GetType() ValueType {
-	return n.Type
 }
 
 func (n NullVal) GetType() ValueType {

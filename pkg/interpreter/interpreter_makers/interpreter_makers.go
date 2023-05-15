@@ -22,10 +22,3 @@ func MK_Boolean(b bool) interpreter_env.BooleanVal {
 		Value: b,
 	}
 }
-
-func MK_NATIVE_FN(call interpreter_env.FunctionCall) interpreter_env.NativeFnVal {
-	return interpreter_env.NativeFnVal{
-		Type: interpreter_env.NativeFn,
-		Call: call,
-	}
-}
