@@ -5,7 +5,7 @@ import (
 	"pika/pkg/interpreter/interpreter_env"
 )
 
-func evalFunctionDeclaration(declaration ast.FunctionDeclaration, env interpreter_env.Environment) interpreter_env.RuntimeValue {
+func evalFunctionDeclaration(declaration ast.FunctionDeclaration, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 
 	fn := interpreter_env.FunctionVal{
 		Type:           interpreter_env.Function,
@@ -15,5 +15,7 @@ func evalFunctionDeclaration(declaration ast.FunctionDeclaration, env interprete
 		Body:           declaration.Body,
 	}
 
-	return env.DeclareVar(declaration.Name, fn, true)
+	variables, err := env.DeclareVar(declaration.Name, fn, true)
+
+	return variables, err
 }

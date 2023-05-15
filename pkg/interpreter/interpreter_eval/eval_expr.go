@@ -1,6 +1,8 @@
 package interpreter_eval
 
 import (
+	"errors"
+	compilerErrors "pika/internal/errors"
 	"pika/pkg/ast"
 	"pika/pkg/ast/ast_types"
 	"pika/pkg/interpreter/interpreter_env"
@@ -28,7 +30,7 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 	}
 
 	if err != nil || fn.GetType() != interpreter_env.Function {
-		panic("Function not found")
+		return nil, errors.New(string(compilerErrors.ErrFuncNotFound) + fnName)
 	}
 
 	function := fn.(interpreter_env.FunctionVal)
@@ -86,7 +88,7 @@ func evalObjectExpr(objectExpr ast.ObjectLiteral, env interpreter_env.Environmen
 
 func evalAssignment(assignment ast.AssigmentExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	if assignment.Assigne.GetKind() != ast_types.Identifier {
-		panic("Invalid assignment target")
+		return nil, errors.New(string(compilerErrors.ErrSintaxInvalidAssignment))
 	}
 
 	varName := assignment.Assigne.(ast.Identifier).Symbol
@@ -106,14 +108,14 @@ func evalIdentifier(ident ast.Identifier, env interpreter_env.Environment) (inte
 	return val, err
 }
 
-func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) interpreter_env.RuntimeValue {
+func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
 	result := 0
 
 	valLhs, okLhs := lhs.(interpreter_env.NumberVal)
 	valRhs, okRhs := rhs.(interpreter_env.NumberVal)
 
 	if !okLhs || !okRhs {
-		panic("Left and right hand side of binary expression must be of type number")
+		return nil, errors.New(string(compilerErrors.ErrSintaxInvalidBinaryExpr))
 	}
 
 	switch operator {
@@ -130,7 +132,7 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue
 		result = valLhs.Value % valRhs.Value
 	}
 
-	return interpreter_env.NumberVal{Value: result, Type: interpreter_env.Number}
+	return interpreter_env.NumberVal{Value: result, Type: interpreter_env.Number}, nil
 }
 
 func evalBinaryExpr(binop ast.BinaryExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
@@ -145,7 +147,8 @@ func evalBinaryExpr(binop ast.BinaryExpr, env interpreter_env.Environment) (inte
 	}
 
 	if lhs.GetType() == interpreter_env.Number && rhs.GetType() == interpreter_env.Number {
-		return evaluateNumericBinaryExpr(binop.Operator, lhs, rhs), nil
+		eval, err := evaluateNumericBinaryExpr(binop.Operator, lhs, rhs)
+		return eval, err
 	}
 
 	return interpreter_makers.MK_NULL(), nil

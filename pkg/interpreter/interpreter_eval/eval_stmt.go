@@ -16,7 +16,10 @@ func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env in
 		}
 		value = eval
 	}
-	return env.DeclareVar(variableDeclaration.Identifier, value, variableDeclaration.Constant), nil
+
+	variable, err := env.DeclareVar(variableDeclaration.Identifier, value, variableDeclaration.Constant)
+
+	return variable, err
 }
 
 func evalProgram(program ast.Program, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {

@@ -1,7 +1,6 @@
 package parser
 
 import (
-	"fmt"
 	"pika/pkg/ast"
 	"pika/pkg/ast/ast_types"
 	"pika/pkg/lexer"
@@ -16,17 +15,20 @@ func New() *Parser {
 	return &Parser{}
 }
 
-func (p *Parser) ProduceAST(input string) ast.Program {
+func (p *Parser) ProduceAST(input string) (*ast.Program, error) {
 	p.tokens = lexer.Tokenize(input)
-	fmt.Println("TOKENS: ", p.tokens)
 	program := ast.Program{
 		Kind: ast_types.Program,
 		Body: []ast.Stmt{},
 	}
 
 	for p.notEOF() {
-		program.Body = append(program.Body, p.parseStmt())
+		stmt, err := p.parseStmt()
+		if err != nil {
+			return nil, err
+		}
+		program.Body = append(program.Body, stmt)
 	}
 
-	return program
+	return &program, nil
 }

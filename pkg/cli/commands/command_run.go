@@ -53,7 +53,11 @@ func runApp(cCtx *cli.Context) error {
 
 	parser := parser.New()
 
-	program := parser.ProduceAST(src)
+	program, err := parser.ProduceAST(src)
+
+	if err != nil {
+		return fmt.Errorf(err.Error())
+	}
 
 	interpreter_eval.Evaluate(program, env)
 

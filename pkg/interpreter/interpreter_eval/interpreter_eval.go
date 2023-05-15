@@ -1,6 +1,7 @@
 package interpreter_eval
 
 import (
+	"errors"
 	"pika/pkg/ast"
 	"pika/pkg/ast/ast_types"
 	"pika/pkg/interpreter/interpreter_env"
@@ -45,9 +46,10 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 		variable, err := evalVariableDeclaration(astNode.(ast.VariableDeclaration), env)
 		return variable, err
 	case ast_types.FunctionDeclaration:
-		return evalFunctionDeclaration(astNode.(ast.FunctionDeclaration), env), nil
+		funDeclaration, err := evalFunctionDeclaration(astNode.(ast.FunctionDeclaration), env)
+		return funDeclaration, err
 
 	default:
-		panic("This AST node is not supported")
+		return nil, errors.New("ERROR: Unknown node type")
 	}
 }

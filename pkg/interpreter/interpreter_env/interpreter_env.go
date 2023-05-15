@@ -1,6 +1,9 @@
 package interpreter_env
 
-import "pika/internal/errors"
+import (
+	"errors"
+	compilerErrors "pika/internal/errors"
+)
 
 type Environment struct {
 	parent    *Environment
@@ -16,10 +19,10 @@ func New(parentENV *Environment) Environment {
 	}
 }
 
-func (e *Environment) DeclareVar(varName string, value RuntimeValue, constant bool) RuntimeValue {
+func (e *Environment) DeclareVar(varName string, value RuntimeValue, constant bool) (RuntimeValue, error) {
 
 	if _, ok := e.variables[varName]; ok {
-		panic("Variable already exists")
+		return nil, errors.New(string(compilerErrors.ErrVariableAlreadyExists) + varName)
 	}
 
 	e.variables[varName] = value
@@ -28,12 +31,12 @@ func (e *Environment) DeclareVar(varName string, value RuntimeValue, constant bo
 		e.constants[varName] = value
 	}
 
-	return value
+	return value, nil
 }
 
 func (e *Environment) AssignVar(varName string, value RuntimeValue) (RuntimeValue, error) {
 	if _, ok := e.constants[varName]; ok {
-		panic("Cannot reassign to a constant: " + varName)
+		return nil, errors.New(string(compilerErrors.ErrVariableIsConstant) + varName)
 	}
 
 	env, err := e.Resolve(varName)
@@ -49,7 +52,7 @@ func (e *Environment) Resolve(varName string) (Environment, error) {
 	}
 
 	if e.parent == nil {
-		return *e, errors.ErrVariableNotFound
+		return *e, errors.New(string(compilerErrors.ErrVariableDoesNotExist) + varName)
 	}
 
 	return e.parent.Resolve(varName)
