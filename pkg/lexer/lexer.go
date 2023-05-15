@@ -1,19 +1,28 @@
 package lexer
 
 import (
+	"errors"
+	"fmt"
+	compilerErrors "pika/internal/errors"
 	"pika/pkg/lexer/token_type"
 	"strings"
 )
 
-func Tokenize(line string) []token_type.Token {
+func Tokenize(line string) ([]token_type.Token, error) {
 	tokens := []token_type.Token{}
 	src := strings.Split(line, "")
+
+	substract := func(i int) string {
+		str := src[0]
+		src = src[i:]
+		return str
+	}
 
 	for len(src) > 0 {
 		tokenStr := src[0]
 		// Check if token is skippable
 		if IsSkippable(tokenStr) {
-			src = src[1:]
+			substract(1)
 			continue
 		}
 
@@ -48,8 +57,27 @@ func Tokenize(line string) []token_type.Token {
 
 		// Check for operators
 		switch tokenStr {
-		case "+", "-", "*", "/", "%":
+		case "+", "-", "%":
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: tokenStr})
+		case "*":
+			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: tokenStr})
+		case "/":
+			nextChar := src[1]
+			switch nextChar {
+			case "/":
+			case "*":
+				substract(2) // consume /*
+				for src[0]+src[1] != "*/" {
+					substract(1)
+					if len(src) <= 1 { // if the comment is not terminated
+						return nil, errors.New(string(compilerErrors.ErrSyntaxUnterminatedMultilineComment))
+					}
+					fmt.Println(len(src))
+				}
+				substract(2) // consume */
+			default:
+				tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: tokenStr})
+			}
 		case "=":
 			tokens = append(tokens, token_type.Token{Type: token_type.Equals, Value: tokenStr})
 		case ";":
@@ -74,12 +102,11 @@ func Tokenize(line string) []token_type.Token {
 			tokens = append(tokens, token_type.Token{Type: token_type.Dot, Value: tokenStr})
 		case "\"":
 			tokens = append(tokens, token_type.Token{Type: token_type.DoubleQoute, Value: tokenStr}) // Append double qoute
-			src = src[1:]
+			substract(1)
 
 			var str string
 			for src[0] != "\"" {
-				str += src[0]
-				src = src[1:]
+				str += substract(1)
 			}
 
 			tokens = append(tokens, token_type.Token{Type: token_type.StringLiteral, Value: str})
@@ -91,8 +118,10 @@ func Tokenize(line string) []token_type.Token {
 		}
 
 		// Remove token
-		src = src[1:]
+		if len(src) > 0 {
+			substract(1)
+		}
 	}
 	tokens = append(tokens, token_type.Token{Type: token_type.EOF, Value: "EndOfFile"})
-	return tokens
+	return tokens, nil
 }

@@ -41,7 +41,7 @@ func (p *Parser) parseFnDeclaration() (ast.Stmt, error) {
 		params[i] = arg.(ast.Identifier).Symbol
 	}
 
-	p.expect(token_type.LeftBrace, string(compilerErrors.ErrSintaxExpectedLeftBrace))
+	p.expect(token_type.LeftBrace, string(compilerErrors.ErrSyntaxExpectedLeftBrace))
 
 	var body []ast.Stmt
 
@@ -53,7 +53,7 @@ func (p *Parser) parseFnDeclaration() (ast.Stmt, error) {
 		body = append(body, stmt)
 	}
 
-	p.expect(token_type.RightBrace, string(compilerErrors.ErrSintaxExpectedRightBrace))
+	p.expect(token_type.RightBrace, string(compilerErrors.ErrSyntaxExpectedRightBrace))
 
 	return ast.FunctionDeclaration{
 		Kind:   ast_types.FunctionDeclaration,
@@ -80,7 +80,7 @@ func (p *Parser) parseVarDeclaration() (ast.Stmt, error) {
 		}, nil
 	}
 
-	p.expect(token_type.Equals, string(compilerErrors.ErrSintaxExpectedAsignation))
+	p.expect(token_type.Equals, string(compilerErrors.ErrSyntaxExpectedAsignation))
 
 	expr, err := p.parseExpr()
 

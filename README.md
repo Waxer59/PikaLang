@@ -70,7 +70,7 @@ The print function is used to `print` a value to standard output. It takes an ar
 Example of use:
 
 ```py
-print("Hi, Pika!!") // Prints the message "Hi, Pika!!"
+print("Hi, Pika!!")
 ```
 
 #### len()
