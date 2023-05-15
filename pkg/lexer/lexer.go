@@ -2,7 +2,6 @@ package lexer
 
 import (
 	"errors"
-	"fmt"
 	compilerErrors "pika/internal/errors"
 	"pika/pkg/lexer/token_type"
 	"strings"
@@ -72,7 +71,6 @@ func Tokenize(line string) ([]token_type.Token, error) {
 					if len(src) <= 1 { // if the comment is not terminated
 						return nil, errors.New(string(compilerErrors.ErrSyntaxUnterminatedMultilineComment))
 					}
-					fmt.Println(len(src))
 				}
 				substract(2) // consume */
 			default:
