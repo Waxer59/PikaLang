@@ -1,49 +1,63 @@
 package interpreter_eval
 
 import (
+	"errors"
+	compilerErrors "pika/internal/errors"
 	"pika/pkg/ast"
 	"pika/pkg/ast/ast_types"
 	"pika/pkg/interpreter/interpreter_env"
 	"pika/pkg/interpreter/interpreter_makers"
 )
 
-func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) interpreter_env.RuntimeValue {
+func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	args := make([]interpreter_env.RuntimeValue, len(expr.Args))
 
 	for idx, arg := range expr.Args {
-		args[idx] = Evaluate(arg, env)
+		eval, err := Evaluate(arg, env)
+		if err != nil {
+			return nil, err
+		}
+		args[idx] = eval
 	}
 
-	fn := Evaluate(expr.Caller, env)
+	fn, err := Evaluate(expr.Caller, env)
+	fnName := expr.Caller.(ast.Identifier).Symbol
+	nativeFn, nativeFnOk := interpreter_env.IsNativeFunction(fnName)
 
-	switch fn.GetType() {
-	case interpreter_env.NativeFn:
-		result := fn.(interpreter_env.NativeFnVal).Call(args, env)
-		return result
-	case interpreter_env.Function:
-		function := fn.(interpreter_env.FunctionVal)
-		scope := interpreter_env.New(function.DeclarationEnv)
-
-		// Create the variables for the function arguments
-		for idx, arg := range function.Params {
-			//TODO: Check the bounds | verify arity of function
-			scope.DeclareVar(arg, args[idx], false)
-		}
-
-		var result interpreter_env.RuntimeValue = interpreter_makers.MK_NULL()
-
-		// Evaluate the function body line by line
-		for _, statement := range function.Body {
-			result = Evaluate(statement, scope)
-		}
-
-		return result
+	if err != nil && nativeFnOk {
+		result := nativeFn(args, env)
+		return result, nil
 	}
 
-	panic("Function not found")
+	if err != nil || fn.GetType() != interpreter_env.Function {
+		return nil, errors.New(string(compilerErrors.ErrFuncNotFound) + fnName)
+	}
+
+	function := fn.(interpreter_env.FunctionVal)
+	scope := interpreter_env.New(function.DeclarationEnv)
+
+	// Create the variables for the function arguments
+	for idx, arg := range function.Params {
+		//TODO: Check the bounds | verify arity of function
+		scope.DeclareVar(arg, args[idx], false)
+	}
+
+	var result interpreter_env.RuntimeValue = interpreter_makers.MK_NULL()
+
+	// Evaluate the function body line by line
+	for _, statement := range function.Body {
+		eval, err := Evaluate(statement, scope)
+		if err != nil {
+			return nil, err
+		}
+		result = eval
+	}
+
+	return result, nil
+
 }
 
-func evalObjectExpr(objectExpr ast.ObjectLiteral, env interpreter_env.Environment) interpreter_env.RuntimeValue {
+func evalObjectExpr(objectExpr ast.ObjectLiteral, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	obj := interpreter_env.ObjectVal{
 		Type:       interpreter_env.Object,
 		Properties: make(map[string]interpreter_env.RuntimeValue),
@@ -54,41 +68,54 @@ func evalObjectExpr(objectExpr ast.ObjectLiteral, env interpreter_env.Environmen
 		value := property.Value
 
 		var runtimeValue interpreter_env.RuntimeValue
+		var err error
 
 		if value == nil {
-			runtimeValue = env.LookupVar(key)
+			runtimeValue, err = env.LookupVar(key)
 		} else {
-			runtimeValue = Evaluate(value, env)
+			runtimeValue, err = Evaluate(value, env)
+		}
+
+		if err != nil {
+			return nil, err
 		}
 
 		obj.Properties[key] = runtimeValue
 	}
 
-	return obj
+	return obj, nil
 }
 
-func evalAssignment(assignment ast.AssigmentExpr, env interpreter_env.Environment) interpreter_env.RuntimeValue {
+func evalAssignment(assignment ast.AssigmentExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	if assignment.Assigne.GetKind() != ast_types.Identifier {
-		panic("Invalid assignment target")
+		return nil, errors.New(string(compilerErrors.ErrSintaxInvalidAssignment))
 	}
 
 	varName := assignment.Assigne.(ast.Identifier).Symbol
-	return env.AssignVar(varName, Evaluate(assignment.Value, env))
+	eval, err := Evaluate(assignment.Value, env)
+
+	if err != nil {
+		return nil, err
+	}
+
+	variable, err := env.AssignVar(varName, eval)
+
+	return variable, err
 }
 
-func evalIdentifier(ident ast.Identifier, env interpreter_env.Environment) interpreter_env.RuntimeValue {
-	val := env.LookupVar(ident.Symbol)
-	return val
+func evalIdentifier(ident ast.Identifier, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	val, err := env.LookupVar(ident.Symbol)
+	return val, err
 }
 
-func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) interpreter_env.RuntimeValue {
+func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
 	result := 0
 
 	valLhs, okLhs := lhs.(interpreter_env.NumberVal)
 	valRhs, okRhs := rhs.(interpreter_env.NumberVal)
 
 	if !okLhs || !okRhs {
-		panic("Left and right hand side of binary expression must be of type number")
+		return nil, errors.New(string(compilerErrors.ErrSintaxInvalidBinaryExpr))
 	}
 
 	switch operator {
@@ -105,16 +132,24 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue
 		result = valLhs.Value % valRhs.Value
 	}
 
-	return interpreter_env.NumberVal{Value: result, Type: interpreter_env.Number}
+	return interpreter_env.NumberVal{Value: result, Type: interpreter_env.Number}, nil
 }
 
-func evalBinaryExpr(binop ast.BinaryExpr, env interpreter_env.Environment) interpreter_env.RuntimeValue {
-	lhs := Evaluate(binop.Left, env)
-	rhs := Evaluate(binop.Right, env)
-
-	if lhs.GetType() == interpreter_env.Number && rhs.GetType() == interpreter_env.Number {
-		return evaluateNumericBinaryExpr(binop.Operator, lhs, rhs)
+func evalBinaryExpr(binop ast.BinaryExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	lhs, err := Evaluate(binop.Left, env)
+	if err != nil {
+		return nil, err
 	}
 
-	return interpreter_makers.MK_NULL()
+	rhs, err := Evaluate(binop.Right, env)
+	if err != nil {
+		return nil, err
+	}
+
+	if lhs.GetType() == interpreter_env.Number && rhs.GetType() == interpreter_env.Number {
+		eval, err := evaluateNumericBinaryExpr(binop.Operator, lhs, rhs)
+		return eval, err
+	}
+
+	return interpreter_makers.MK_NULL(), nil
 }

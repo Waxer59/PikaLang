@@ -1,6 +1,11 @@
 package parser
 
-import "pika/pkg/lexer/token_type"
+import (
+	"os"
+	"pika/pkg/lexer/token_type"
+
+	"github.com/fatih/color"
+)
 
 func (p *Parser) at() token_type.Token {
 	return p.tokens[0]
@@ -15,7 +20,8 @@ func (p *Parser) subtract() token_type.Token {
 func (p *Parser) expect(typeExpected token_type.TokenType, errMsg string) token_type.Token {
 	prev := p.subtract()
 	if (prev == token_type.Token{} || prev.Type != typeExpected) {
-		panic("Parser Error:\n" + errMsg)
+		color.Red(errMsg)
+		os.Exit(0)
 	}
 
 	return prev

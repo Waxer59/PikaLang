@@ -1,20 +1,33 @@
 package parser
 
 import (
+	"errors"
+	"os"
+	compilerErrors "pika/internal/errors"
 	"pika/pkg/ast"
 	"pika/pkg/ast/ast_types"
 	"pika/pkg/lexer/token_type"
 	"strconv"
 
+	"github.com/fatih/color"
 	"golang.org/x/exp/slices"
 )
 
-func (p *Parser) parseAdditiveExpr() ast.Expr {
-	var left = p.parseMultiplicativeExpr()
+func (p *Parser) parseAdditiveExpr() (ast.Expr, error) {
+	left, err := p.parseMultiplicativeExpr()
+
+	if err != nil {
+		return nil, err
+	}
 
 	for slices.Contains(ast_types.AdditiveExpr, p.at().Value) {
 		var op = p.subtract().Value
-		var right = p.parseMultiplicativeExpr()
+		right, err := p.parseMultiplicativeExpr()
+
+		if err != nil {
+			return nil, err
+		}
+
 		left = ast.BinaryExpr{
 			Kind:     ast_types.BinaryExpr,
 			Left:     left,
@@ -23,15 +36,24 @@ func (p *Parser) parseAdditiveExpr() ast.Expr {
 		}
 	}
 
-	return left
+	return left, nil
 }
 
-func (p *Parser) parseMultiplicativeExpr() ast.Expr {
-	var left = p.parseCallMemberExpr()
+func (p *Parser) parseMultiplicativeExpr() (ast.Expr, error) {
+	left, err := p.parseCallMemberExpr()
+
+	if err != nil {
+		return nil, err
+	}
 
 	for slices.Contains(ast_types.MultiplicativeExpr, p.at().Value) {
 		var op = p.subtract().Value
-		var right = p.parseCallMemberExpr()
+		right, err := p.parseCallMemberExpr()
+
+		if err != nil {
+			return nil, err
+		}
+
 		left = ast.BinaryExpr{
 			Kind:     ast_types.BinaryExpr,
 			Left:     left,
@@ -40,58 +62,84 @@ func (p *Parser) parseMultiplicativeExpr() ast.Expr {
 		}
 	}
 
-	return left
+	return left, nil
 }
 
-func (p *Parser) parseCallMemberExpr() ast.Expr {
-	member := p.parseMemberExpr()
-
-	if p.at().Type == token_type.LeftParen {
-		return p.parseCallExpr(member)
+func (p *Parser) parseCallMemberExpr() (ast.Expr, error) {
+	member, err := p.parseMemberExpr()
+	if err != nil {
+		return nil, err
 	}
 
-	return member
+	if p.at().Type == token_type.LeftParen {
+		callExpr, err := p.parseCallExpr(member)
+		return callExpr, err
+	}
+
+	return member, nil
 }
 
-func (p *Parser) parseCallExpr(caller ast.Expr) ast.Expr {
+func (p *Parser) parseCallExpr(caller ast.Expr) (ast.Expr, error) {
+	args, err := p.parseArgs()
+	if err != nil {
+		return nil, err
+	}
 	var callExpr ast.Expr = ast.CallExpr{
 		Kind:   ast_types.CallExpr,
 		Caller: caller,
-		Args:   p.parseArgs(),
+		Args:   args,
 	}
 
 	if p.at().Type == token_type.LeftParen {
-		callExpr = p.parseCallExpr(callExpr)
+		var err error
+
+		callExpr, err = p.parseCallExpr(callExpr)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	return callExpr
+	return callExpr, nil
 }
 
-func (p *Parser) parseArgs() []ast.Expr {
-	p.expect(token_type.LeftParen, "Expected '('")
+func (p *Parser) parseArgs() ([]ast.Expr, error) {
+	p.expect(token_type.LeftParen, string(compilerErrors.ErrSintaxExpectedLeftParen))
 
 	args := []ast.Expr{}
 
 	if p.at().Type != token_type.RightParen {
-		args = p.parseArgsList()
+		var err error
+		args, err = p.parseArgsList()
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	p.expect(token_type.RightParen, "Expected ')'")
+	p.expect(token_type.RightParen, string(compilerErrors.ErrSintaxExpectedRightParen))
 
-	return args
+	return args, nil
 }
 
-func (p *Parser) parseArgsList() []ast.Expr {
-	args := []ast.Expr{p.parseAssigmentExpr()}
+func (p *Parser) parseArgsList() ([]ast.Expr, error) {
+	assigmentExpr, err := p.parseAssigmentExpr()
+	if err != nil {
+		return nil, err
+	}
+	args := []ast.Expr{assigmentExpr}
 
 	for p.at().Type == token_type.Comma && p.subtract().Type == token_type.Comma {
-		args = append(args, p.parseAssigmentExpr())
+		assigmentExpr, err := p.parseAssigmentExpr()
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, assigmentExpr)
 	}
 
-	return args
+	return args, nil
 }
 
-func (p *Parser) parseMemberExpr() ast.Expr {
+func (p *Parser) parseMemberExpr() (ast.Expr, error) {
 	obj := p.parsePrimaryExpr()
 
 	for p.at().Type == token_type.Dot || p.at().Type == token_type.LeftBracket {
@@ -105,13 +153,19 @@ func (p *Parser) parseMemberExpr() ast.Expr {
 			property = p.parsePrimaryExpr()
 
 			if property.GetKind() != ast_types.Identifier {
-				panic("Expected identifier")
+				return nil, errors.New(string(compilerErrors.ErrFuncExpectedIdentifer))
 			}
 		case token_type.LeftBracket:
-			computed = true
-			property = p.parseExpr()
+			var err error
 
-			p.expect(token_type.RightBracket, "Expected ']'")
+			computed = true
+			property, err = p.parseExpr()
+
+			if err != nil {
+				return nil, err
+			}
+
+			p.expect(token_type.RightBracket, string(compilerErrors.ErrSintaxExpectedRightBracket))
 		}
 
 		obj = ast.MemberExpr{
@@ -122,16 +176,18 @@ func (p *Parser) parseMemberExpr() ast.Expr {
 		}
 	}
 
-	return obj
+	return obj, nil
 }
 
-func (p *Parser) parseExpr() ast.Expr {
-	return p.parseAssigmentExpr()
+func (p *Parser) parseExpr() (ast.Expr, error) {
+	expr, err := p.parseAssigmentExpr()
+	return expr, err
 }
 
-func (p *Parser) parseObjectExpr() ast.Expr {
+func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 	if p.at().Type != token_type.LeftBrace {
-		return p.parseAdditiveExpr()
+		additiveExpr, err := p.parseAdditiveExpr()
+		return additiveExpr, err
 	}
 
 	p.subtract() // advance post open brace
@@ -139,7 +195,7 @@ func (p *Parser) parseObjectExpr() ast.Expr {
 	properties := []ast.Property{}
 
 	for p.notEOF() && p.at().Type != token_type.RightBrace {
-		key := p.expect(token_type.Identifier, "Expected a key").Value
+		key := p.expect(token_type.Identifier, string(compilerErrors.ErrSintaxExpectedKey)).Value
 
 		// Allows shorthand syntax: { key, } && { key }
 		switch p.at().Type {
@@ -160,8 +216,12 @@ func (p *Parser) parseObjectExpr() ast.Expr {
 			continue
 		}
 
-		p.expect(token_type.Colon, "Expected ':'")
-		value := p.parseExpr()
+		p.expect(token_type.Colon, string(compilerErrors.ErrSintaxExpectedColon))
+		value, err := p.parseExpr()
+
+		if err != nil {
+			return nil, err
+		}
 
 		properties = append(properties, ast.Property{
 			Kind:  ast_types.Property,
@@ -170,31 +230,38 @@ func (p *Parser) parseObjectExpr() ast.Expr {
 		})
 
 		if p.at().Type != token_type.RightBrace {
-			p.expect(token_type.Comma, "Expected ',' or '}'")
+			p.expect(token_type.Comma, string(compilerErrors.ErrSintaxExpectedComma))
 		}
 	}
 
-	p.expect(token_type.RightBrace, "Expected '}'")
+	p.expect(token_type.RightBrace, string(compilerErrors.ErrSintaxExpectedRightBrace))
 	return ast.ObjectLiteral{
 		Kind:       ast_types.ObjectLiteral,
 		Properties: properties,
-	}
+	}, nil
 }
 
-func (p *Parser) parseAssigmentExpr() ast.Expr {
-	var left = p.parseObjectExpr()
+func (p *Parser) parseAssigmentExpr() (ast.Expr, error) {
+	left, err := p.parseObjectExpr()
+
+	if err != nil {
+		return nil, err
+	}
 
 	if p.at().Type == token_type.Equals {
 		p.subtract() // consume '='
-		value := p.parseAssigmentExpr()
+		value, err := p.parseAssigmentExpr()
+		if err != nil {
+			return nil, err
+		}
 		return ast.AssigmentExpr{
 			Kind:    ast_types.AssigmentExpr,
 			Assigne: left,
 			Value:   value,
-		}
+		}, nil
 	}
 
-	return left
+	return left, nil
 }
 
 func (p *Parser) parsePrimaryExpr() ast.Expr {
@@ -202,22 +269,51 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 	errorMsg := ""
 
 	switch tk {
+	case token_type.BooleanLiteral:
+		b, err := strconv.ParseBool(p.subtract().Value)
+		if err != nil {
+			errorMsg = err.Error()
+			break
+		}
+		return ast.BooleanLiteral{Kind: ast_types.BooleanLiteral, Value: b}
+	case token_type.Null:
+		p.subtract() // consume 'null'
+		return ast.NullLiteral{Kind: ast_types.NullLiteral, Value: nil}
 	case token_type.Identifier:
 		return ast.Identifier{Kind: ast_types.Identifier, Symbol: p.subtract().Value}
 	case token_type.Number:
 		n, err := strconv.Atoi(p.subtract().Value)
+
 		if err != nil {
-			panic("Something went wrong with parsing: " + err.Error())
+			errorMsg = err.Error()
+			break
 		}
+
 		return ast.NumericLiteral{Kind: ast_types.NumericLiteral, Value: n}
+	case token_type.DoubleQoute:
+		p.subtract() // consume '"'
+		value := p.subtract().Value
+		p.expect(token_type.DoubleQoute, string(compilerErrors.ErrSintaxExpectedDoubleQoute))
+		return ast.StringLiteral{
+			Kind:  ast_types.StringLiteral,
+			Value: value,
+		}
 	case token_type.LeftParen:
 		p.subtract() // consume '('
-		value := p.parseExpr()
-		p.expect(token_type.RightParen, "Expected ')'")
+		value, err := p.parseExpr()
+
+		if err != nil {
+			errorMsg = err.Error()
+			break
+		}
+
+		p.expect(token_type.RightParen, string(compilerErrors.ErrSintaxExpectedRightParen))
 		return value
 	default:
 		errorMsg = "Expected an expression"
 	}
 
-	panic("Something went wrong with parsing: " + errorMsg)
+	color.Red("Something went wrong with parsing: " + errorMsg)
+	os.Exit(0)
+	return nil
 }

@@ -1,6 +1,10 @@
 package utils
 
-import "io/ioutil"
+import (
+	"io/ioutil"
+
+	"github.com/inancgumus/screen"
+)
 
 func ScanFile(filePath string) (string, error) {
 	content, err := ioutil.ReadFile(filePath)
@@ -9,4 +13,12 @@ func ScanFile(filePath string) (string, error) {
 	}
 
 	return string(content), nil
+}
+
+func CallClearConsoleSc() {
+	// Clears the screen
+	screen.Clear()
+	// Moves the cursor to the top left corner of the screen
+	screen.MoveTopLeft()
+
 }

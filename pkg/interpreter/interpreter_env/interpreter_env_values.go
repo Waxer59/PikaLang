@@ -1,0 +1,104 @@
+package interpreter_env
+
+import (
+	"pika/pkg/ast"
+)
+
+type ValueType string
+
+const (
+	Null     ValueType = "null"
+	Number   ValueType = "number"
+	String   ValueType = "string"
+	Boolean  ValueType = "boolean"
+	Object   ValueType = "object"
+	Function ValueType = "function"
+)
+
+type RuntimeValue interface {
+	GetType() ValueType
+	GetValue() interface{}
+}
+
+type NullVal struct {
+	Type  ValueType
+	Value interface{} // nil
+}
+
+func (n NullVal) GetType() ValueType {
+	return n.Type
+}
+
+func (n NullVal) GetValue() interface{} {
+	return nil
+}
+
+type BooleanVal struct {
+	Type  ValueType
+	Value bool
+}
+
+func (b BooleanVal) GetType() ValueType {
+	return b.Type
+}
+
+func (b BooleanVal) GetValue() interface{} {
+	return b.Value
+}
+
+type NumberVal struct {
+	Type  ValueType
+	Value int
+}
+
+func (n NumberVal) GetType() ValueType {
+	return n.Type
+}
+
+func (n NumberVal) GetValue() interface{} {
+	return n.Value
+}
+
+type ObjectVal struct {
+	Type       ValueType
+	Properties map[string]RuntimeValue
+}
+
+func (o ObjectVal) GetType() ValueType {
+	return o.Type
+}
+
+func (o ObjectVal) GetValue() interface{} {
+	return o.Properties
+}
+
+type FunctionCall = func(args []RuntimeValue, env Environment) RuntimeValue
+
+type FunctionVal struct {
+	Type           ValueType
+	Name           string
+	Params         []string
+	DeclarationEnv *Environment
+	Body           []ast.Stmt
+}
+
+func (f FunctionVal) GetType() ValueType {
+	return f.Type
+}
+
+func (f FunctionVal) GetValue() interface{} {
+	return f.Body
+}
+
+type StringVal struct {
+	Type  ValueType
+	Value string
+}
+
+func (s StringVal) GetType() ValueType {
+	return s.Type
+}
+
+func (s StringVal) GetValue() interface{} {
+	return s.Value
+}

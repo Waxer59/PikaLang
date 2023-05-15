@@ -1,7 +1,8 @@
 package interpreter_env
 
 import (
-	"fmt"
+	"errors"
+	compilerErrors "pika/internal/errors"
 )
 
 type Environment struct {
@@ -18,11 +19,10 @@ func New(parentENV *Environment) Environment {
 	}
 }
 
-func (e *Environment) DeclareVar(varName string, value RuntimeValue, constant bool) RuntimeValue {
-	fmt.Println("Declaring variable " + varName)
+func (e *Environment) DeclareVar(varName string, value RuntimeValue, constant bool) (RuntimeValue, error) {
 
 	if _, ok := e.variables[varName]; ok {
-		panic("Variable already exists")
+		return nil, errors.New(string(compilerErrors.ErrVariableAlreadyExists) + varName)
 	}
 
 	e.variables[varName] = value
@@ -31,34 +31,37 @@ func (e *Environment) DeclareVar(varName string, value RuntimeValue, constant bo
 		e.constants[varName] = value
 	}
 
-	return value
+	return value, nil
 }
 
-func (e *Environment) AssignVar(varName string, value RuntimeValue) RuntimeValue {
+func (e *Environment) AssignVar(varName string, value RuntimeValue) (RuntimeValue, error) {
 	if _, ok := e.constants[varName]; ok {
-		panic("Cannot reassign to a constant: " + varName)
+		return nil, errors.New(string(compilerErrors.ErrVariableIsConstant) + varName)
 	}
 
-	env := e.Resolve(varName)
+	env, err := e.Resolve(varName)
 	env.variables[varName] = value
 
-	return value
+	return value, err
 }
 
 // Returns the environment that contains the variable
-func (e *Environment) Resolve(varName string) Environment {
+func (e *Environment) Resolve(varName string) (Environment, error) {
 	if _, ok := e.variables[varName]; ok {
-		return *e
+		return *e, nil
 	}
 
 	if e.parent == nil {
-		panic("Cannot resolve variable " + varName + " as it does not exist in this scope")
+		return *e, errors.New(string(compilerErrors.ErrVariableDoesNotExist) + varName)
 	}
 
 	return e.parent.Resolve(varName)
 }
 
-func (e *Environment) LookupVar(varName string) RuntimeValue {
-	env := e.Resolve(varName)
-	return env.variables[varName].(RuntimeValue)
+func (e *Environment) LookupVar(varName string) (RuntimeValue, error) {
+	env, err := e.Resolve(varName)
+	if err != nil {
+		return nil, err
+	}
+	return env.variables[varName].(RuntimeValue), nil
 }

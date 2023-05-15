@@ -73,6 +73,16 @@ func Tokenize(line string) []token_type.Token {
 		case ".":
 			tokens = append(tokens, token_type.Token{Type: token_type.Dot, Value: tokenStr})
 		case "\"":
+			tokens = append(tokens, token_type.Token{Type: token_type.DoubleQoute, Value: tokenStr}) // Append double qoute
+			src = src[1:]
+
+			var str string
+			for src[0] != "\"" {
+				str += src[0]
+				src = src[1:]
+			}
+
+			tokens = append(tokens, token_type.Token{Type: token_type.StringLiteral, Value: str})
 			tokens = append(tokens, token_type.Token{Type: token_type.DoubleQoute, Value: tokenStr})
 		case "'":
 			tokens = append(tokens, token_type.Token{Type: token_type.SingleQoute, Value: tokenStr})

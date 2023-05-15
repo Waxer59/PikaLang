@@ -23,9 +23,9 @@ func MK_Boolean(b bool) interpreter_env.BooleanVal {
 	}
 }
 
-func MK_NATIVE_FN(call interpreter_env.FunctionCall) interpreter_env.NativeFnVal {
-	return interpreter_env.NativeFnVal{
-		Type: interpreter_env.NativeFn,
-		Call: call,
+func MK_String(s string) interpreter_env.StringVal {
+	return interpreter_env.StringVal{
+		Type:  interpreter_env.String,
+		Value: s,
 	}
 }
