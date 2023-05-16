@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-func Tokenize(line string) ([]token_type.Token, error) {
+func Tokenize(input string) ([]token_type.Token, error) {
 	tokens := []token_type.Token{}
-	src := strings.Split(line, "")
+	src := strings.Split(input, "")
 
 	substract := func(i int) string {
 		str := src[0]
@@ -64,6 +64,13 @@ func Tokenize(line string) ([]token_type.Token, error) {
 			nextChar := src[1]
 			switch nextChar {
 			case "/":
+				substract(2) // consume ' // '
+				for src[0] != "\n" {
+					substract(1)
+					if len(src) <= 0 {
+						break
+					}
+				}
 			case "*":
 				substract(2) // consume /*
 				for src[0]+src[1] != "*/" {

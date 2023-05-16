@@ -4,13 +4,16 @@
 
 # PikaLang
 
-Pika, or Pikalang, is a programming language designed to be simple, efficient and easy to use. It is written in Go and its syntax is inspired by several languages.
+Pika, or Pikalang, is a programming language designed to be simple, efficient and easy to use. It is written in Go and its syntax is inspired by several languages. Pika uses the `.pk` extension for its files.
 
 - [PikaLang](#pikalang)
   - [CLI](#cli)
   - [Syntax](#syntax)
     - [Variable declaration](#variable-declaration)
     - [Function declaration](#function-declaration)
+    - [Comments](#comments)
+      - [Single-line Comments](#single-line-comments)
+      - [Multi-line Comments](#multi-line-comments)
     - [Native functions](#native-functions)
       - [print()](#print)
       - [len()](#len)
@@ -58,6 +61,38 @@ fn add(x,y) {
     x + y
 }
 ```
+
+### Comments
+
+In PikaLang, comments are used to add explanatory notes or annotations within the code that are ignored by the compiler or interpreter. They are meant to provide information to developers and are not executed as part of the program.
+
+PikaLang supports both single-line and multi-line comments.
+
+#### Single-line Comments
+
+A single-line comment starts with `//` and extends until the end of the line. It is used to add a comment on a single line.
+
+```js
+var greeting = "Hello, world!" // This is a single-line comment
+```
+
+> The comment text after `//` is ignored by the compiler or interpreter.
+
+#### Multi-line Comments
+
+Multi-line comments, also known as block comments, allow you to add comments that span multiple lines. They start with `/*` and end with `*/`. Everything between these delimiters is treated as a comment and is ignored by the compiler or interpreter.
+
+```js
+/*
+This is a multi-line comment.
+It can span multiple lines.
+*/
+
+var x = 10;
+```
+
+> Remember that comments are for humans reading the code, so write clear and concise comments that enhance code readability and maintainability.
+
 
 ### Native functions
 
