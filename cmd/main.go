@@ -11,7 +11,7 @@ func main() {
 	err := cli.New()
 
 	if err != nil {
-		color.Red("Something went wrong")
+		color.Red(err.Error())
 		os.Exit(0)
 	}
 }

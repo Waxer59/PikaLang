@@ -88,7 +88,7 @@ func evalObjectExpr(objectExpr ast.ObjectLiteral, env interpreter_env.Environmen
 
 func evalAssignment(assignment ast.AssigmentExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	if assignment.Assigne.GetKind() != ast_types.Identifier {
-		return nil, errors.New(string(compilerErrors.ErrSintaxInvalidAssignment))
+		return nil, errors.New(string(compilerErrors.ErrSyntaxInvalidAssignment))
 	}
 
 	varName := assignment.Assigne.(ast.Identifier).Symbol
@@ -115,7 +115,7 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue
 	valRhs, okRhs := rhs.(interpreter_env.NumberVal)
 
 	if !okLhs || !okRhs {
-		return nil, errors.New(string(compilerErrors.ErrSintaxInvalidBinaryExpr))
+		return nil, errors.New(string(compilerErrors.ErrSyntaxInvalidBinaryExpr))
 	}
 
 	switch operator {

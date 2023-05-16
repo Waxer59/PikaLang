@@ -103,7 +103,7 @@ func (p *Parser) parseCallExpr(caller ast.Expr) (ast.Expr, error) {
 }
 
 func (p *Parser) parseArgs() ([]ast.Expr, error) {
-	p.expect(token_type.LeftParen, string(compilerErrors.ErrSintaxExpectedLeftParen))
+	p.expect(token_type.LeftParen, string(compilerErrors.ErrSyntaxExpectedLeftParen))
 
 	args := []ast.Expr{}
 
@@ -116,7 +116,7 @@ func (p *Parser) parseArgs() ([]ast.Expr, error) {
 		}
 	}
 
-	p.expect(token_type.RightParen, string(compilerErrors.ErrSintaxExpectedRightParen))
+	p.expect(token_type.RightParen, string(compilerErrors.ErrSyntaxExpectedRightParen))
 
 	return args, nil
 }
@@ -165,7 +165,7 @@ func (p *Parser) parseMemberExpr() (ast.Expr, error) {
 				return nil, err
 			}
 
-			p.expect(token_type.RightBracket, string(compilerErrors.ErrSintaxExpectedRightBracket))
+			p.expect(token_type.RightBracket, string(compilerErrors.ErrSyntaxExpectedRightBracket))
 		}
 
 		obj = ast.MemberExpr{
@@ -195,7 +195,7 @@ func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 	properties := []ast.Property{}
 
 	for p.notEOF() && p.at().Type != token_type.RightBrace {
-		key := p.expect(token_type.Identifier, string(compilerErrors.ErrSintaxExpectedKey)).Value
+		key := p.expect(token_type.Identifier, string(compilerErrors.ErrSyntaxExpectedKey)).Value
 
 		// Allows shorthand syntax: { key, } && { key }
 		switch p.at().Type {
@@ -216,7 +216,7 @@ func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 			continue
 		}
 
-		p.expect(token_type.Colon, string(compilerErrors.ErrSintaxExpectedColon))
+		p.expect(token_type.Colon, string(compilerErrors.ErrSyntaxExpectedColon))
 		value, err := p.parseExpr()
 
 		if err != nil {
@@ -230,11 +230,11 @@ func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 		})
 
 		if p.at().Type != token_type.RightBrace {
-			p.expect(token_type.Comma, string(compilerErrors.ErrSintaxExpectedComma))
+			p.expect(token_type.Comma, string(compilerErrors.ErrSyntaxExpectedComma))
 		}
 	}
 
-	p.expect(token_type.RightBrace, string(compilerErrors.ErrSintaxExpectedRightBrace))
+	p.expect(token_type.RightBrace, string(compilerErrors.ErrSyntaxExpectedRightBrace))
 	return ast.ObjectLiteral{
 		Kind:       ast_types.ObjectLiteral,
 		Properties: properties,
@@ -293,7 +293,7 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 	case token_type.DoubleQoute:
 		p.subtract() // consume '"'
 		value := p.subtract().Value
-		p.expect(token_type.DoubleQoute, string(compilerErrors.ErrSintaxExpectedDoubleQoute))
+		p.expect(token_type.DoubleQoute, string(compilerErrors.ErrSyntaxExpectedDoubleQoute))
 		return ast.StringLiteral{
 			Kind:  ast_types.StringLiteral,
 			Value: value,
@@ -307,7 +307,7 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 			break
 		}
 
-		p.expect(token_type.RightParen, string(compilerErrors.ErrSintaxExpectedRightParen))
+		p.expect(token_type.RightParen, string(compilerErrors.ErrSyntaxExpectedRightParen))
 		return value
 	default:
 		errorMsg = "Expected an expression"
