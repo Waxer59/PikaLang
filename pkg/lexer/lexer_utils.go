@@ -8,11 +8,11 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-func IsSkippable(char string) bool {
+func IsSkippable(char rune) bool {
 	return slices.Contains(token_type.SkippableChars, char)
 }
 
-func NextChar(src *[]string) string {
+func NextChar(src *[]rune) string {
 	char := (*src)[0]
 	*src = (*src)[1:]
 	return string(char)
@@ -21,7 +21,7 @@ func NextChar(src *[]string) string {
 /*  FirstReturn: Number extracted
  * 	SecondReturn: Rest of the string
  */
-func ExtractInt(src []string) (string, []string) {
+func ExtractInt(src []rune) (string, []rune) {
 	var num = ""
 
 	for len(src) > 0 && IsInt(src[0]) {
@@ -34,7 +34,7 @@ func ExtractInt(src []string) (string, []string) {
 /*  FirstReturn: String extracted
  * 	SecondReturn: Rest of the string
  */
-func ExtractAlpha(src []string) (string, []string) {
+func ExtractAlpha(src []rune) (string, []rune) {
 	var str = ""
 
 	for len(src) > 0 && IsAlpha(src[0]) {
@@ -44,8 +44,8 @@ func ExtractAlpha(src []string) (string, []string) {
 	return str, src
 }
 
-func IsAlpha(char string) bool {
-	return strings.ToUpper(char) != strings.ToLower(char)
+func IsAlpha(char rune) bool {
+	return strings.ToUpper(string(char)) != strings.ToLower(string(char))
 }
 
 /*  FirstReturn: Keyword extracted
@@ -57,7 +57,7 @@ func IsKeyword(src string) (token_type.TokenType, bool) {
 	return keyword, ok
 }
 
-func IsInt(char string) bool {
-	val, err := strconv.Atoi(char)
+func IsInt(char rune) bool {
+	val, err := strconv.Atoi(string(char))
 	return err == nil && val >= 0
 }
