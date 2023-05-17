@@ -48,7 +48,7 @@ func (b BooleanVal) GetValue() interface{} {
 
 type NumberVal struct {
 	Type  ValueType
-	Value int
+	Value float64
 }
 
 func (n NumberVal) GetType() ValueType {

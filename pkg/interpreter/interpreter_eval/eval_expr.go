@@ -2,6 +2,7 @@ package interpreter_eval
 
 import (
 	"errors"
+	"math"
 	compilerErrors "pika/internal/errors"
 	"pika/pkg/ast"
 	"pika/pkg/ast/ast_types"
@@ -109,13 +110,13 @@ func evalIdentifier(ident ast.Identifier, env interpreter_env.Environment) (inte
 }
 
 func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
-	result := 0
+	var result float64 = 0
 
 	valLhs, okLhs := lhs.(interpreter_env.NumberVal)
 	valRhs, okRhs := rhs.(interpreter_env.NumberVal)
 
 	if !okLhs || !okRhs {
-		return nil, errors.New(string(compilerErrors.ErrSyntaxInvalidBinaryExpr))
+		return nil, errors.New(string(compilerErrors.ErrBinaryInvalidBinaryExpr))
 	}
 
 	switch operator {
@@ -126,10 +127,15 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue
 	case "*":
 		result = valLhs.Value * valRhs.Value
 	case "/":
-		//TODO: Division by zero checks
+		if valRhs.Value == 0 {
+			result = math.Inf(0)
+		}
 		result = valLhs.Value / valRhs.Value
 	case "%":
-		result = valLhs.Value % valRhs.Value
+		if valRhs.Value == 0 {
+			return nil, errors.New(string(compilerErrors.ErrBinaryDivisionByZero))
+		}
+		result = float64(int(valLhs.Value) % int(valRhs.Value))
 	}
 
 	return interpreter_env.NumberVal{Value: result, Type: interpreter_env.Number}, nil

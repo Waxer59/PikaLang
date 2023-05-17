@@ -3,5 +3,6 @@ package compilerErrors
 type ErrBinary string
 
 var (
-	ErrSyntaxInvalidBinaryExpr ErrBinary = "ERROR: Invalid binary operation"
+	ErrBinaryInvalidBinaryExpr ErrBinary = "ERROR: Invalid binary operation"
+	ErrBinaryDivisionByZero    ErrBinary = "ERROR: Division by zero"
 )

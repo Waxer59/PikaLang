@@ -16,7 +16,7 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 		Identifier, err := evalIdentifier(astNode.(ast.Identifier), env)
 		return Identifier, err
 	case ast_types.NumericLiteral:
-		value := astNode.(ast.NumericLiteral).GetValue().(int)
+		value := astNode.(ast.NumericLiteral).GetValue().(float64)
 		return interpreter_env.NumberVal{Value: value, Type: interpreter_env.Number}, nil
 	case ast_types.ObjectLiteral:
 		obj, err := evalObjectExpr(astNode.(ast.ObjectLiteral), env)

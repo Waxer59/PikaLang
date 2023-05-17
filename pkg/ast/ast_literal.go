@@ -14,7 +14,7 @@ func (p Property) GetKind() ast_types.NodeType {
 
 type NumericLiteral struct {
 	Kind  ast_types.NodeType
-	Value int
+	Value float64
 }
 
 func (n NumericLiteral) GetKind() ast_types.NodeType {

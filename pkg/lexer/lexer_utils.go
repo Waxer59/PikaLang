@@ -24,7 +24,7 @@ func NextChar(src *[]rune) string {
 func ExtractInt(src []rune) (string, []rune) {
 	var num = ""
 
-	for len(src) > 0 && IsInt(src[0]) {
+	for len(src) > 0 && (IsInt(src[0]) || src[0] == '.') {
 		num += NextChar(&src)
 	}
 
@@ -58,6 +58,6 @@ func IsKeyword(src string) (token_type.TokenType, bool) {
 }
 
 func IsInt(char rune) bool {
-	val, err := strconv.Atoi(string(char))
+	val, err := strconv.ParseFloat(string(char), 64)
 	return err == nil && val >= 0
 }

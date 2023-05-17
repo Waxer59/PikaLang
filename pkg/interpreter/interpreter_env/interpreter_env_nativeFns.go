@@ -27,7 +27,7 @@ var NativeFunctions = map[string]NativeFunction{
 		}
 		return NumberVal{
 			Type:  Number,
-			Value: int(len(arg)),
+			Value: float64(len(arg)),
 		}
 	},
 }
