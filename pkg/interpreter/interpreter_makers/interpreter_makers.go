@@ -9,7 +9,7 @@ func MK_NULL() interpreter_env.NullVal {
 	}
 }
 
-func MK_Number(n int) interpreter_env.NumberVal {
+func MK_Number(n float64) interpreter_env.NumberVal {
 	return interpreter_env.NumberVal{
 		Type:  interpreter_env.Number,
 		Value: n,

@@ -2,7 +2,6 @@ package lexer
 
 import (
 	"errors"
-	"fmt"
 	compilerErrors "pika/internal/errors"
 	"pika/pkg/lexer/token_type"
 )
@@ -14,7 +13,6 @@ func Tokenize(input string) ([]token_type.Token, error) {
 		if len(src) <= 0 {
 			return 0
 		}
-		fmt.Println(len(src))
 		char := src[0]
 		src = src[i:]
 		return char
