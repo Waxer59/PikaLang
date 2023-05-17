@@ -46,7 +46,7 @@ var KEYWORDS = map[string]TokenType{
 	"false": BooleanLiteral,
 }
 
-var SkippableChars = []string{" ", "\t", "\n", "\r"}
+var SkippableChars = []rune{' ', '\t', '\n', '\r'}
 
 type Token struct {
 	Value string
