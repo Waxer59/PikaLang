@@ -1,25 +1,5 @@
 package lexer
 
-//! FIX THIS LEXER
-
-/*
-112 [112 114 105 110 116 40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-40 [40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-40 [40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-40 [40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-40 [40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-40 [40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-40 [40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-40 [40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-40 [40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-40 [40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-40 [40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-40 [40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-40 [40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-40 [40 34 72 101 108 108 111 32 87 111 114 108 100 34 41] print("Hello World")
-[{print 1} {( 10} {( 10} {( 10} {( 10} {( 10} {( 10} {( 10} {( 10} {( 10} {( 10} {( 10} {( 10} {( 10} {EndOfFile 22}]
-*/
-
 import (
 	"errors"
 	"fmt"
@@ -30,21 +10,17 @@ import (
 func Tokenize(input string) ([]token_type.Token, error) {
 	tokens := []token_type.Token{}
 	src := []rune(input)
-
-	pos := 0
-
 	substract := func(i int) rune {
-		if pos+i >= len(src) {
+		if len(src) <= 0 {
 			return 0
 		}
-
-		char := src[pos]
-		pos += i
+		fmt.Println(len(src))
+		char := src[0]
+		src = src[i:]
 		return char
 	}
 
-	for ; pos < len(src)-1; substract(1) {
-		fmt.Println(src[0], src, input)
+	for len(src) > 0 {
 		tokenStr := src[0]
 		// Check if token is skippable
 		if IsSkippable(tokenStr) {
@@ -131,7 +107,7 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			substract(1)
 
 			var str string
-			for src[0] != '\'' {
+			for src[0] != '"' {
 				str += string(substract(1))
 			}
 
@@ -142,6 +118,7 @@ func Tokenize(input string) ([]token_type.Token, error) {
 		default:
 			tokens = append(tokens, token_type.Token{Type: token_type.Identifier, Value: string(tokenStr)})
 		}
+		substract(1)
 	}
 	tokens = append(tokens, token_type.Token{Type: token_type.EOF, Value: "EndOfFile"})
 	return tokens, nil
