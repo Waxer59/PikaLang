@@ -33,6 +33,15 @@ const (
 	DoubleQoute  // "
 	SingleQoute  // '
 
+	// Comparison operators
+	EqualEqual   // ==
+	Greater      // >
+	GreaterEqual // >=
+	Less         // <
+	LessEqual    // <=
+	Not          // !
+	NotEqual     // !=
+
 	// End Of File
 	EOF
 )

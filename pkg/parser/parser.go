@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"fmt"
 	"pika/pkg/ast"
 	"pika/pkg/ast/ast_types"
 	"pika/pkg/lexer"
@@ -18,6 +19,7 @@ func New() *Parser {
 func (p *Parser) ProduceAST(input string) (*ast.Program, error) {
 	var err error
 	p.tokens, err = lexer.Tokenize(input)
+	fmt.Println(p.tokens)
 
 	if err != nil {
 		return nil, err
