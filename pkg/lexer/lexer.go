@@ -18,6 +18,13 @@ func Tokenize(input string) ([]token_type.Token, error) {
 		return char
 	}
 
+	nextChar := func() rune {
+		if len(src) <= 1 {
+			return 0
+		}
+		return src[1]
+	}
+
 	for len(src) > 0 {
 		tokenStr := src[0]
 		// Check if token is skippable
@@ -51,13 +58,21 @@ func Tokenize(input string) ([]token_type.Token, error) {
 
 		// Check for operators
 		switch tokenStr {
-		case '+', '-', '%':
+		case '+', '%':
+			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenStr)})
+		case '-':
+			if IsInt(nextChar()) { // Check for negative numbers
+				substract(1) // advance '-'
+				num, rest := ExtractInt(src)
+				tokens = append(tokens, token_type.Token{Type: token_type.Number, Value: num})
+				src = rest
+				continue
+			}
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenStr)})
 		case '*':
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenStr)})
 		case '/':
-			nextChar := src[1]
-			switch nextChar {
+			switch nextChar() {
 			case '/':
 				substract(2) // consume ' // '
 				for src[0] != '\n' {
@@ -68,7 +83,7 @@ func Tokenize(input string) ([]token_type.Token, error) {
 				}
 			case '*':
 				substract(2) // consume /*
-				for src[0] != '*' && src[1] == '/' {
+				for src[0] != '*' && nextChar() == '/' {
 					substract(1)
 					if len(src) <= 1 { // if the comment is not terminated
 						return nil, errors.New(string(compilerErrors.ErrSyntaxUnterminatedMultilineComment))
@@ -79,7 +94,29 @@ func Tokenize(input string) ([]token_type.Token, error) {
 				tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenStr)})
 			}
 		case '=':
+			if nextChar() == '=' {
+				tokens = append(tokens, token_type.Token{Type: token_type.EqualEqual, Value: string(tokenStr)})
+				continue
+			}
 			tokens = append(tokens, token_type.Token{Type: token_type.Equals, Value: string(tokenStr)})
+		case '!':
+			if nextChar() == '=' {
+				tokens = append(tokens, token_type.Token{Type: token_type.NotEqual, Value: string(tokenStr)})
+				continue
+			}
+			tokens = append(tokens, token_type.Token{Type: token_type.Not, Value: string(tokenStr)})
+		case '>':
+			if nextChar() == '=' {
+				tokens = append(tokens, token_type.Token{Type: token_type.GreaterEqual, Value: string(tokenStr)})
+				continue
+			}
+			tokens = append(tokens, token_type.Token{Type: token_type.Greater, Value: string(tokenStr)})
+		case '<':
+			if nextChar() == '=' {
+				tokens = append(tokens, token_type.Token{Type: token_type.LessEqual, Value: string(tokenStr)})
+				continue
+			}
+			tokens = append(tokens, token_type.Token{Type: token_type.Less, Value: string(tokenStr)})
 		case ';':
 			tokens = append(tokens, token_type.Token{Type: token_type.SemiColon, Value: string(tokenStr)})
 		case '(':
@@ -99,6 +136,12 @@ func Tokenize(input string) ([]token_type.Token, error) {
 		case ':':
 			tokens = append(tokens, token_type.Token{Type: token_type.Colon, Value: string(tokenStr)})
 		case '.':
+			if IsInt(nextChar()) { // Check for decimal numbers as .123 == 0.123
+				num, rest := ExtractInt(src)
+				tokens = append(tokens, token_type.Token{Type: token_type.Number, Value: num})
+				src = rest
+				continue
+			}
 			tokens = append(tokens, token_type.Token{Type: token_type.Dot, Value: string(tokenStr)})
 		case '"':
 			tokens = append(tokens, token_type.Token{Type: token_type.DoubleQoute, Value: string(tokenStr)}) // Append double qoute
