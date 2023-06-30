@@ -27,4 +27,5 @@ const (
 var (
 	AdditiveExpr       = []string{"+", "-"}
 	MultiplicativeExpr = []string{"*", "/", "%"}
+	ExponentialExpr    = []string{"^", "**"}
 )

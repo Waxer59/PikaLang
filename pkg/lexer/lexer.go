@@ -70,6 +70,14 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenStr)})
 		case '*':
+			if nextChar() == '*' { // Check for power
+				substract(2) // consume ' ** '
+				tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: "**"})
+				continue
+			}
+
+			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenStr)})
+		case '^':
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenStr)})
 		case '/':
 			switch nextChar() {

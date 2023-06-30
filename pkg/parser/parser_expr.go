@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	compilerErrors "pika/internal/errors"
 	"pika/pkg/ast"
@@ -14,7 +15,7 @@ import (
 )
 
 func (p *Parser) parseAdditiveExpr() (ast.Expr, error) {
-	left, err := p.parseMultiplicativeExpr()
+	left, err := p.parseExponentialExpr()
 
 	if err != nil {
 		return nil, err
@@ -22,7 +23,7 @@ func (p *Parser) parseAdditiveExpr() (ast.Expr, error) {
 
 	for slices.Contains(ast_types.AdditiveExpr, p.at().Value) {
 		var op = p.subtract().Value
-		right, err := p.parseMultiplicativeExpr()
+		right, err := p.parseExponentialExpr()
 
 		if err != nil {
 			return nil, err
@@ -50,6 +51,33 @@ func (p *Parser) parseMultiplicativeExpr() (ast.Expr, error) {
 		var op = p.subtract().Value
 		right, err := p.parseCallMemberExpr()
 
+		if err != nil {
+			return nil, err
+		}
+
+		left = ast.BinaryExpr{
+			Kind:     ast_types.BinaryExpr,
+			Left:     left,
+			Right:    right,
+			Operator: op,
+		}
+	}
+
+	return left, nil
+}
+
+func (p *Parser) parseExponentialExpr() (ast.Expr, error) {
+	left, err := p.parseMultiplicativeExpr()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for slices.Contains(ast_types.ExponentialExpr, p.at().Value) {
+		op := p.subtract().Value
+		right, err := p.parseMultiplicativeExpr()
+
+		fmt.Println(right)
 		if err != nil {
 			return nil, err
 		}

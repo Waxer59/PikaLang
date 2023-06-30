@@ -109,6 +109,21 @@ func evalIdentifier(ident ast.Identifier, env interpreter_env.Environment) (inte
 	return val, err
 }
 
+func evalStringBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
+	var result string = ""
+	valLhs, okLhs := lhs.(interpreter_env.StringVal)
+	valRhs, okRhs := rhs.(interpreter_env.StringVal)
+	if !okLhs || !okRhs {
+		return nil, errors.New(string(compilerErrors.ErrBinaryInvalidBinaryExpr))
+	}
+	switch operator {
+	case "+":
+		result = valLhs.Value + valRhs.Value
+	}
+
+	return interpreter_env.StringVal{Value: result, Type: interpreter_env.String}, nil
+}
+
 func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
 	var result float64 = 0
 
@@ -136,6 +151,8 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue
 			return nil, errors.New(string(compilerErrors.ErrBinaryDivisionByZero))
 		}
 		result = float64(int(valLhs.Value) % int(valRhs.Value))
+	case "**", "^":
+		result = math.Pow(valLhs.Value, valRhs.Value)
 	}
 
 	return interpreter_env.NumberVal{Value: result, Type: interpreter_env.Number}, nil
@@ -154,6 +171,11 @@ func evalBinaryExpr(binop ast.BinaryExpr, env interpreter_env.Environment) (inte
 
 	if lhs.GetType() == interpreter_env.Number && rhs.GetType() == interpreter_env.Number {
 		eval, err := evaluateNumericBinaryExpr(binop.Operator, lhs, rhs)
+		return eval, err
+	}
+
+	if lhs.GetType() == interpreter_env.String && rhs.GetType() == interpreter_env.String {
+		eval, err := evalStringBinaryExpr(binop.Operator, lhs, rhs)
 		return eval, err
 	}
 
