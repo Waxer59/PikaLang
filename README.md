@@ -68,7 +68,7 @@ var bar = 42
 
 #### constants
 
-In Pikalang, constants are declared using the `const` keyword followed by the constant name. For example:
+In Pikalang, constants are declared using the `const` keyword followed by the constant name, constants as they are not indicated are immutable. For example:
 
 ```js
 const foo = "bar"
@@ -176,11 +176,10 @@ The modulo operator is used to find the remainder after division.
 
 ##### Exponentiation
 
-Exponentiation is a mathematical operation that involves raising a number to a certain power. In programming, the exponentiation operator is denoted by ** (two asterisks) or ^ (caret) in some languages.
+Exponentiation is a mathematical operation that involves raising a number to a certain power. In programming, the exponentiation operator is denoted by ** (two asterisks).
 
 ```js
 4 ** 4 // base ** exponent
-4 ^ 4  // base ^ exponent
 ```
 
 
@@ -195,9 +194,15 @@ Objects are a fundamental data structure used to store and manipulate data. They
 To create an object, you can use the syntax of curly braces {} and define its properties and values within them. Here's a basic example:
 
 ```js
+const val3 = 33
+
 const obj = {
   val1: "Hi!!",
-  val2: 3.14
+  val2: 3.14,
+  val3,
+  val4: {
+    hello: "world"
+  }
 }
 ```
 

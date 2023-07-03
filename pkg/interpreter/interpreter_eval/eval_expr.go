@@ -8,6 +8,8 @@ import (
 	"pika/pkg/ast/ast_types"
 	"pika/pkg/interpreter/interpreter_env"
 	"pika/pkg/interpreter/interpreter_makers"
+
+	"golang.org/x/exp/slices"
 )
 
 func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
@@ -158,6 +160,39 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue
 	return interpreter_env.NumberVal{Value: result, Type: interpreter_env.Number}, nil
 }
 
+func evalComparisonBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
+	var result bool = false
+
+	if lhs.GetType() != rhs.GetType() {
+		return nil, errors.New(string(compilerErrors.ErrBinaryInvalidBinaryExpr))
+	}
+
+	switch operator {
+	case "==":
+		result = lhs.GetValue() == rhs.GetValue()
+	case "!=":
+		result = lhs.GetValue() != rhs.GetValue()
+		// case "<":
+
+		// 	if !okLhs || !okRhs {
+		// 		return nil, errors.New(string(compilerErrors.ErrBinaryInvalidBinaryExpr))
+		// 	}
+
+		// 	if lhs.GetType() != interpreter_env.Number {
+		// 		return nil, errors.New(string(compilerErrors.ErrBinaryInvalidBinaryExpr))
+		// 	}
+
+		// 	result = valLhs.Value < valRhs.Value
+		// case ">":
+		// 	result = lhs.GetValue() > rhs.GetValue()
+		// case "<=":
+		// 	result = lhs.GetValue() <= rhs.GetValue()
+		// case ">=":
+		// 	result = lhs.GetValue() >= rhs.GetValue()
+	}
+	return interpreter_env.BooleanVal{Value: result, Type: interpreter_env.Boolean}, nil
+}
+
 func evalBinaryExpr(binop ast.BinaryExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	lhs, err := Evaluate(binop.Left, env)
 	if err != nil {
@@ -169,11 +204,19 @@ func evalBinaryExpr(binop ast.BinaryExpr, env interpreter_env.Environment) (inte
 		return nil, err
 	}
 
+	// EVAL < < >= <= == !=
+	if slices.Contains(ast_types.BoolExpr, binop.Operator) {
+		eval, err := evalComparisonBinaryExpr(binop.Operator, lhs, rhs)
+		return eval, err
+	}
+
+	// EVAL + - * / % ** (numbers)
 	if lhs.GetType() == interpreter_env.Number && rhs.GetType() == interpreter_env.Number {
 		eval, err := evaluateNumericBinaryExpr(binop.Operator, lhs, rhs)
 		return eval, err
 	}
 
+	// EVAL + (strings)
 	if lhs.GetType() == interpreter_env.String && rhs.GetType() == interpreter_env.String {
 		eval, err := evalStringBinaryExpr(binop.Operator, lhs, rhs)
 		return eval, err

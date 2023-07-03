@@ -16,7 +16,7 @@ const (
 	Fn
 
 	// Operators
-	BinaryOperator // + - * / ** ^
+	BinaryOperator // + - * / ** %
 	Equals         // =
 
 	// Grouping

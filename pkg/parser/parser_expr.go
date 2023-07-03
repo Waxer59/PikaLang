@@ -73,7 +73,7 @@ func (p *Parser) parseExponentialExpr() (ast.Expr, error) {
 		return nil, err
 	}
 
-	for slices.Contains(ast_types.ExponentialExpr, p.at().Value) {
+	for p.at().Value == "**" {
 		op := p.subtract().Value
 		right, err := p.parseMultiplicativeExpr()
 
@@ -208,7 +208,7 @@ func (p *Parser) parseMemberExpr() (ast.Expr, error) {
 }
 
 func (p *Parser) parseExpr() (ast.Expr, error) {
-	expr, err := p.parseAssigmentExpr()
+	expr, err := p.parseEqualityExpr()
 	return expr, err
 }
 
@@ -269,6 +269,55 @@ func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 	}, nil
 }
 
+func (p *Parser) parseEqualityExpr() (ast.Expr, error) {
+	left, err := p.parseComparisonExpr()
+	if err != nil {
+		return nil, err
+	}
+
+	for slices.Contains(ast_types.EqualityExpr, p.at().Value) {
+		op := p.subtract().Value // consume operator
+		right, err := p.parseComparisonExpr()
+		if err != nil {
+			return nil, err
+		}
+		left = ast.BinaryExpr{
+			Kind:     ast_types.BinaryExpr,
+			Left:     left,
+			Right:    right,
+			Operator: op,
+		}
+	}
+
+	return left, nil
+}
+
+func (p *Parser) parseComparisonExpr() (ast.Expr, error) {
+	left, err := p.parseObjectExpr()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for slices.Contains(ast_types.ComparisonExpr, p.at().Value) {
+		op := p.subtract().Value // consume operator
+		right, err := p.parseObjectExpr()
+
+		if err != nil {
+			return nil, err
+		}
+
+		left = ast.BinaryExpr{
+			Kind:     ast_types.BinaryExpr,
+			Left:     left,
+			Right:    right,
+			Operator: op,
+		}
+	}
+
+	return left, nil
+}
+
 func (p *Parser) parseAssigmentExpr() (ast.Expr, error) {
 	left, err := p.parseObjectExpr()
 
@@ -278,7 +327,7 @@ func (p *Parser) parseAssigmentExpr() (ast.Expr, error) {
 
 	if p.at().Type == token_type.Equals {
 		p.subtract() // consume '='
-		value, err := p.parseAssigmentExpr()
+		value, err := p.parseObjectExpr()
 		if err != nil {
 			return nil, err
 		}
