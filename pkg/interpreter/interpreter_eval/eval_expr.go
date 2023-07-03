@@ -163,6 +163,12 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue
 func evalComparisonBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
 	var result bool = false
 
+	numValLhs, isNumLhs := lhs.(interpreter_env.NumberVal)
+	numValRhs, isNumRhs := rhs.(interpreter_env.NumberVal)
+	if !isNumRhs || !isNumLhs && lhs.GetType() == interpreter_env.Number && rhs.GetType() == interpreter_env.Number {
+		return nil, errors.New(string(compilerErrors.ErrBinaryInvalidBinaryExpr))
+	}
+
 	if lhs.GetType() != rhs.GetType() {
 		return nil, errors.New(string(compilerErrors.ErrBinaryInvalidBinaryExpr))
 	}
@@ -172,23 +178,14 @@ func evalComparisonBinaryExpr(operator string, lhs interpreter_env.RuntimeValue,
 		result = lhs.GetValue() == rhs.GetValue()
 	case "!=":
 		result = lhs.GetValue() != rhs.GetValue()
-		// case "<":
-
-		// 	if !okLhs || !okRhs {
-		// 		return nil, errors.New(string(compilerErrors.ErrBinaryInvalidBinaryExpr))
-		// 	}
-
-		// 	if lhs.GetType() != interpreter_env.Number {
-		// 		return nil, errors.New(string(compilerErrors.ErrBinaryInvalidBinaryExpr))
-		// 	}
-
-		// 	result = valLhs.Value < valRhs.Value
-		// case ">":
-		// 	result = lhs.GetValue() > rhs.GetValue()
-		// case "<=":
-		// 	result = lhs.GetValue() <= rhs.GetValue()
-		// case ">=":
-		// 	result = lhs.GetValue() >= rhs.GetValue()
+	case "<":
+		result = numValLhs.Value < numValRhs.Value
+	case ">":
+		result = numValLhs.Value > numValRhs.Value
+	case "<=":
+		result = numValLhs.Value <= numValRhs.Value
+	case ">=":
+		result = numValLhs.Value >= numValRhs.Value
 	}
 	return interpreter_env.BooleanVal{Value: result, Type: interpreter_env.Boolean}, nil
 }
