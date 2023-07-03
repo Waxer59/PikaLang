@@ -6,6 +6,7 @@ import (
 
 type ValueType string
 
+// Value types
 const (
 	Null     ValueType = "null"
 	Number   ValueType = "number"

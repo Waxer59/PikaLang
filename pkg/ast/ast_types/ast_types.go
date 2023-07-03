@@ -7,6 +7,7 @@ const (
 	Program             NodeType = "Program"
 	VariableDeclaration NodeType = "VariableDeclaration"
 	FunctionDeclaration NodeType = "FunctionDeclaration"
+	IfStatement         NodeType = "IfStatement"
 
 	// EXPRESSIONS
 	AssigmentExpr NodeType = "AssigmentExpr"

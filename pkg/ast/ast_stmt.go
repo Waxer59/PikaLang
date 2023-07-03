@@ -36,3 +36,13 @@ type VariableDeclaration struct {
 func (vd VariableDeclaration) GetKind() ast_types.NodeType {
 	return vd.Kind
 }
+
+type IfStatement struct {
+	Kind      ast_types.NodeType
+	Condition Expr
+	Body      []Stmt
+}
+
+func (cd IfStatement) GetKind() ast_types.NodeType {
+	return cd.Kind
+}
