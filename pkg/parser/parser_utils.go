@@ -11,6 +11,13 @@ func (p *Parser) at() token_type.Token {
 	return p.tokens[0]
 }
 
+func (p *Parser) next() token_type.Token {
+	if len(p.tokens) > 1 {
+		return p.tokens[1]
+	}
+	return token_type.Token{}
+}
+
 func (p *Parser) subtract() token_type.Token {
 	prev := p.at()
 	p.tokens = p.tokens[1:]

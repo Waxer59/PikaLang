@@ -36,7 +36,7 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 	case string:
 		val = val.(string) != ""
 	case int, float32, float64:
-		val = val != 0
+		val = val != 0.0
 	default:
 		val = false
 	}
@@ -45,6 +45,36 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 		for _, statement := range declaration.Body {
 			Evaluate(statement, env)
 		}
+		return nil, nil
+	}
+
+	for _, elseIfStatement := range declaration.ElseIfStmt {
+		conditionRawValue, err := Evaluate(elseIfStatement.Condition, env)
+		if err != nil {
+			return nil, err
+		}
+		val := conditionRawValue.GetValue()
+
+		// Handle truthy/falsy values
+		switch val.(type) {
+		case string:
+			val = val.(string) != ""
+		case int, float32, float64:
+			val = val != 0.0
+		default:
+			val = false
+		}
+
+		if val.(bool) {
+			for _, statement := range elseIfStatement.Body {
+				Evaluate(statement, env)
+			}
+			return nil, nil
+		}
+	}
+
+	for _, statement := range declaration.ElseBody {
+		Evaluate(statement, env)
 	}
 
 	return nil, nil

@@ -1,6 +1,8 @@
 package ast
 
-import "pika/pkg/ast/ast_types"
+import (
+	"pika/pkg/ast/ast_types"
+)
 
 type Stmt interface {
 	GetKind() ast_types.NodeType
@@ -38,7 +40,14 @@ func (vd VariableDeclaration) GetKind() ast_types.NodeType {
 }
 
 type IfStatement struct {
-	Kind      ast_types.NodeType
+	Kind       ast_types.NodeType
+	Condition  Expr
+	Body       []Stmt
+	ElseIfStmt []ElseIfStatement
+	ElseBody   []Stmt
+}
+
+type ElseIfStatement struct {
 	Condition Expr
 	Body      []Stmt
 }

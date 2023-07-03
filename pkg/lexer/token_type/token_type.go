@@ -16,7 +16,6 @@ const (
 	Fn
 	If
 	Else
-	ElseIf
 
 	// Operators
 	BinaryOperator // + - * / ** %
@@ -50,15 +49,14 @@ const (
 )
 
 var KEYWORDS = map[string]TokenType{
-	"var":     Var,
-	"const":   Const,
-	"fn":      Fn,
-	"null":    Null,
-	"true":    BooleanLiteral,
-	"false":   BooleanLiteral,
-	"if":      If,
-	"else":    Else,
-	"else if": ElseIf,
+	"var":   Var,
+	"const": Const,
+	"fn":    Fn,
+	"null":  Null,
+	"true":  BooleanLiteral,
+	"false": BooleanLiteral,
+	"if":    If,
+	"else":  Else,
 }
 
 var SkippableChars = []rune{' ', '\t', '\n', '\r'}
