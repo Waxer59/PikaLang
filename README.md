@@ -26,6 +26,13 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
         - [Division](#division)
         - [Module](#module)
         - [Exponentiation](#exponentiation)
+      - [Comparison operators](#comparison-operators)
+        - [Equality operator (==)](#equality-operator-)
+        - [Inequality operator (!=)](#inequality-operator-)
+        - [Greater than operator (\>)](#greater-than-operator-)
+        - [Less than operator (\<)](#less-than-operator-)
+        - [Greater than or equal to operator (\>=)](#greater-than-or-equal-to-operator-)
+        - [Less than or equal to operator (\<=)](#less-than-or-equal-to-operator-)
     - [Data structures](#data-structures)
       - [object](#object)
     - [Primitive data types](#primitive-data-types)
@@ -182,6 +189,65 @@ Exponentiation is a mathematical operation that involves raising a number to a c
 4 ** 4 // base ** exponent
 ```
 
+#### Comparison operators
+
+Comparison operators are used to compare two values and evaluate whether a condition is true or false.
+
+##### Equality operator (==)
+
+The equality operator compares two values and returns true if they are equal and false if they are different.
+
+```js
+5 == 5 // Returns true
+5 == 6 // Returns false
+```
+
+##### Inequality operator (!=)
+
+The inequality operator compares two values and returns true if they are different and false if they are equal.
+
+```js
+5 != 5  // Returns false
+10 != 5 // Returns true
+```
+
+##### Greater than operator (>)
+
+The greater than operator compares two values and returns true if the value on the left is greater than the value on the right.
+
+```js
+10 > 5  // Returns true
+5 > 10  // Returns false
+```
+
+##### Less than operator (<)
+
+The less than operator compares two values and returns true if the value on the left is less than the value on the right. 
+
+```js
+5 < 10  // Returns true
+10 < 5  // Returns false
+```
+
+##### Greater than or equal to operator (>=)
+
+The greater than or equal to operator compares two values and returns true if the value on the left is greater than or equal to the value on the right.
+
+```js
+10 >= 5  // Returns true
+5 >= 10  // Returns false
+5 >= 5   // Returns true
+```
+
+##### Less than or equal to operator (<=)
+
+The less than or equal to operator compares two values and returns true if the value on the left is less than or equal to the value on the right.
+
+```js
+5 <= 10  // Returns true
+10 <= 5  // Returns false
+5 <= 5   // Returns true
+```
 
 ### Data structures
 
