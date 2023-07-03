@@ -25,6 +25,13 @@ const (
 )
 
 var (
+	// MATH EXPR
 	AdditiveExpr       = []string{"+", "-"}
 	MultiplicativeExpr = []string{"*", "/", "%"}
+	MathExpr           = []string{"+", "-", "*", "/", "%", "**"}
+
+	// BOOLEAN EXPR
+	ComparisonExpr = []string{"<", "<=", ">", ">="}
+	EqualityExpr   = []string{"==", "!="}
+	BoolExpr       = []string{"<", "<=", ">", ">=", "==", "!="}
 )

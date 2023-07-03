@@ -70,6 +70,12 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenStr)})
 		case '*':
+			if nextChar() == '*' { // Check for power
+				substract(2) // consume ' ** '
+				tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: "**"})
+				continue
+			}
+
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenStr)})
 		case '/':
 			switch nextChar() {
@@ -95,25 +101,29 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			}
 		case '=':
 			if nextChar() == '=' {
-				tokens = append(tokens, token_type.Token{Type: token_type.EqualEqual, Value: string(tokenStr)})
+				substract(2) // consume '=='
+				tokens = append(tokens, token_type.Token{Type: token_type.EqualEqual, Value: "=="})
 				continue
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.Equals, Value: string(tokenStr)})
 		case '!':
 			if nextChar() == '=' {
-				tokens = append(tokens, token_type.Token{Type: token_type.NotEqual, Value: string(tokenStr)})
+				substract(2) // consume '!='
+				tokens = append(tokens, token_type.Token{Type: token_type.NotEqual, Value: "!="})
 				continue
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.Not, Value: string(tokenStr)})
 		case '>':
 			if nextChar() == '=' {
-				tokens = append(tokens, token_type.Token{Type: token_type.GreaterEqual, Value: string(tokenStr)})
+				substract(2) // consume '>='
+				tokens = append(tokens, token_type.Token{Type: token_type.GreaterEqual, Value: ">="})
 				continue
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.Greater, Value: string(tokenStr)})
 		case '<':
 			if nextChar() == '=' {
-				tokens = append(tokens, token_type.Token{Type: token_type.LessEqual, Value: string(tokenStr)})
+				substract(2) // consume '<='
+				tokens = append(tokens, token_type.Token{Type: token_type.LessEqual, Value: "<="})
 				continue
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.Less, Value: string(tokenStr)})

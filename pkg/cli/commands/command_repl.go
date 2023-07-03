@@ -45,6 +45,7 @@ func startRepl(cCtx *cli.Context) error {
 		}
 
 		program, err := parser.ProduceAST(code)
+		fmt.Println(program)
 
 		if err != nil {
 			return fmt.Errorf(err.Error())
