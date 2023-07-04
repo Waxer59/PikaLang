@@ -55,3 +55,19 @@ type ElseIfStatement struct {
 func (cd IfStatement) GetKind() ast_types.NodeType {
 	return cd.Kind
 }
+
+type SwitchStatement struct {
+	Kind        ast_types.NodeType
+	Condition   Expr
+	CaseStmts   []CaseStatement
+	DefaultStmt CaseStatement
+}
+
+type CaseStatement struct {
+	Condition Expr
+	Body      []Stmt
+}
+
+func (cs SwitchStatement) GetKind() ast_types.NodeType {
+	return cs.Kind
+}

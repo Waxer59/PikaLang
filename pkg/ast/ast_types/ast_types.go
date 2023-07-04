@@ -8,6 +8,7 @@ const (
 	VariableDeclaration NodeType = "VariableDeclaration"
 	FunctionDeclaration NodeType = "FunctionDeclaration"
 	IfStatement         NodeType = "IfStatement"
+	SwitchStatement     NodeType = "SwitchStatement"
 
 	// EXPRESSIONS
 	AssigmentExpr NodeType = "AssigmentExpr"

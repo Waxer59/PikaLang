@@ -1,24 +1,22 @@
 package compilerErrors
 
-type ErrSyntax string
-
-var (
-	ErrSyntaxExpectedLeftParen            ErrSyntax = "ERROR: Expected '('"
-	ErrSyntaxExpectedRightParen           ErrSyntax = "ERROR: Expected ')'"
-	ErrSyntaxExpectedLeftBracket          ErrSyntax = "ERROR: Expected '['"
-	ErrSyntaxExpectedRightBracket         ErrSyntax = "ERROR: Expected ']'"
-	ErrSyntaxExpectedLeftBrace            ErrSyntax = "ERROR: Expected '{'"
-	ErrSyntaxExpectedRightBrace           ErrSyntax = "ERROR: Expected '}'"
-	ErrSyntaxExpectedColon                ErrSyntax = "ERROR: Expected ':'"
-	ErrSyntaxExpectedComma                ErrSyntax = "ERROR: Expected ','"
-	ErrSyntaxExpectedSemicolon            ErrSyntax = "ERROR: Expected ';'"
-	ErrSyntaxExpectedDot                  ErrSyntax = "ERROR: Expected '.'"
-	ErrSyntaxExpectedOperator             ErrSyntax = "ERROR: Expected operator"
-	ErrSyntaxExpectedDoubleQoute          ErrSyntax = "ERROR: Expected '\"'"
-	ErrSyntaxExpectedSingleQuote          ErrSyntax = "ERROR: Expected \"'\""
-	ErrSyntaxExpectedIdentifier           ErrSyntax = "ERROR: Expected identifier"
-	ErrSyntaxInvalidAssignment            ErrSyntax = "ERROR: Invalid assignment"
-	ErrSyntaxExpectedKey                  ErrSyntax = "ERROR: Expected a key"
-	ErrSyntaxExpectedAsignation           ErrSyntax = "ERROR: Expected '='"
-	ErrSyntaxUnterminatedMultilineComment ErrSyntax = "ERROR: Unterminated multiline comment"
+const (
+	ErrSyntaxExpectedLeftParen            = "ERROR: Expected '('"
+	ErrSyntaxExpectedRightParen           = "ERROR: Expected ')'"
+	ErrSyntaxExpectedLeftBracket          = "ERROR: Expected '['"
+	ErrSyntaxExpectedRightBracket         = "ERROR: Expected ']'"
+	ErrSyntaxExpectedLeftBrace            = "ERROR: Expected '{'"
+	ErrSyntaxExpectedRightBrace           = "ERROR: Expected '}'"
+	ErrSyntaxExpectedColon                = "ERROR: Expected ':'"
+	ErrSyntaxExpectedComma                = "ERROR: Expected ','"
+	ErrSyntaxExpectedSemicolon            = "ERROR: Expected ';'"
+	ErrSyntaxExpectedDot                  = "ERROR: Expected '.'"
+	ErrSyntaxExpectedOperator             = "ERROR: Expected operator"
+	ErrSyntaxExpectedDoubleQoute          = "ERROR: Expected '\"'"
+	ErrSyntaxExpectedSingleQuote          = "ERROR: Expected \"'\""
+	ErrSyntaxExpectedIdentifier           = "ERROR: Expected identifier"
+	ErrSyntaxInvalidAssignment            = "ERROR: Invalid assignment"
+	ErrSyntaxExpectedKey                  = "ERROR: Expected a key"
+	ErrSyntaxExpectedAsignation           = "ERROR: Expected '='"
+	ErrSyntaxUnterminatedMultilineComment = "ERROR: Unterminated multiline comment"
 )

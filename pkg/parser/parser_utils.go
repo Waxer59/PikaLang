@@ -18,9 +18,14 @@ func (p *Parser) next() token_type.Token {
 	return token_type.Token{}
 }
 
-func (p *Parser) subtract() token_type.Token {
+func (p *Parser) subtract(params ...int) token_type.Token {
+	n := 1
+	if len(params) > 0 {
+		n = params[0]
+	}
+
 	prev := p.at()
-	p.tokens = p.tokens[1:]
+	p.tokens = p.tokens[n:]
 	return prev
 }
 

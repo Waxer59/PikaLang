@@ -22,7 +22,7 @@ func New(parentENV *Environment) Environment {
 func (e *Environment) DeclareVar(varName string, value RuntimeValue, constant bool) (RuntimeValue, error) {
 
 	if _, ok := e.variables[varName]; ok {
-		return nil, errors.New(string(compilerErrors.ErrVariableAlreadyExists) + varName)
+		return nil, errors.New(compilerErrors.ErrVariableAlreadyExists + varName)
 	}
 
 	e.variables[varName] = value
@@ -36,7 +36,7 @@ func (e *Environment) DeclareVar(varName string, value RuntimeValue, constant bo
 
 func (e *Environment) AssignVar(varName string, value RuntimeValue) (RuntimeValue, error) {
 	if _, ok := e.constants[varName]; ok {
-		return nil, errors.New(string(compilerErrors.ErrVariableIsConstant) + varName)
+		return nil, errors.New(compilerErrors.ErrVariableIsConstant + varName)
 	}
 
 	env, err := e.Resolve(varName)
@@ -52,7 +52,7 @@ func (e *Environment) Resolve(varName string) (Environment, error) {
 	}
 
 	if e.parent == nil {
-		return *e, errors.New(string(compilerErrors.ErrVariableDoesNotExist) + varName)
+		return *e, errors.New(compilerErrors.ErrVariableDoesNotExist + varName)
 	}
 
 	return e.parent.Resolve(varName)

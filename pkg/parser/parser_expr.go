@@ -131,7 +131,7 @@ func (p *Parser) parseCallExpr(caller ast.Expr) (ast.Expr, error) {
 }
 
 func (p *Parser) parseArgs() ([]ast.Expr, error) {
-	p.expect(token_type.LeftParen, string(compilerErrors.ErrSyntaxExpectedLeftParen))
+	p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
 
 	args := []ast.Expr{}
 
@@ -144,7 +144,7 @@ func (p *Parser) parseArgs() ([]ast.Expr, error) {
 		}
 	}
 
-	p.expect(token_type.RightParen, string(compilerErrors.ErrSyntaxExpectedRightParen))
+	p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
 
 	return args, nil
 }
@@ -181,7 +181,7 @@ func (p *Parser) parseMemberExpr() (ast.Expr, error) {
 			property = p.parsePrimaryExpr()
 
 			if property.GetKind() != ast_types.Identifier {
-				return nil, errors.New(string(compilerErrors.ErrFuncExpectedIdentifer))
+				return nil, errors.New(compilerErrors.ErrFuncExpectedIdentifer)
 			}
 		case token_type.LeftBracket:
 			var err error
@@ -193,7 +193,7 @@ func (p *Parser) parseMemberExpr() (ast.Expr, error) {
 				return nil, err
 			}
 
-			p.expect(token_type.RightBracket, string(compilerErrors.ErrSyntaxExpectedRightBracket))
+			p.expect(token_type.RightBracket, compilerErrors.ErrSyntaxExpectedRightBracket)
 		}
 
 		obj = ast.MemberExpr{
@@ -223,7 +223,7 @@ func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 	properties := []ast.Property{}
 
 	for p.notEOF() && p.at().Type != token_type.RightBrace {
-		key := p.expect(token_type.Identifier, string(compilerErrors.ErrSyntaxExpectedKey)).Value
+		key := p.expect(token_type.Identifier, compilerErrors.ErrSyntaxExpectedKey).Value
 
 		// Allows shorthand syntax: { key, } && { key }
 		switch p.at().Type {
@@ -244,7 +244,7 @@ func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 			continue
 		}
 
-		p.expect(token_type.Colon, string(compilerErrors.ErrSyntaxExpectedColon))
+		p.expect(token_type.Colon, compilerErrors.ErrSyntaxExpectedColon)
 		value, err := p.parseExpr()
 
 		if err != nil {
@@ -258,11 +258,11 @@ func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 		})
 
 		if p.at().Type != token_type.RightBrace {
-			p.expect(token_type.Comma, string(compilerErrors.ErrSyntaxExpectedComma))
+			p.expect(token_type.Comma, compilerErrors.ErrSyntaxExpectedComma)
 		}
 	}
 
-	p.expect(token_type.RightBrace, string(compilerErrors.ErrSyntaxExpectedRightBrace))
+	p.expect(token_type.RightBrace, compilerErrors.ErrSyntaxExpectedRightBrace)
 	return ast.ObjectLiteral{
 		Kind:       ast_types.ObjectLiteral,
 		Properties: properties,
@@ -275,7 +275,7 @@ func (p *Parser) parseEqualityExpr() (ast.Expr, error) {
 		return nil, err
 	}
 
-	for slices.Contains(ast_types.EqualityExpr, p.at().Value) {
+	for slices.Contains(ast_types.EqualityExpr, p.at().Value) && p.notEOF() {
 		op := p.subtract().Value // consume operator
 		right, err := p.parseComparisonExpr()
 		if err != nil {
@@ -299,7 +299,7 @@ func (p *Parser) parseComparisonExpr() (ast.Expr, error) {
 		return nil, err
 	}
 
-	for slices.Contains(ast_types.ComparisonExpr, p.at().Value) {
+	for p.notEOF() && slices.Contains(ast_types.ComparisonExpr, p.at().Value) {
 		op := p.subtract().Value // consume operator
 		right, err := p.parseObjectExpr()
 
@@ -370,7 +370,7 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 	case token_type.DoubleQoute:
 		p.subtract() // consume '"'
 		value := p.subtract().Value
-		p.expect(token_type.DoubleQoute, string(compilerErrors.ErrSyntaxExpectedDoubleQoute))
+		p.expect(token_type.DoubleQoute, compilerErrors.ErrSyntaxExpectedDoubleQoute)
 		return ast.StringLiteral{
 			Kind:  ast_types.StringLiteral,
 			Value: value,
@@ -384,7 +384,7 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 			break
 		}
 
-		p.expect(token_type.RightParen, string(compilerErrors.ErrSyntaxExpectedRightParen))
+		p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
 		return value
 	default:
 		errorMsg = "Expected an expression"

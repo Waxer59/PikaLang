@@ -33,7 +33,7 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 	}
 
 	if err != nil || fn.GetType() != interpreter_env.Function {
-		return nil, errors.New(string(compilerErrors.ErrFuncNotFound) + fnName)
+		return nil, errors.New(compilerErrors.ErrFuncNotFound + fnName)
 	}
 
 	function := fn.(interpreter_env.FunctionVal)
@@ -91,7 +91,7 @@ func evalObjectExpr(objectExpr ast.ObjectLiteral, env interpreter_env.Environmen
 
 func evalAssignment(assignment ast.AssigmentExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	if assignment.Assigne.GetKind() != ast_types.Identifier {
-		return nil, errors.New(string(compilerErrors.ErrSyntaxInvalidAssignment))
+		return nil, errors.New(compilerErrors.ErrSyntaxInvalidAssignment)
 	}
 
 	varName := assignment.Assigne.(ast.Identifier).Symbol
@@ -116,7 +116,7 @@ func evalStringBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs
 	valLhs, okLhs := lhs.(interpreter_env.StringVal)
 	valRhs, okRhs := rhs.(interpreter_env.StringVal)
 	if !okLhs || !okRhs {
-		return nil, errors.New(string(compilerErrors.ErrBinaryInvalidBinaryExpr))
+		return nil, errors.New(compilerErrors.ErrBinaryInvalidBinaryExpr)
 	}
 	switch operator {
 	case "+":
@@ -133,7 +133,7 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue
 	valRhs, okRhs := rhs.(interpreter_env.NumberVal)
 
 	if !okLhs || !okRhs {
-		return nil, errors.New(string(compilerErrors.ErrBinaryInvalidBinaryExpr))
+		return nil, errors.New(compilerErrors.ErrBinaryInvalidBinaryExpr)
 	}
 
 	switch operator {
@@ -150,7 +150,7 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue
 		result = valLhs.Value / valRhs.Value
 	case "%":
 		if valRhs.Value == 0 {
-			return nil, errors.New(string(compilerErrors.ErrBinaryDivisionByZero))
+			return nil, errors.New(compilerErrors.ErrBinaryDivisionByZero)
 		}
 		result = float64(int(valLhs.Value) % int(valRhs.Value))
 	case "**", "^":
@@ -166,11 +166,11 @@ func evalComparisonBinaryExpr(operator string, lhs interpreter_env.RuntimeValue,
 	numValLhs, isNumLhs := lhs.(interpreter_env.NumberVal)
 	numValRhs, isNumRhs := rhs.(interpreter_env.NumberVal)
 	if !isNumRhs || !isNumLhs && lhs.GetType() == interpreter_env.Number && rhs.GetType() == interpreter_env.Number {
-		return nil, errors.New(string(compilerErrors.ErrBinaryInvalidBinaryExpr))
+		return nil, errors.New(compilerErrors.ErrBinaryInvalidBinaryExpr)
 	}
 
 	if lhs.GetType() != rhs.GetType() {
-		return nil, errors.New(string(compilerErrors.ErrBinaryInvalidBinaryExpr))
+		return nil, errors.New(compilerErrors.ErrBinaryInvalidBinaryExpr)
 	}
 
 	switch operator {
