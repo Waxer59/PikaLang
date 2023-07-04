@@ -25,6 +25,20 @@ func (p *Parser) parseStmt() (ast.Stmt, error) {
 	return expr, err
 }
 
+// func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
+// 	p.subtract() // consume 'switch'
+// 	p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
+
+// 	condition, err := p.parseExpr()
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
+
+// 	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
+// }
+
 func (p *Parser) parseIfStatement() (ast.Stmt, error) {
 	var elseBody []ast.Stmt = nil
 
@@ -108,7 +122,7 @@ func (p *Parser) parseFnDeclaration() (ast.Stmt, error) {
 
 	name := p.expect(token_type.Identifier, compilerErrors.ErrFuncExpectedIdentifer)
 
-	args, err := p.parseArgs()
+	args, err := p.parseFunctionArgs()
 
 	if err != nil {
 		return nil, err

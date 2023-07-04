@@ -108,7 +108,7 @@ func (p *Parser) parseCallMemberExpr() (ast.Expr, error) {
 }
 
 func (p *Parser) parseCallExpr(caller ast.Expr) (ast.Expr, error) {
-	args, err := p.parseArgs()
+	args, err := p.parseFunctionArgs()
 	if err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func (p *Parser) parseCallExpr(caller ast.Expr) (ast.Expr, error) {
 	return callExpr, nil
 }
 
-func (p *Parser) parseArgs() ([]ast.Expr, error) {
+func (p *Parser) parseFunctionArgs() ([]ast.Expr, error) {
 	p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
 
 	args := []ast.Expr{}
@@ -208,7 +208,7 @@ func (p *Parser) parseMemberExpr() (ast.Expr, error) {
 }
 
 func (p *Parser) parseExpr() (ast.Expr, error) {
-	expr, err := p.parseEqualityExpr()
+	expr, err := p.parseAssigmentExpr()
 	return expr, err
 }
 
@@ -319,7 +319,7 @@ func (p *Parser) parseComparisonExpr() (ast.Expr, error) {
 }
 
 func (p *Parser) parseAssigmentExpr() (ast.Expr, error) {
-	left, err := p.parseObjectExpr()
+	left, err := p.parseEqualityExpr()
 
 	if err != nil {
 		return nil, err
@@ -327,7 +327,7 @@ func (p *Parser) parseAssigmentExpr() (ast.Expr, error) {
 
 	if p.at().Type == token_type.Equals {
 		p.subtract() // consume '='
-		value, err := p.parseObjectExpr()
+		value, err := p.parseEqualityExpr()
 		if err != nil {
 			return nil, err
 		}
