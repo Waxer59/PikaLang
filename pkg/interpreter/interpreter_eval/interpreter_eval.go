@@ -13,14 +13,12 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 
 	// LITERALS
 	case ast_types.Identifier:
-		Identifier, err := evalIdentifier(astNode.(ast.Identifier), env)
-		return Identifier, err
+		return evalIdentifier(astNode.(ast.Identifier), env)
 	case ast_types.NumericLiteral:
 		value := astNode.(ast.NumericLiteral).GetValue().(float64)
 		return interpreter_env.NumberVal{Value: value, Type: interpreter_env.Number}, nil
 	case ast_types.ObjectLiteral:
-		obj, err := evalObjectExpr(astNode.(ast.ObjectLiteral), env)
-		return obj, err
+		return evalObjectExpr(astNode.(ast.ObjectLiteral), env)
 	case ast_types.NullLiteral:
 		return interpreter_makers.MK_NULL(), nil
 	case ast_types.BooleanLiteral:
@@ -30,27 +28,21 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 
 	// EXPRESSIONS
 	case ast_types.BinaryExpr:
-		binaryExpr, err := evalBinaryExpr(astNode.(ast.BinaryExpr), env)
-		return binaryExpr, err
+		return evalBinaryExpr(astNode.(ast.BinaryExpr), env)
 	case ast_types.CallExpr:
-		callExpr, err := evalCallExpr(astNode.(ast.CallExpr), env)
-		return callExpr, err
+		return evalCallExpr(astNode.(ast.CallExpr), env)
 	case ast_types.AssigmentExpr:
 		return evalAssignment(astNode.(ast.AssigmentExpr), env)
 
 	// STATEMENTS
 	case ast_types.Program:
-		program, err := evalProgram(astNode.(ast.Program), env)
-		return program, err
+		return evalProgram(astNode.(ast.Program), env)
 	case ast_types.VariableDeclaration:
-		variable, err := evalVariableDeclaration(astNode.(ast.VariableDeclaration), env)
-		return variable, err
+		return evalVariableDeclaration(astNode.(ast.VariableDeclaration), env)
 	case ast_types.FunctionDeclaration:
-		funDeclaration, err := evalFunctionDeclaration(astNode.(ast.FunctionDeclaration), env)
-		return funDeclaration, err
+		return evalFunctionDeclaration(astNode.(ast.FunctionDeclaration), env)
 	case ast_types.IfStatement:
-		ifStmt, err := evalIfStatement(astNode.(ast.IfStatement), env)
-		return ifStmt, err
+		return evalIfStatement(astNode.(ast.IfStatement), env)
 	default:
 		return nil, errors.New("ERROR: Unknown node type")
 	}

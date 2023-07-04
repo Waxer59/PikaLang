@@ -10,6 +10,7 @@ import (
 	"pika/pkg/interpreter/interpreter_eval"
 	"pika/pkg/parser"
 
+	"github.com/fatih/color"
 	"github.com/urfave/cli/v2"
 )
 
@@ -59,7 +60,11 @@ func runApp(cCtx *cli.Context) error {
 		return fmt.Errorf(err.Error())
 	}
 
-	interpreter_eval.Evaluate(*program, env)
+	_, err = interpreter_eval.Evaluate(*program, env)
+
+	if err != nil {
+		color.Red(err.Error())
+	}
 
 	return nil
 }
