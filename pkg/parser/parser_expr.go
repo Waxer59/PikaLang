@@ -108,7 +108,7 @@ func (p *Parser) parseCallMemberExpr() (ast.Expr, error) {
 }
 
 func (p *Parser) parseCallExpr(caller ast.Expr) (ast.Expr, error) {
-	args, err := p.parseFunctionArgs()
+	args, err := p.parseArgs(token_type.Fn)
 	if err != nil {
 		return nil, err
 	}
@@ -128,43 +128,6 @@ func (p *Parser) parseCallExpr(caller ast.Expr) (ast.Expr, error) {
 	}
 
 	return callExpr, nil
-}
-
-func (p *Parser) parseFunctionArgs() ([]ast.Expr, error) {
-	p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
-
-	args := []ast.Expr{}
-
-	if p.at().Type != token_type.RightParen {
-		var err error
-		args, err = p.parseArgsList()
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
-
-	return args, nil
-}
-
-func (p *Parser) parseArgsList() ([]ast.Expr, error) {
-	assigmentExpr, err := p.parseAssigmentExpr()
-	if err != nil {
-		return nil, err
-	}
-	args := []ast.Expr{assigmentExpr}
-
-	for p.at().Type == token_type.Comma && p.subtract().Type == token_type.Comma {
-		assigmentExpr, err := p.parseAssigmentExpr()
-		if err != nil {
-			return nil, err
-		}
-		args = append(args, assigmentExpr)
-	}
-
-	return args, nil
 }
 
 func (p *Parser) parseMemberExpr() (ast.Expr, error) {

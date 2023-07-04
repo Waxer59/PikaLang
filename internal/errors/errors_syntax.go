@@ -19,4 +19,5 @@ const (
 	ErrSyntaxExpectedKey                  = "ERROR: Expected a key"
 	ErrSyntaxExpectedAsignation           = "ERROR: Expected '='"
 	ErrSyntaxUnterminatedMultilineComment = "ERROR: Unterminated multiline comment"
+	ErrSyntaxStatementNotFound            = "ERROR: Statement not supported"
 )

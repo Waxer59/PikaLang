@@ -1,7 +1,10 @@
 package parser
 
 import (
+	"errors"
 	"os"
+	compilerErrors "pika/internal/errors"
+	"pika/pkg/ast"
 	"pika/pkg/lexer/token_type"
 
 	"github.com/fatih/color"
@@ -41,4 +44,67 @@ func (p *Parser) expect(typeExpected token_type.TokenType, errMsg string) token_
 
 func (p *Parser) notEOF() bool {
 	return p.at().Type != token_type.EOF
+}
+
+func (p *Parser) parseArgs(argType token_type.TokenType) ([]ast.Expr, error) {
+
+	switch argType {
+	case token_type.Fn:
+		return p.parseFunctionArgs()
+	case token_type.If, token_type.Switch:
+		return p.parseSingleLogicalArg()
+	}
+
+	return nil, errors.New(compilerErrors.ErrSyntaxStatementNotFound)
+}
+
+func (p *Parser) parseSingleLogicalArg() ([]ast.Expr, error) {
+	p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
+
+	condition, err := p.parseExpr()
+
+	if err != nil {
+		return nil, err
+	}
+
+	p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
+
+	return []ast.Expr{condition}, nil
+}
+
+func (p *Parser) parseFunctionArgs() ([]ast.Expr, error) {
+	p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
+
+	args := []ast.Expr{}
+
+	if p.at().Type != token_type.RightParen {
+		var err error
+		args, err = p.parseArgsList()
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
+
+	return args, nil
+}
+
+func (p *Parser) parseArgsList() ([]ast.Expr, error) {
+	assigmentExpr, err := p.parseAssigmentExpr()
+	if err != nil {
+		return nil, err
+	}
+	args := []ast.Expr{assigmentExpr}
+
+	for p.at().Type == token_type.Comma && p.subtract().Type == token_type.Comma {
+		assigmentExpr, err := p.parseAssigmentExpr()
+		if err != nil {
+			return nil, err
+		}
+		args = append(args, assigmentExpr)
+	}
+
+	return args, nil
 }

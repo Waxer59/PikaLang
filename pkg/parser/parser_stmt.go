@@ -25,44 +25,38 @@ func (p *Parser) parseStmt() (ast.Stmt, error) {
 	return expr, err
 }
 
-// func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
-// 	p.subtract() // consume 'switch'
-// 	p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
+func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
+	p.subtract() // consume 'switch'
 
-// 	condition, err := p.parseExpr()
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	args, err := p.parseArgs(token_type.If)
 
-// 	p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
+	if err != nil {
+		return nil, err
+	}
 
-// 	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
-// }
+	condition := args[0]
+
+	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
+}
 
 func (p *Parser) parseIfStatement() (ast.Stmt, error) {
 	var elseBody []ast.Stmt = nil
 
 	p.subtract() // consume 'if'
 
-	p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
-
-	condition, err := p.parseExpr()
+	args, err := p.parseArgs(token_type.If)
 
 	if err != nil {
 		return nil, err
 	}
 
-	p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
-
-	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
+	condition := args[0]
 
 	body, err := p.parseBodyStmt()
 
 	if err != nil {
 		return nil, err
 	}
-
-	p.expect(token_type.RightBrace, compilerErrors.ErrSyntaxExpectedRightBrace)
 
 	// Verify for else if statements
 	elseIfStmt, err := p.parseElseIfStatement()
@@ -96,21 +90,23 @@ func (p *Parser) parseElseIfStatement() ([]ast.ElseIfStatement, error) {
 
 	for p.at().Type == token_type.Else && p.next().Type == token_type.If && p.at().Type != token_type.EOF {
 		p.subtract(2) // consume 'else' & 'if'
-		p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
-		elseIfCondition, err := p.parseExpr()
+		args, err := p.parseArgs(token_type.If)
+
 		if err != nil {
 			return nil, err
 		}
-		p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
-		p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
-		elseIfBody, err := p.parseBodyStmt()
+
+		condition := args[0]
+
+		body, err := p.parseBodyStmt()
+
 		if err != nil {
 			return nil, err
 		}
-		p.expect(token_type.RightBrace, compilerErrors.ErrSyntaxExpectedRightBrace)
+
 		elseIfStmt = append(elseIfStmt, ast.ElseIfStatement{
-			Condition: elseIfCondition,
-			Body:      elseIfBody,
+			Condition: condition,
+			Body:      body,
 		})
 	}
 
@@ -122,7 +118,7 @@ func (p *Parser) parseFnDeclaration() (ast.Stmt, error) {
 
 	name := p.expect(token_type.Identifier, compilerErrors.ErrFuncExpectedIdentifer)
 
-	args, err := p.parseFunctionArgs()
+	args, err := p.parseArgs(token_type.Fn)
 
 	if err != nil {
 		return nil, err
@@ -137,15 +133,11 @@ func (p *Parser) parseFnDeclaration() (ast.Stmt, error) {
 		params[i] = arg.(ast.Identifier).Symbol
 	}
 
-	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
-
 	body, err := p.parseBodyStmt()
 
 	if err != nil {
 		return nil, err
 	}
-
-	p.expect(token_type.RightBrace, compilerErrors.ErrSyntaxExpectedRightBrace)
 
 	return ast.FunctionDeclaration{
 		Kind:   ast_types.FunctionDeclaration,
@@ -158,6 +150,7 @@ func (p *Parser) parseFnDeclaration() (ast.Stmt, error) {
 func (p *Parser) parseBodyStmt() ([]ast.Stmt, error) {
 	var body []ast.Stmt
 
+	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
 	for p.at().Type != token_type.RightBrace && p.at().Type != token_type.EOF {
 		stmt, err := p.parseStmt()
 		if err != nil {
@@ -165,6 +158,7 @@ func (p *Parser) parseBodyStmt() ([]ast.Stmt, error) {
 		}
 		body = append(body, stmt)
 	}
+	p.expect(token_type.RightBrace, compilerErrors.ErrSyntaxExpectedRightBrace)
 
 	return body, nil
 }
