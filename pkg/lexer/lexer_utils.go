@@ -3,6 +3,7 @@ package lexer
 import (
 	"pika/pkg/lexer/token_type"
 	"strconv"
+	"strings"
 
 	"golang.org/x/exp/slices"
 )
@@ -12,8 +13,17 @@ func IsSkippable(char rune) bool {
 }
 
 func NextChar(src *[]rune) string {
+	if len(*src) <= 0 {
+		return ""
+	}
+
 	char := (*src)[0]
-	*src = (*src)[1:]
+	if len(*src)-1 > 0 {
+		*src = (*src)[1:]
+	} else {
+		*src = []rune{}
+	}
+
 	return string(char)
 }
 
@@ -21,7 +31,17 @@ func NextChar(src *[]rune) string {
  * 	SecondReturn: Rest of the string
  */
 func ExtractInt(src []rune) (string, []rune) {
-	var num = ""
+	if len(src) <= 0 {
+		return "", src
+	}
+
+	isNegative := src[0] == '-'
+	num := ""
+
+	if isNegative {
+		num = "-"
+		NextChar(&src)
+	}
 
 	for len(src) > 0 && (IsInt(src[0]) || src[0] == '.') {
 		num += NextChar(&src)
@@ -34,17 +54,21 @@ func ExtractInt(src []rune) (string, []rune) {
  * 	SecondReturn: Rest of the string
  */
 func ExtractIdentifier(src []rune) (string, []rune) {
+	if len(src) <= 0 || !IsAlpha(src[0]) {
+		return "", src
+	}
+
 	var str = ""
 
-	for len(src) > 0 && IsIdentifier(src[0]) {
+	for len(src) > 0 && (IsAlpha(src[0]) || slices.Contains(token_type.AllowedIdentifierChars, src[0])) {
 		str += NextChar(&src)
 	}
 
 	return str, src
 }
 
-func IsIdentifier(char rune) bool {
-	return slices.Contains(token_type.AllowedIdentifierChars, char)
+func IsAlpha(char rune) bool {
+	return strings.ToUpper(string(char)) != strings.ToLower(string(char)) || slices.Contains(token_type.AllowedIdentifierCharsWithFirst, char)
 }
 
 /*  FirstReturn: Keyword type

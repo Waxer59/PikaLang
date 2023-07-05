@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"errors"
+	"fmt"
 	compilerErrors "pika/internal/errors"
 	"pika/pkg/lexer/token_type"
 )
@@ -26,15 +27,16 @@ func Tokenize(input string) ([]token_type.Token, error) {
 	}
 
 	for len(src) > 0 {
-		tokenStr := src[0]
+		tokenChar := src[0]
+
 		// Check if token is skippable
-		if IsSkippable(tokenStr) {
+		if IsSkippable(tokenChar) {
 			substract(1)
 			continue
 		}
 
 		// Check for number
-		if IsInt(tokenStr) {
+		if IsInt(tokenChar) {
 			num, rest := ExtractInt(src)
 			tokens = append(tokens, token_type.Token{Type: token_type.Number, Value: num})
 			src = rest
@@ -42,7 +44,7 @@ func Tokenize(input string) ([]token_type.Token, error) {
 		}
 
 		// Check for alpha
-		if IsIdentifier(tokenStr) {
+		if IsAlpha(tokenChar) {
 			alpha, rest := ExtractIdentifier(src)
 			alphaType := token_type.Identifier
 
@@ -57,9 +59,9 @@ func Tokenize(input string) ([]token_type.Token, error) {
 		}
 
 		// Check for operators
-		switch tokenStr {
+		switch tokenChar {
 		case '+', '%':
-			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 		case '-':
 			if IsInt(nextChar()) { // Check for negative numbers
 				substract(1) // advance '-'
@@ -68,7 +70,7 @@ func Tokenize(input string) ([]token_type.Token, error) {
 				src = rest
 				continue
 			}
-			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 		case '*':
 			if nextChar() == '*' { // Check for power
 				substract(2) // consume ' ** '
@@ -76,12 +78,12 @@ func Tokenize(input string) ([]token_type.Token, error) {
 				continue
 			}
 
-			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 		case '/':
 			switch nextChar() {
 			case '/':
 				substract(2) // consume ' // '
-				for src[0] != '\n' {
+				for len(src) > 0 && src[0] != '\n' {
 					substract(1)
 					if len(src) <= 0 {
 						break
@@ -89,15 +91,16 @@ func Tokenize(input string) ([]token_type.Token, error) {
 				}
 			case '*':
 				substract(2) // consume /*
-				for src[0] != '*' && nextChar() == '/' {
+				for len(src) > 0 && src[0] != '*' && nextChar() != '/' {
 					substract(1)
+					fmt.Println(string(src))
 					if len(src) <= 1 { // if the comment is not terminated
 						return nil, errors.New(string(compilerErrors.ErrSyntaxUnterminatedMultilineComment))
 					}
 				}
 				substract(2) // consume */
 			default:
-				tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenStr)})
+				tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 			}
 		case '=':
 			if nextChar() == '=' {
@@ -105,46 +108,46 @@ func Tokenize(input string) ([]token_type.Token, error) {
 				tokens = append(tokens, token_type.Token{Type: token_type.EqualEqual, Value: "=="})
 				continue
 			}
-			tokens = append(tokens, token_type.Token{Type: token_type.Equals, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.Equals, Value: string(tokenChar)})
 		case '!':
 			if nextChar() == '=' {
 				substract(2) // consume '!='
 				tokens = append(tokens, token_type.Token{Type: token_type.NotEqual, Value: "!="})
 				continue
 			}
-			tokens = append(tokens, token_type.Token{Type: token_type.Not, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.Not, Value: string(tokenChar)})
 		case '>':
 			if nextChar() == '=' {
 				substract(2) // consume '>='
 				tokens = append(tokens, token_type.Token{Type: token_type.GreaterEqual, Value: ">="})
 				continue
 			}
-			tokens = append(tokens, token_type.Token{Type: token_type.Greater, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.Greater, Value: string(tokenChar)})
 		case '<':
 			if nextChar() == '=' {
 				substract(2) // consume '<='
 				tokens = append(tokens, token_type.Token{Type: token_type.LessEqual, Value: "<="})
 				continue
 			}
-			tokens = append(tokens, token_type.Token{Type: token_type.Less, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.Less, Value: string(tokenChar)})
 		case ';':
-			tokens = append(tokens, token_type.Token{Type: token_type.SemiColon, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.SemiColon, Value: string(tokenChar)})
 		case '(':
-			tokens = append(tokens, token_type.Token{Type: token_type.LeftParen, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.LeftParen, Value: string(tokenChar)})
 		case ')':
-			tokens = append(tokens, token_type.Token{Type: token_type.RightParen, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.RightParen, Value: string(tokenChar)})
 		case '{':
-			tokens = append(tokens, token_type.Token{Type: token_type.LeftBrace, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.LeftBrace, Value: string(tokenChar)})
 		case '}':
-			tokens = append(tokens, token_type.Token{Type: token_type.RightBrace, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.RightBrace, Value: string(tokenChar)})
 		case '[':
-			tokens = append(tokens, token_type.Token{Type: token_type.LeftBracket, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.LeftBracket, Value: string(tokenChar)})
 		case ']':
-			tokens = append(tokens, token_type.Token{Type: token_type.RightBracket, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.RightBracket, Value: string(tokenChar)})
 		case ',':
-			tokens = append(tokens, token_type.Token{Type: token_type.Comma, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.Comma, Value: string(tokenChar)})
 		case ':':
-			tokens = append(tokens, token_type.Token{Type: token_type.Colon, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.Colon, Value: string(tokenChar)})
 		case '.':
 			if IsInt(nextChar()) { // Check for decimal numbers as .123 == 0.123
 				num, rest := ExtractInt(src)
@@ -152,22 +155,22 @@ func Tokenize(input string) ([]token_type.Token, error) {
 				src = rest
 				continue
 			}
-			tokens = append(tokens, token_type.Token{Type: token_type.Dot, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.Dot, Value: string(tokenChar)})
 		case '"':
-			tokens = append(tokens, token_type.Token{Type: token_type.DoubleQoute, Value: string(tokenStr)}) // Append double qoute
+			tokens = append(tokens, token_type.Token{Type: token_type.DoubleQoute, Value: string(tokenChar)}) // Append double qoute
 			substract(1)
 
 			var str string
-			for src[0] != '"' {
+			for len(src) > 0 && src[0] != '"' {
 				str += string(substract(1))
 			}
 
 			tokens = append(tokens, token_type.Token{Type: token_type.StringLiteral, Value: str})
-			tokens = append(tokens, token_type.Token{Type: token_type.DoubleQoute, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.DoubleQoute, Value: string(tokenChar)})
 		case '\'':
-			tokens = append(tokens, token_type.Token{Type: token_type.SingleQoute, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.SingleQoute, Value: string(tokenChar)})
 		default:
-			tokens = append(tokens, token_type.Token{Type: token_type.Identifier, Value: string(tokenStr)})
+			tokens = append(tokens, token_type.Token{Type: token_type.Identifier, Value: string(tokenChar)})
 		}
 		substract(1)
 	}

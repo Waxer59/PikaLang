@@ -2,7 +2,6 @@ package parser
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	compilerErrors "pika/internal/errors"
 	"pika/pkg/ast"
@@ -77,7 +76,6 @@ func (p *Parser) parseExponentialExpr() (ast.Expr, error) {
 		op := p.subtract().Value
 		right, err := p.parseMultiplicativeExpr()
 
-		fmt.Println(right)
 		if err != nil {
 			return nil, err
 		}
