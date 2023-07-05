@@ -43,7 +43,7 @@ func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
 		if p.at().Type == token_type.Case {
 			p.subtract() // consume 'case'
 
-			caseCondition, err := p.parseArgs(token_type.Fn)
+			caseCondition, err := p.parseArgs(token_type.Case)
 
 			if err != nil {
 				return nil, err
@@ -137,7 +137,7 @@ func (p *Parser) parseIfStatement() (ast.Stmt, error) {
 func (p *Parser) parseElseIfStatement() ([]ast.ElseIfStatement, error) {
 	var elseIfStmt []ast.ElseIfStatement = nil
 
-	for p.at().Type == token_type.Else && p.next().Type == token_type.If && p.at().Type != token_type.EOF {
+	for p.at().Type == token_type.Else && p.atNext().Type == token_type.If && p.at().Type != token_type.EOF {
 		p.subtract(2) // consume 'else' & 'if'
 		args, err := p.parseArgs(token_type.If)
 

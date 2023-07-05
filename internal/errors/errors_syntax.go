@@ -20,4 +20,7 @@ const (
 	ErrSyntaxExpectedAsignation           = "ERROR: Expected '='"
 	ErrSyntaxUnterminatedMultilineComment = "ERROR: Unterminated multiline comment"
 	ErrSyntaxStatementNotFound            = "ERROR: Statement not supported"
+	ErrSyntaxExpectedExpr                 = "ERROR: Expected an expression"
+	ErrConditionCannotBeEmpty             = "ERROR: Condition cannot be empty"
+	ErrSyntaxCaseCannotBeEmpty            = "ERROR: Case cannot be empty"
 )

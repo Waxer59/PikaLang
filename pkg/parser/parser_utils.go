@@ -14,7 +14,7 @@ func (p *Parser) at() token_type.Token {
 	return p.tokens[0]
 }
 
-func (p *Parser) next() token_type.Token {
+func (p *Parser) atNext() token_type.Token {
 	if len(p.tokens) > 1 {
 		return p.tokens[1]
 	}
@@ -50,7 +50,7 @@ func (p *Parser) parseArgs(argType token_type.TokenType) ([]ast.Expr, error) {
 
 	switch argType {
 	case token_type.Fn, token_type.Case:
-		return p.parseFunctionArgs()
+		return p.parseMultipleArgs(argType)
 	case token_type.If, token_type.Switch:
 		return p.parseSingleArg()
 	}
@@ -70,6 +70,10 @@ func (p *Parser) parseSingleArg() ([]ast.Expr, error) {
 		return nil, err
 	}
 
+	if condition == nil {
+		return nil, errors.New(compilerErrors.ErrConditionCannotBeEmpty)
+	}
+
 	if p.at().Type == token_type.RightParen { // Optional parens
 		p.subtract() // Remove the closing paren
 	}
@@ -77,10 +81,14 @@ func (p *Parser) parseSingleArg() ([]ast.Expr, error) {
 	return []ast.Expr{condition}, nil
 }
 
-func (p *Parser) parseFunctionArgs() ([]ast.Expr, error) {
+func (p *Parser) parseMultipleArgs(argType token_type.TokenType) ([]ast.Expr, error) {
 
-	if p.at().Type == token_type.LeftParen { // Optional parens
-		p.subtract() // Remove the opening paren
+	if argType == token_type.Fn {
+		p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
+	}
+
+	if argType == token_type.Case && p.at().Type == token_type.Colon {
+		return nil, errors.New(compilerErrors.ErrSyntaxCaseCannotBeEmpty)
 	}
 
 	args := []ast.Expr{}
@@ -94,8 +102,8 @@ func (p *Parser) parseFunctionArgs() ([]ast.Expr, error) {
 		}
 	}
 
-	if p.at().Type == token_type.RightParen { // Optional parens
-		p.subtract() // Remove the closing paren
+	if argType == token_type.Fn {
+		p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
 	}
 
 	return args, nil

@@ -13,6 +13,8 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
       - [variables](#variables)
       - [constants](#constants)
     - [If statements](#if-statements)
+      - [Else Statement](#else-statement)
+      - [Else If Statement:](#else-if-statement)
     - [Function declaration](#function-declaration)
     - [Switch statement](#switch-statement)
       - [Multiple Cases](#multiple-cases)
@@ -108,7 +110,7 @@ if x > 5 {
 }
 ```
 
-2. Else Statement:
+#### Else Statement
 The 'else' statement follows an 'if' statement and is used to specify a block of code that should be executed if the condition in the preceding 'if' statement evaluates to false. The 'else' statement does not require any conditions. It is optional and can be omitted if not needed.
 
 Example:
@@ -120,7 +122,7 @@ if (x > 5) {
 }
 ```
 
-3. Else If Statement:
+#### Else If Statement:
 The 'else if' statement allows for the evaluation of multiple conditions in a series of sequential checks. It is used when there are more than two possible outcomes based on different conditions. Multiple 'else if' statements can follow an 'if' statement, and the code block associated with the first true condition is executed. Only one code block will be executed, even if multiple conditions are true. Similar to the 'if' statement, the 'else if' statement supports the two syntax forms:
 
 * First form: else if (condition) { }
@@ -149,21 +151,12 @@ if (x > 5) {
 
 Please note that nested 'if' statements are supported, allowing the inclusion of further 'if,' 'else if,' or 'else' statements within the code blocks.
 
-
 ### Function declaration
 
 In Pikalang, functions are defined using the keyword `fn`, followed by the function name, the parameters in parentheses and the return type. For example:
 
 ```rs
 fn add(x,y) {
-  // Do something...
-}
-```
-
-In Pikalang the parentheses that collect all the parameters of the function are optional, therefore you can suppress them
-
-```rs
-fn add x,y{
   // Do something...
 }
 ```
