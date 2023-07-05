@@ -58,6 +58,13 @@ func TestTokenize(t *testing.T) {
 			expectedError: nil,
 		},
 		{
+			input: "// This is a comment",
+			expectedTokens: []token_type.Token{
+				{Type: token_type.EOF, Value: "EndOfFile"},
+			},
+			expectedError: nil,
+		},
+		{
 			input:          "/* Unterminated comment",
 			expectedTokens: nil,
 			expectedError:  errors.New(string(compilerErrors.ErrSyntaxUnterminatedMultilineComment)),
