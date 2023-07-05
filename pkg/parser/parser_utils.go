@@ -49,7 +49,7 @@ func (p *Parser) notEOF() bool {
 func (p *Parser) parseArgs(argType token_type.TokenType) ([]ast.Expr, error) {
 
 	switch argType {
-	case token_type.Fn:
+	case token_type.Fn, token_type.Case:
 		return p.parseFunctionArgs()
 	case token_type.If, token_type.Switch:
 		return p.parseSingleArg()

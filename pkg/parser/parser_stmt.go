@@ -40,13 +40,15 @@ func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
 	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
 
 	for p.at().Type != token_type.RightBrace && p.at().Type != token_type.EOF {
-		// TODO: parse multiple conditions splited by commas
 		if p.at().Type == token_type.Case {
 			p.subtract() // consume 'case'
-			caseCondition, err := p.parseExpr()
+
+			caseCondition, err := p.parseArgs(token_type.Fn)
+
 			if err != nil {
 				return nil, err
 			}
+
 			p.expect(token_type.Colon, compilerErrors.ErrSyntaxExpectedColon)
 
 			body, err := p.parseSwitchBodyStmt()

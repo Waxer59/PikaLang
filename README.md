@@ -15,6 +15,7 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
     - [If statements](#if-statements)
     - [Function declaration](#function-declaration)
     - [Switch statement](#switch-statement)
+      - [Multiple Cases](#multiple-cases)
     - [Comments](#comments)
       - [Single-line Comments](#single-line-comments)
       - [Multi-line Comments](#multi-line-comments)
@@ -189,6 +190,21 @@ switch (condition) {
 }
 ```
 
+#### Multiple Cases
+
+To execute the same block of code for multiple cases, you can use the `case` keyword with a comma-separated list of values. This allows you to specify multiple cases that should execute the same block of code. Here's an example to illustrate this concept: 
+
+```go
+switch expression {
+    case value1, value2, value3:
+        // Code to be executed for value1, value2, and value3
+    case value4, value5:
+        // Code to be executed for value4 and value5
+    default:
+        // Code to be executed if no matching case is found
+}
+
+```
 
 ### Comments
 

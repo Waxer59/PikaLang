@@ -41,7 +41,6 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 
 	// Create the variables for the function arguments
 	for idx, arg := range function.Params {
-		//TODO: Check the bounds | verify arity of function
 		scope.DeclareVar(arg, args[idx], false)
 	}
 

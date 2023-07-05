@@ -64,7 +64,7 @@ type SwitchStatement struct {
 }
 
 type CaseStatement struct {
-	Condition Expr
+	Condition []Expr
 	Body      []Stmt
 }
 

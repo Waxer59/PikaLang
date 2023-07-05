@@ -4,6 +4,8 @@ import (
 	"pika/pkg/ast"
 	"pika/pkg/interpreter/interpreter_env"
 	"pika/pkg/interpreter/interpreter_makers"
+
+	"golang.org/x/exp/slices"
 )
 
 func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
@@ -24,7 +26,7 @@ func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env in
 
 func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	for _, caseStatement := range declaration.CaseStmts {
-		if caseStatement.Condition == declaration.Condition {
+		if slices.Contains(caseStatement.Condition, declaration.Condition) {
 			for _, statement := range caseStatement.Body {
 				_, err := Evaluate(statement, env)
 				if err != nil {
