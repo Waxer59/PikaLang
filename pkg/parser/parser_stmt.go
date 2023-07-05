@@ -18,10 +18,9 @@ func (p *Parser) parseStmt() (ast.Stmt, error) {
 		return p.parseIfStatement()
 	case token_type.Switch:
 		return p.parseSwitchStatement()
+	default:
+		return p.parseExpr()
 	}
-
-	expr, err := p.parseExpr()
-	return expr, err
 }
 
 func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {

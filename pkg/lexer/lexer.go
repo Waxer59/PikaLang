@@ -42,8 +42,8 @@ func Tokenize(input string) ([]token_type.Token, error) {
 		}
 
 		// Check for alpha
-		if IsAlpha(tokenStr) {
-			alpha, rest := ExtractAlpha(src)
+		if IsIdentifier(tokenStr) {
+			alpha, rest := ExtractIdentifier(src)
 			alphaType := token_type.Identifier
 
 			if keyword, ok := IsKeyword(alpha); ok {

@@ -3,7 +3,6 @@ package lexer
 import (
 	"pika/pkg/lexer/token_type"
 	"strconv"
-	"strings"
 
 	"golang.org/x/exp/slices"
 )
@@ -34,27 +33,27 @@ func ExtractInt(src []rune) (string, []rune) {
 /*  FirstReturn: String extracted
  * 	SecondReturn: Rest of the string
  */
-func ExtractAlpha(src []rune) (string, []rune) {
+func ExtractIdentifier(src []rune) (string, []rune) {
 	var str = ""
 
-	for len(src) > 0 && IsAlpha(src[0]) {
+	for len(src) > 0 && IsIdentifier(src[0]) {
 		str += NextChar(&src)
 	}
 
 	return str, src
 }
 
-func IsAlpha(char rune) bool {
-	return strings.ToUpper(string(char)) != strings.ToLower(string(char))
+func IsIdentifier(char rune) bool {
+	return slices.Contains(token_type.AllowedIdentifierChars, char)
 }
 
-/*  FirstReturn: Keyword extracted
+/*  FirstReturn: Keyword type
  * 	SecondReturn: Is the keyword valid
  */
 func IsKeyword(src string) (token_type.TokenType, bool) {
-	keyword, ok := token_type.KEYWORDS[src]
+	keywordType, ok := token_type.KEYWORDS[src]
 
-	return keyword, ok
+	return keywordType, ok
 }
 
 func IsInt(char rune) bool {
