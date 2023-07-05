@@ -13,12 +13,11 @@ func (p *Parser) parseStmt() (ast.Stmt, error) {
 	case token_type.Const, token_type.Var:
 		return p.parseVarConstDeclaration()
 	case token_type.Fn:
-		fn, err := p.parseFnDeclaration()
-		return fn, err
+		return p.parseFnDeclaration()
 	case token_type.If:
-		ifStmt, err := p.parseIfStatement()
-		return ifStmt, err
+		return p.parseIfStatement()
 	case token_type.Switch:
+		return p.parseSwitchStatement()
 	}
 
 	expr, err := p.parseExpr()
@@ -28,15 +27,65 @@ func (p *Parser) parseStmt() (ast.Stmt, error) {
 func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
 	p.subtract() // consume 'switch'
 
-	args, err := p.parseArgs(token_type.If)
+	args, err := p.parseArgs(token_type.Switch)
 
 	if err != nil {
 		return nil, err
 	}
 
+	var caseStmts []ast.CaseStatement
+	var defaultStmt ast.CaseStatement
 	condition := args[0]
 
 	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
+
+	for p.at().Type != token_type.RightBrace && p.at().Type != token_type.EOF {
+		// TODO: parse multiple conditions splited by commas
+		if p.at().Type == token_type.Case {
+			p.subtract() // consume 'case'
+			caseCondition, err := p.parseExpr()
+			if err != nil {
+				return nil, err
+			}
+			p.expect(token_type.Colon, compilerErrors.ErrSyntaxExpectedColon)
+
+			body, err := p.parseSwitchBodyStmt()
+
+			if err != nil {
+				return nil, err
+			}
+
+			caseStmts = append(caseStmts, ast.CaseStatement{
+				Condition: caseCondition,
+				Body:      body,
+			})
+		}
+
+		if p.at().Type == token_type.Default {
+			p.subtract() // consume 'default'
+			p.expect(token_type.Colon, compilerErrors.ErrSyntaxExpectedColon)
+			body, err := p.parseSwitchBodyStmt()
+
+			if err != nil {
+				return nil, err
+			}
+
+			defaultStmt = ast.CaseStatement{
+				Condition: nil,
+				Body:      body,
+			}
+			break
+		}
+	}
+
+	p.expect(token_type.RightBrace, compilerErrors.ErrSyntaxExpectedRightBrace)
+
+	return ast.SwitchStatement{
+		Kind:        ast_types.SwitchStatement,
+		Condition:   condition,
+		CaseStmts:   caseStmts,
+		DefaultStmt: defaultStmt,
+	}, nil
 }
 
 func (p *Parser) parseIfStatement() (ast.Stmt, error) {
@@ -52,7 +101,7 @@ func (p *Parser) parseIfStatement() (ast.Stmt, error) {
 
 	condition := args[0]
 
-	body, err := p.parseBodyStmt()
+	body, err := p.parseBlockBodyStmt()
 
 	if err != nil {
 		return nil, err
@@ -68,12 +117,10 @@ func (p *Parser) parseIfStatement() (ast.Stmt, error) {
 	// Verify for else statements
 	if p.at().Type == token_type.Else {
 		p.subtract() // consume 'else'
-		p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
-		elseBody, err = p.parseBodyStmt()
+		elseBody, err = p.parseBlockBodyStmt()
 		if err != nil {
 			return nil, err
 		}
-		p.expect(token_type.RightBrace, compilerErrors.ErrSyntaxExpectedRightBrace)
 	}
 
 	return ast.IfStatement{
@@ -98,7 +145,7 @@ func (p *Parser) parseElseIfStatement() ([]ast.ElseIfStatement, error) {
 
 		condition := args[0]
 
-		body, err := p.parseBodyStmt()
+		body, err := p.parseBlockBodyStmt()
 
 		if err != nil {
 			return nil, err
@@ -133,7 +180,7 @@ func (p *Parser) parseFnDeclaration() (ast.Stmt, error) {
 		params[i] = arg.(ast.Identifier).Symbol
 	}
 
-	body, err := p.parseBodyStmt()
+	body, err := p.parseBlockBodyStmt()
 
 	if err != nil {
 		return nil, err
@@ -145,22 +192,6 @@ func (p *Parser) parseFnDeclaration() (ast.Stmt, error) {
 		Params: params,
 		Body:   body,
 	}, nil
-}
-
-func (p *Parser) parseBodyStmt() ([]ast.Stmt, error) {
-	var body []ast.Stmt
-
-	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
-	for p.at().Type != token_type.RightBrace && p.at().Type != token_type.EOF {
-		stmt, err := p.parseStmt()
-		if err != nil {
-			return nil, err
-		}
-		body = append(body, stmt)
-	}
-	p.expect(token_type.RightBrace, compilerErrors.ErrSyntaxExpectedRightBrace)
-
-	return body, nil
 }
 
 func (p *Parser) parseVarConstDeclaration() (ast.Stmt, error) {

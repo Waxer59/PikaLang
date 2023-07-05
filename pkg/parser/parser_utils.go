@@ -52,14 +52,17 @@ func (p *Parser) parseArgs(argType token_type.TokenType) ([]ast.Expr, error) {
 	case token_type.Fn:
 		return p.parseFunctionArgs()
 	case token_type.If, token_type.Switch:
-		return p.parseSingleLogicalArg()
+		return p.parseSingleArg()
 	}
 
 	return nil, errors.New(compilerErrors.ErrSyntaxStatementNotFound)
 }
 
-func (p *Parser) parseSingleLogicalArg() ([]ast.Expr, error) {
-	p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
+func (p *Parser) parseSingleArg() ([]ast.Expr, error) {
+
+	if p.at().Type == token_type.LeftParen { // Optional parens
+		p.subtract() // Remove the opening paren
+	}
 
 	condition, err := p.parseExpr()
 
@@ -67,13 +70,18 @@ func (p *Parser) parseSingleLogicalArg() ([]ast.Expr, error) {
 		return nil, err
 	}
 
-	p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
+	if p.at().Type == token_type.RightParen { // Optional parens
+		p.subtract() // Remove the closing paren
+	}
 
 	return []ast.Expr{condition}, nil
 }
 
 func (p *Parser) parseFunctionArgs() ([]ast.Expr, error) {
-	p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
+
+	if p.at().Type == token_type.LeftParen { // Optional parens
+		p.subtract() // Remove the opening paren
+	}
 
 	args := []ast.Expr{}
 
@@ -86,7 +94,9 @@ func (p *Parser) parseFunctionArgs() ([]ast.Expr, error) {
 		}
 	}
 
-	p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
+	if p.at().Type == token_type.RightParen { // Optional parens
+		p.subtract() // Remove the closing paren
+	}
 
 	return args, nil
 }
@@ -107,4 +117,35 @@ func (p *Parser) parseArgsList() ([]ast.Expr, error) {
 	}
 
 	return args, nil
+}
+
+func (p *Parser) parseBlockBodyStmt() ([]ast.Stmt, error) {
+	var body []ast.Stmt
+
+	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
+
+	for p.at().Type != token_type.RightBrace && p.at().Type != token_type.EOF {
+		stmt, err := p.parseStmt()
+		if err != nil {
+			return nil, err
+		}
+		body = append(body, stmt)
+	}
+
+	p.expect(token_type.RightBrace, compilerErrors.ErrSyntaxExpectedRightBrace)
+
+	return body, nil
+}
+
+func (p *Parser) parseSwitchBodyStmt() ([]ast.Stmt, error) {
+	var body []ast.Stmt
+
+	for p.at().Type != token_type.RightBrace && p.at().Type != token_type.Case && p.at().Type != token_type.Default && p.at().Type != token_type.EOF {
+		stmt, err := p.parseStmt()
+		if err != nil {
+			return nil, err
+		}
+		body = append(body, stmt)
+	}
+	return body, nil
 }

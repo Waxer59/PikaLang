@@ -43,6 +43,8 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 		return evalFunctionDeclaration(astNode.(ast.FunctionDeclaration), env)
 	case ast_types.IfStatement:
 		return evalIfStatement(astNode.(ast.IfStatement), env)
+	case ast_types.SwitchStatement:
+		return evalSwitchStatement(astNode.(ast.SwitchStatement), env)
 	default:
 		return nil, errors.New("ERROR: Unknown node type")
 	}

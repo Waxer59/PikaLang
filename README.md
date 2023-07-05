@@ -12,7 +12,9 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
     - [Variables \& constants declaration](#variables--constants-declaration)
       - [variables](#variables)
       - [constants](#constants)
+    - [If statements](#if-statements)
     - [Function declaration](#function-declaration)
+    - [Switch statement](#switch-statement)
     - [Comments](#comments)
       - [Single-line Comments](#single-line-comments)
       - [Multi-line Comments](#multi-line-comments)
@@ -81,6 +83,71 @@ In Pikalang, constants are declared using the `const` keyword followed by the co
 const foo = "bar"
 const bar = 42
 ```
+### If statements
+
+The 'if' statement is used to execute a block of code only if a specified condition is true. The syntax for the 'if' statement in our language supports two forms:
+
+* First form: if (condition) { }
+This form encloses the code block within curly braces immediately after the condition.
+
+Example:
+``` js
+if (x > 5) {
+    print("x is greater than 5");
+}
+```
+
+* Second form: if condition { }
+This form omits the parentheses around the condition and directly includes the code block.
+
+Example:
+```js
+if x > 5 {
+    print("x is greater than 5");
+}
+```
+
+2. Else Statement:
+The 'else' statement follows an 'if' statement and is used to specify a block of code that should be executed if the condition in the preceding 'if' statement evaluates to false. The 'else' statement does not require any conditions. It is optional and can be omitted if not needed.
+
+Example:
+```js
+if (x > 5) {
+    print("x is greater than 5");
+} else {
+    print("x is not greater than 5");
+}
+```
+
+3. Else If Statement:
+The 'else if' statement allows for the evaluation of multiple conditions in a series of sequential checks. It is used when there are more than two possible outcomes based on different conditions. Multiple 'else if' statements can follow an 'if' statement, and the code block associated with the first true condition is executed. Only one code block will be executed, even if multiple conditions are true. Similar to the 'if' statement, the 'else if' statement supports the two syntax forms:
+
+* First form: else if (condition) { }
+This form encloses the code block within curly braces immediately after the condition.
+
+Example:
+```js
+if (x > 5) {
+    print("x is greater than 5");
+} else if (x < 5) {
+    print("x is less than 5");
+}
+```
+
+* Second form: else if condition { }
+This form omits the parentheses around the condition and directly includes the code block.
+
+Example:
+```js
+if (x > 5) {
+    print("x is greater than 5");
+} else if x < 5 {
+    print("x is less than 5");
+}
+```
+
+Please note that nested 'if' statements are supported, allowing the inclusion of further 'if,' 'else if,' or 'else' statements within the code blocks.
+
 
 ### Function declaration
 
@@ -88,9 +155,40 @@ In Pikalang, functions are defined using the keyword `fn`, followed by the funct
 
 ```rs
 fn add(x,y) {
-    x + y
+  // Do something...
 }
 ```
+
+In Pikalang the parentheses that collect all the parameters of the function are optional, therefore you can suppress them
+
+```rs
+fn add x,y{
+  // Do something...
+}
+```
+
+### Switch statement
+
+The switch statement allows you to perform different actions based on the value of a given expression. It provides a concise way to write multiple conditional statements and improve the readability of your code.
+
+The switch statement evaluates the given condition and compares it against different cases. When a match is found, the corresponding block of code is executed. If no match is found, an optional default case can be specified to handle such scenarios.
+
+In PikaLang's switch statement, the 'break' statement is not required. After executing a matching case block, the control automatically exits the switch statement. This means that each case is isolated and does not fall through to the next case by default. If you want to fall through to the next case, you can omit the 'break' statement.
+
+In Pikalang the brackets in the switch statement parameter are optional so there are two types of syntax for the switch statement:
+
+```go
+switch condition {
+  // Do something
+}
+```
+
+```go
+switch (condition) {
+  // Do something
+}
+```
+
 
 ### Comments
 

@@ -1,25 +1,16 @@
 package interpreter_eval
 
-import (
-	"errors"
-	compilerErrors "pika/internal/errors"
-)
-
-func EvaluateTruthyFalsyValues(val interface{}) (bool, error) {
-	boolVal, ok := val.(bool)
-
-	if !ok {
-		return false, errors.New(compilerErrors.ErrTypesInvalidType)
-	}
-
-	switch val.(type) {
+func EvaluateTruthyFalsyValues(val interface{}) bool {
+	switch v := val.(type) {
+	case bool:
+		return v
+	case int, float64, float32:
+		return v != 0.0
 	case string:
-		val = val.(string) != ""
-	case int, float32, float64:
-		val = val != 0.0
+		return v != ""
+	case nil:
+		return false
 	default:
-		val = false
+		return true
 	}
-
-	return boolVal, nil
 }

@@ -22,6 +22,33 @@ func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env in
 	return variable, err
 }
 
+func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	for _, caseStatement := range declaration.CaseStmts {
+		if caseStatement.Condition == declaration.Condition {
+			for _, statement := range caseStatement.Body {
+				_, err := Evaluate(statement, env)
+				if err != nil {
+					return nil, err
+				}
+			}
+			return nil, nil
+		}
+	}
+
+	if declaration.DefaultStmt.Body == nil {
+		return nil, nil
+	}
+
+	for _, statement := range declaration.DefaultStmt.Body {
+		_, err := Evaluate(statement, env)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return nil, nil
+}
+
 func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	conditionRawValue, err := Evaluate(declaration.Condition, env)
 
@@ -29,7 +56,7 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 		return nil, err
 	}
 
-	val, err := EvaluateTruthyFalsyValues(conditionRawValue.GetValue())
+	val := EvaluateTruthyFalsyValues(conditionRawValue.GetValue())
 
 	if err != nil {
 		return nil, err
@@ -38,8 +65,16 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 	// Handle first if
 	if val {
 		for _, statement := range declaration.Body {
-			Evaluate(statement, env)
+			_, err := Evaluate(statement, env)
+
+			if err != nil {
+				return nil, err
+			}
 		}
+		return nil, nil
+	}
+
+	if declaration.ElseIfStmt == nil && declaration.ElseBody == nil {
 		return nil, nil
 	}
 
@@ -51,7 +86,7 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 			return nil, err
 		}
 
-		val, err := EvaluateTruthyFalsyValues(conditionRawValue.GetValue())
+		val := EvaluateTruthyFalsyValues(conditionRawValue.GetValue())
 
 		if err != nil {
 			return nil, err
@@ -59,7 +94,11 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 
 		if val {
 			for _, statement := range elseIfStatement.Body {
-				Evaluate(statement, env)
+				_, err := Evaluate(statement, env)
+
+				if err != nil {
+					return nil, err
+				}
 			}
 			return nil, nil
 		}
@@ -67,7 +106,11 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 
 	// Handle else
 	for _, statement := range declaration.ElseBody {
-		Evaluate(statement, env)
+		_, err := Evaluate(statement, env)
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return nil, nil
