@@ -47,6 +47,8 @@ const (
 	LessEqual    // <=
 	Not          // !
 	NotEqual     // !=
+	Or           // ||
+	And          // &&
 
 	// End Of File
 	EOF

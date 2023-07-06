@@ -178,15 +178,8 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue
 func evalComparisonBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
 	var result bool = false
 
-	numValLhs, isNumLhs := lhs.(interpreter_env.NumberVal)
-	numValRhs, isNumRhs := rhs.(interpreter_env.NumberVal)
-	if !isNumRhs || !isNumLhs && lhs.GetType() == interpreter_env.Number && rhs.GetType() == interpreter_env.Number {
-		return nil, errors.New(compilerErrors.ErrBinaryInvalidBinaryExpr)
-	}
-
-	if lhs.GetType() != rhs.GetType() {
-		return nil, errors.New(compilerErrors.ErrBinaryInvalidBinaryExpr)
-	}
+	numValLhs, _ := lhs.(interpreter_env.NumberVal)
+	numValRhs, _ := rhs.(interpreter_env.NumberVal)
 
 	switch operator {
 	case "==":

@@ -67,3 +67,14 @@ type ConditionalExpr struct {
 func (c ConditionalExpr) GetKind() ast_types.NodeType {
 	return c.Kind
 }
+
+type LogicalExpr struct {
+	Kind     ast_types.NodeType
+	Left     Expr
+	Right    Expr
+	Operator string
+}
+
+func (l LogicalExpr) GetKind() ast_types.NodeType {
+	return l.Kind
+}

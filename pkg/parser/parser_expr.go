@@ -237,7 +237,7 @@ func (p *Parser) parseComparisonExpr() (ast.Expr, error) {
 		return nil, err
 	}
 
-	for p.notEOF() && slices.Contains(ast_types.ComparisonExpr, p.at().Value) {
+	for slices.Contains(ast_types.ComparisonExpr, p.at().Value) && p.notEOF() {
 		op := p.subtract().Value // consume operator
 		right, err := p.parseObjectExpr()
 
@@ -264,7 +264,7 @@ func (p *Parser) parseEqualityExpr() (ast.Expr, error) {
 
 	for slices.Contains(ast_types.EqualityExpr, p.at().Value) && p.notEOF() {
 		op := p.subtract().Value // consume operator
-		right, err := p.parseComparisonExpr()
+		right, err := p.parseExpr()
 		if err != nil {
 			return nil, err
 		}
@@ -279,14 +279,62 @@ func (p *Parser) parseEqualityExpr() (ast.Expr, error) {
 	return left, nil
 }
 
+func (p *Parser) parseLogicalAndExpr() (ast.Expr, error) {
+	left, err := p.parseEqualityExpr()
+
+	if err != nil {
+		return nil, nil
+	}
+
+	for p.at().Type == token_type.And && p.notEOF() {
+		p.subtract() // consume '&&'
+		right, err := p.parseEqualityExpr()
+		if err != nil {
+			return nil, nil
+		}
+		left = ast.LogicalExpr{
+			Kind:     ast_types.LogicalExpr,
+			Left:     left,
+			Right:    right,
+			Operator: "&&",
+		}
+	}
+
+	return left, nil
+}
+
+func (p *Parser) parseLogicalOrExpr() (ast.Expr, error) {
+	left, err := p.parseLogicalAndExpr()
+
+	if err != nil {
+		return nil, nil
+	}
+
+	for p.at().Type == token_type.Or && p.notEOF() {
+		p.subtract() // consume '||'
+		right, err := p.parseLogicalAndExpr()
+		if err != nil {
+			return nil, nil
+		}
+		left = ast.LogicalExpr{
+			Kind:     ast_types.LogicalExpr,
+			Left:     left,
+			Right:    right,
+			Operator: "||",
+		}
+	}
+
+	return left, nil
+}
+
 func (p *Parser) parseTernaryExpr() (ast.Expr, error) {
-	condition, err := p.parseEqualityExpr()
+	condition, err := p.parseLogicalOrExpr()
 
 	if err != nil {
 		return nil, err
 	}
 
-	for p.at().Type == token_type.QuestionMark && p.notEOF() {
+	if p.at().Type == token_type.QuestionMark {
 		p.subtract() // consume '?'
 		consequent, err := p.parseExpr()
 
@@ -308,7 +356,6 @@ func (p *Parser) parseTernaryExpr() (ast.Expr, error) {
 			Consequent: consequent,
 			Alternate:  alternate,
 		}, nil
-
 	}
 
 	return condition, nil

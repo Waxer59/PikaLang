@@ -17,6 +17,7 @@ const (
 	Identifier      NodeType = "Identifier"
 	MemberExpr      NodeType = "MemberExpr"
 	CallExpr        NodeType = "CallExpr"
+	LogicalExpr     NodeType = "LogicalExpr"
 
 	// LITERALS
 	ObjectLiteral  NodeType = "ObjectLiteral"

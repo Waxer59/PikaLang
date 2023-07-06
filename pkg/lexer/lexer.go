@@ -171,6 +171,16 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			tokens = append(tokens, token_type.Token{Type: token_type.DoubleQoute, Value: string(tokenChar)})
 		case '\'':
 			tokens = append(tokens, token_type.Token{Type: token_type.SingleQoute, Value: string(tokenChar)})
+		case '|':
+			if nextChar() == '|' {
+				substract(2) // consume '||'
+				tokens = append(tokens, token_type.Token{Type: token_type.Or, Value: "||"})
+			}
+		case '&':
+			if nextChar() == '&' {
+				substract(2) // consume '&&'
+				tokens = append(tokens, token_type.Token{Type: token_type.Or, Value: "&&"})
+			}
 		default:
 			tokens = append(tokens, token_type.Token{Type: token_type.Identifier, Value: string(tokenChar)})
 		}
