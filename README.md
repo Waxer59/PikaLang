@@ -23,6 +23,10 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
       - [Single-line Comments](#single-line-comments)
       - [Multi-line Comments](#multi-line-comments)
     - [Operators](#operators)
+      - [Logical operators](#logical-operators)
+        - [OR](#or)
+        - [AND](#and)
+        - [NOT](#not)
       - [Ternary operator](#ternary-operator)
       - [String operators](#string-operators)
         - [Concatenation](#concatenation)
@@ -249,6 +253,46 @@ var x = 10;
 ### Operators
 
 Operators are symbols or characters used in programming languages to perform operations on variables, values, or expressions. They are used to manipulate and compare data, control program flow, and perform logical operations.
+
+#### Logical operators
+
+##### OR
+
+The OR operator is a logical operator that operates on two or more operands, and it returns true if at least one of the operands is true. It can be represented using the symbol "||". Here's an example of the OR operator in action:
+
+```js
+var x = 5
+var y = 10
+var z = x > 3 || y < 5
+print(z)  // Output: true
+```
+
+In the example above, the expression ` x > 3 || y < 5` evaluates to `true` because at least one of the conditions is true (in this case, `x > 3` is true).
+
+##### AND
+
+The AND operator is a logical operator that operates on two or more operands, and it returns true only if all the operands are true. It can be represented using the symbol "&&". Here's an example of the AND operator in action:
+
+```js
+var x = 5
+var y = 10
+var z = x > 3 && y < 5
+print(z)  // Output: false
+```
+In the example above, the expression ` x > 3 && y < 5` evaluates to `false` because one of the conditions `y < 5` is false.
+
+##### NOT
+
+The NOT operator is a logical operator that operates on a single operand and returns the opposite boolean value. It can be represented using the symbol "!". Here's an example of the NOT operator in action:
+
+```js
+var x = 5
+var y = 10
+var z = !(x > 3)
+print(z)  // Output: false
+```
+
+In the example above, the expression `!(x > 3)` evaluates to `false` because the condition `x > 3` is true, but the NOT operator reverses the boolean value.
 
 #### Ternary operator
 
