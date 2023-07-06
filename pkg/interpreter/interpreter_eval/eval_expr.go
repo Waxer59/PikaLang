@@ -138,7 +138,7 @@ func evalStringBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs
 		result = valLhs.Value + valRhs.Value
 	}
 
-	return interpreter_env.StringVal{Value: result, Type: interpreter_env.String}, nil
+	return interpreter_makers.MK_String(result), nil
 }
 
 func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
@@ -175,6 +175,33 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue
 	return interpreter_env.NumberVal{Value: result, Type: interpreter_env.Number}, nil
 }
 
+func evalLogicalExpr(logicalExpr ast.LogicalExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	result := false
+	evalLhs, err := Evaluate(logicalExpr.Left, env)
+
+	if err != nil {
+		return nil, err
+	}
+
+	evalRhs, err := Evaluate(logicalExpr.Right, env)
+
+	if err != nil {
+		return nil, err
+	}
+
+	valLhs := EvaluateTruthyFalsyValues(evalLhs.GetValue())
+	valRhs := EvaluateTruthyFalsyValues(evalRhs.GetValue())
+
+	switch logicalExpr.Operator {
+	case "&&":
+		result = valLhs && valRhs
+	case "||":
+		result = valLhs || valRhs
+	}
+
+	return interpreter_makers.MK_Boolean(result), nil
+}
+
 func evalComparisonBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
 	var result bool = false
 
@@ -195,7 +222,7 @@ func evalComparisonBinaryExpr(operator string, lhs interpreter_env.RuntimeValue,
 	case ">=":
 		result = numValLhs.Value >= numValRhs.Value
 	}
-	return interpreter_env.BooleanVal{Value: result, Type: interpreter_env.Boolean}, nil
+	return interpreter_makers.MK_Boolean(result), nil
 }
 
 func evalBinaryExpr(binop ast.BinaryExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {

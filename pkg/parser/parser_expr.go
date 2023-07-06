@@ -288,7 +288,7 @@ func (p *Parser) parseLogicalAndExpr() (ast.Expr, error) {
 
 	for p.at().Type == token_type.And && p.notEOF() {
 		p.subtract() // consume '&&'
-		right, err := p.parseEqualityExpr()
+		right, err := p.parseExpr()
 		if err != nil {
 			return nil, nil
 		}
@@ -312,7 +312,7 @@ func (p *Parser) parseLogicalOrExpr() (ast.Expr, error) {
 
 	for p.at().Type == token_type.Or && p.notEOF() {
 		p.subtract() // consume '||'
-		right, err := p.parseLogicalAndExpr()
+		right, err := p.parseExpr()
 		if err != nil {
 			return nil, nil
 		}

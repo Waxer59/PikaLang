@@ -16,14 +16,14 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
       - [Else Statement](#else-statement)
       - [Else If Statement:](#else-if-statement)
     - [Function declaration](#function-declaration)
-    - [Ternary operator](#ternary-operator)
     - [Switch statement](#switch-statement)
       - [Multiple Cases](#multiple-cases)
-    - [Logical Cases](#logical-cases)
+      - [Logical Cases](#logical-cases)
     - [Comments](#comments)
       - [Single-line Comments](#single-line-comments)
       - [Multi-line Comments](#multi-line-comments)
     - [Operators](#operators)
+      - [Ternary operator](#ternary-operator)
       - [String operators](#string-operators)
         - [Concatenation](#concatenation)
       - [Math operators](#math-operators)
@@ -163,23 +163,6 @@ fn add(x,y) {
 }
 ```
 
-### Ternary operator
-
-Ternary operators, also known as conditional operators, are operators that evaluate a boolean expression and return a result based on that evaluation. They have the following general syntax:
-
-```js
-condition ? true_expression : false_expression
-```
-
-The condition is a boolean expression that is evaluated first. If the condition is true, the value of true_expression is returned. If the condition is false, the value of false_expression is returned.
-
-```js
-var age = 18
-var message = age >= 18 ? "You are an adult" : "You are a minor"
-```
-
-In this example, the condition `age >= 18` is evaluated. If the age is greater than or equal to 18, the result will be "You are an adult". Otherwise, the result will be "You are a minor". The resulting value is assigned to the variable `message`.
-
 ### Switch statement
 
 The switch statement allows you to perform different actions based on the value of a given expression. It provides a concise way to write multiple conditional statements and improve the readability of your code.
@@ -217,7 +200,7 @@ switch expression {
 }
 ```
 
-### Logical Cases
+#### Logical Cases
 
 Switch cases can also have boolean expressions that if true will execute the case.
 
@@ -266,6 +249,23 @@ var x = 10;
 ### Operators
 
 Operators are symbols or characters used in programming languages to perform operations on variables, values, or expressions. They are used to manipulate and compare data, control program flow, and perform logical operations.
+
+#### Ternary operator
+
+Ternary operators, also known as conditional operators, are operators that evaluate a boolean expression and return a result based on that evaluation. They have the following general syntax:
+
+```js
+condition ? true_expression : false_expression
+```
+
+The condition is a boolean expression that is evaluated first. If the condition is true, the value of true_expression is returned. If the condition is false, the value of false_expression is returned.
+
+```js
+var age = 18
+var message = age >= 18 ? "You are an adult" : "You are a minor"
+```
+
+In this example, the condition `age >= 18` is evaluated. If the age is greater than or equal to 18, the result will be "You are an adult". Otherwise, the result will be "You are a minor". The resulting value is assigned to the variable `message`.
 
 #### String operators
 

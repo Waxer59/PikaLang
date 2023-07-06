@@ -179,7 +179,7 @@ func Tokenize(input string) ([]token_type.Token, error) {
 		case '&':
 			if nextChar() == '&' {
 				substract(2) // consume '&&'
-				tokens = append(tokens, token_type.Token{Type: token_type.Or, Value: "&&"})
+				tokens = append(tokens, token_type.Token{Type: token_type.And, Value: "&&"})
 			}
 		default:
 			tokens = append(tokens, token_type.Token{Type: token_type.Identifier, Value: string(tokenChar)})
