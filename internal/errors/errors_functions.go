@@ -1,8 +1,6 @@
 package compilerErrors
 
-type ErrFunc string
-
-var (
-	ErrFuncNotFound          ErrFunc = "ERROR: Function not found: "
-	ErrFuncExpectedIdentifer ErrFunc = "ERROR: Expected identifier for function name"
+const (
+	ErrFuncNotFound          = "ERROR: Function not found: "
+	ErrFuncExpectedIdentifer = "ERROR: Expected identifier for function name"
 )

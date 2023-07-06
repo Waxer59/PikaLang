@@ -1,8 +1,6 @@
 package compilerErrors
 
-type ErrBinary string
-
-var (
-	ErrBinaryInvalidBinaryExpr ErrBinary = "ERROR: Invalid binary operation"
-	ErrBinaryDivisionByZero    ErrBinary = "ERROR: Division by zero"
+const (
+	ErrBinaryInvalidBinaryExpr = "ERROR: Invalid binary operation"
+	ErrBinaryDivisionByZero    = "ERROR: Division by zero"
 )

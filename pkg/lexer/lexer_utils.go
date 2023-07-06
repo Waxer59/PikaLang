@@ -13,8 +13,17 @@ func IsSkippable(char rune) bool {
 }
 
 func NextChar(src *[]rune) string {
+	if len(*src) <= 0 {
+		return ""
+	}
+
 	char := (*src)[0]
-	*src = (*src)[1:]
+	if len(*src)-1 > 0 {
+		*src = (*src)[1:]
+	} else {
+		*src = []rune{}
+	}
+
 	return string(char)
 }
 
@@ -22,7 +31,17 @@ func NextChar(src *[]rune) string {
  * 	SecondReturn: Rest of the string
  */
 func ExtractInt(src []rune) (string, []rune) {
-	var num = ""
+	if len(src) <= 0 {
+		return "", src
+	}
+
+	isNegative := src[0] == '-'
+	num := ""
+
+	if isNegative {
+		num = "-"
+		NextChar(&src)
+	}
 
 	for len(src) > 0 && (IsInt(src[0]) || src[0] == '.') {
 		num += NextChar(&src)
@@ -34,10 +53,14 @@ func ExtractInt(src []rune) (string, []rune) {
 /*  FirstReturn: String extracted
  * 	SecondReturn: Rest of the string
  */
-func ExtractAlpha(src []rune) (string, []rune) {
+func ExtractIdentifier(src []rune) (string, []rune) {
+	if len(src) <= 0 || !IsAlpha(src[0]) {
+		return "", src
+	}
+
 	var str = ""
 
-	for len(src) > 0 && IsAlpha(src[0]) {
+	for len(src) > 0 && (IsAlpha(src[0]) || slices.Contains(token_type.AllowedIdentifierChars, src[0])) {
 		str += NextChar(&src)
 	}
 
@@ -45,16 +68,16 @@ func ExtractAlpha(src []rune) (string, []rune) {
 }
 
 func IsAlpha(char rune) bool {
-	return strings.ToUpper(string(char)) != strings.ToLower(string(char))
+	return strings.ToUpper(string(char)) != strings.ToLower(string(char)) || slices.Contains(token_type.AllowedIdentifierCharsWithFirst, char)
 }
 
-/*  FirstReturn: Keyword extracted
+/*  FirstReturn: Keyword type
  * 	SecondReturn: Is the keyword valid
  */
 func IsKeyword(src string) (token_type.TokenType, bool) {
-	keyword, ok := token_type.KEYWORDS[src]
+	keywordType, ok := token_type.KEYWORDS[src]
 
-	return keyword, ok
+	return keywordType, ok
 }
 
 func IsInt(char rune) bool {

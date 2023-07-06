@@ -1,6 +1,8 @@
 package ast
 
-import "pika/pkg/ast/ast_types"
+import (
+	"pika/pkg/ast/ast_types"
+)
 
 type Stmt interface {
 	GetKind() ast_types.NodeType
@@ -35,4 +37,37 @@ type VariableDeclaration struct {
 
 func (vd VariableDeclaration) GetKind() ast_types.NodeType {
 	return vd.Kind
+}
+
+type IfStatement struct {
+	Kind       ast_types.NodeType
+	Test       Expr
+	Body       []Stmt
+	ElseIfStmt []ElseIfStatement
+	ElseBody   []Stmt
+}
+
+type ElseIfStatement struct {
+	Test Expr
+	Body []Stmt
+}
+
+func (cd IfStatement) GetKind() ast_types.NodeType {
+	return cd.Kind
+}
+
+type SwitchStatement struct {
+	Kind         ast_types.NodeType
+	Discriminant Expr
+	CaseStmts    []CaseStatement
+	DefaultStmt  CaseStatement
+}
+
+type CaseStatement struct {
+	Test []Expr
+	Body []Stmt
+}
+
+func (cs SwitchStatement) GetKind() ast_types.NodeType {
+	return cs.Kind
 }

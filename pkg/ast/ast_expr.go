@@ -56,3 +56,36 @@ type Identifier struct {
 func (i Identifier) GetKind() ast_types.NodeType {
 	return i.Kind
 }
+
+type ConditionalExpr struct {
+	Kind       ast_types.NodeType
+	Condition  Expr
+	Consequent Expr
+	Alternate  Expr
+}
+
+func (c ConditionalExpr) GetKind() ast_types.NodeType {
+	return c.Kind
+}
+
+type LogicalExpr struct {
+	Kind     ast_types.NodeType
+	Left     Expr
+	Right    Expr
+	Operator string
+}
+
+func (l LogicalExpr) GetKind() ast_types.NodeType {
+	return l.Kind
+}
+
+type UnaryExpr struct {
+	Kind     ast_types.NodeType
+	Operator string
+	Argument Expr
+	Prefix   bool
+}
+
+func (u UnaryExpr) GetKind() ast_types.NodeType {
+	return u.Kind
+}

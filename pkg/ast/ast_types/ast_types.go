@@ -7,13 +7,18 @@ const (
 	Program             NodeType = "Program"
 	VariableDeclaration NodeType = "VariableDeclaration"
 	FunctionDeclaration NodeType = "FunctionDeclaration"
+	IfStatement         NodeType = "IfStatement"
+	SwitchStatement     NodeType = "SwitchStatement"
 
 	// EXPRESSIONS
-	AssigmentExpr NodeType = "AssigmentExpr"
-	BinaryExpr    NodeType = "BinaryExpr"
-	Identifier    NodeType = "Identifier"
-	MemberExpr    NodeType = "MemberExpr"
-	CallExpr      NodeType = "CallExpr"
+	AssigmentExpr   NodeType = "AssigmentExpr"
+	ConditionalExpr NodeType = "ConditionalExp"
+	BinaryExpr      NodeType = "BinaryExpr"
+	Identifier      NodeType = "Identifier"
+	MemberExpr      NodeType = "MemberExpr"
+	CallExpr        NodeType = "CallExpr"
+	LogicalExpr     NodeType = "LogicalExpr"
+	UnaryExpr       NodeType = "UnaryExpr"
 
 	// LITERALS
 	ObjectLiteral  NodeType = "ObjectLiteral"

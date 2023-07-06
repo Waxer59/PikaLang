@@ -12,11 +12,22 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
     - [Variables \& constants declaration](#variables--constants-declaration)
       - [variables](#variables)
       - [constants](#constants)
+    - [If statements](#if-statements)
+      - [Else Statement](#else-statement)
+      - [Else If Statement:](#else-if-statement)
     - [Function declaration](#function-declaration)
+    - [Switch statement](#switch-statement)
+      - [Multiple Cases](#multiple-cases)
+      - [Logical Cases](#logical-cases)
     - [Comments](#comments)
       - [Single-line Comments](#single-line-comments)
       - [Multi-line Comments](#multi-line-comments)
     - [Operators](#operators)
+      - [Logical operators](#logical-operators)
+        - [OR](#or)
+        - [AND](#and)
+        - [NOT](#not)
+      - [Ternary operator](#ternary-operator)
       - [String operators](#string-operators)
         - [Concatenation](#concatenation)
       - [Math operators](#math-operators)
@@ -81,6 +92,70 @@ In Pikalang, constants are declared using the `const` keyword followed by the co
 const foo = "bar"
 const bar = 42
 ```
+### If statements
+
+The 'if' statement is used to execute a block of code only if a specified condition is true. The syntax for the 'if' statement in our language supports two forms:
+
+* First form: if (condition) { }
+This form encloses the code block within curly braces immediately after the condition.
+
+Example:
+``` js
+if (x > 5) {
+    print("x is greater than 5");
+}
+```
+
+* Second form: if condition { }
+This form omits the parentheses around the condition and directly includes the code block.
+
+Example:
+```js
+if x > 5 {
+    print("x is greater than 5");
+}
+```
+
+#### Else Statement
+The 'else' statement follows an 'if' statement and is used to specify a block of code that should be executed if the condition in the preceding 'if' statement evaluates to false. The 'else' statement does not require any conditions. It is optional and can be omitted if not needed.
+
+Example:
+```js
+if (x > 5) {
+    print("x is greater than 5");
+} else {
+    print("x is not greater than 5");
+}
+```
+
+#### Else If Statement:
+The 'else if' statement allows for the evaluation of multiple conditions in a series of sequential checks. It is used when there are more than two possible outcomes based on different conditions. Multiple 'else if' statements can follow an 'if' statement, and the code block associated with the first true condition is executed. Only one code block will be executed, even if multiple conditions are true. Similar to the 'if' statement, the 'else if' statement supports the two syntax forms:
+
+* First form: else if (condition) { }
+This form encloses the code block within curly braces immediately after the condition.
+
+Example:
+```js
+if (x > 5) {
+    print("x is greater than 5");
+} else if (x < 5) {
+    print("x is less than 5");
+}
+```
+
+* Second form: else if condition { }
+This form omits the parentheses around the condition and directly includes the code block.
+
+Example:
+```js
+if (x > 5) {
+    print("x is greater than 5");
+} else if x < 5 {
+    print("x is less than 5");
+}
+```
+
+Please note that nested 'if' statements are supported, allowing the inclusion of further 'if,' 'else if,' or 'else' statements within the code blocks.
 
 ### Function declaration
 
@@ -88,7 +163,59 @@ In Pikalang, functions are defined using the keyword `fn`, followed by the funct
 
 ```rs
 fn add(x,y) {
-    x + y
+  // Do something...
+}
+```
+
+### Switch statement
+
+The switch statement allows you to perform different actions based on the value of a given expression. It provides a concise way to write multiple conditional statements and improve the readability of your code.
+
+The switch statement evaluates the given condition and compares it against different cases. When a match is found, the corresponding block of code is executed. If no match is found, an optional default case can be specified to handle such scenarios.
+
+In PikaLang's switch statement, the 'break' statement is not required. After executing a matching case block, the control automatically exits the switch statement. This means that each case is isolated and does not fall through to the next case by default. If you want to fall through to the next case, you can omit the 'break' statement.
+
+In Pikalang the brackets in the switch statement parameter are optional so there are two types of syntax for the switch statement:
+
+```go
+switch condition {
+  // Do something
+}
+```
+
+```go
+switch (condition) {
+  // Do something
+}
+```
+
+#### Multiple Cases
+
+To execute the same block of code for multiple cases, you can use the `case` keyword with a comma-separated list of values. This allows you to specify multiple cases that should execute the same block of code. Here's an example to illustrate this concept: 
+
+```go
+switch expression {
+    case value1, value2, value3:
+        // Code to be executed for value1, value2, and value3
+    case value4, value5:
+        // Code to be executed for value4 and value5
+    default:
+        // Code to be executed if no matching case is found
+}
+```
+
+#### Logical Cases
+
+Switch cases can also have boolean expressions that if true will execute the case.
+
+```go
+switch expression {
+    case value1, value2, value3:
+        // Code to be executed for value1, value2, and value3
+    case value4, value5 > 10:
+        // Code to be executed for value4 and value5
+    default:
+        // Code to be executed if no matching case is found
 }
 ```
 
@@ -126,6 +253,63 @@ var x = 10;
 ### Operators
 
 Operators are symbols or characters used in programming languages to perform operations on variables, values, or expressions. They are used to manipulate and compare data, control program flow, and perform logical operations.
+
+#### Logical operators
+
+##### OR
+
+The OR operator is a logical operator that operates on two or more operands, and it returns true if at least one of the operands is true. It can be represented using the symbol "||". Here's an example of the OR operator in action:
+
+```js
+var x = 5
+var y = 10
+var z = x > 3 || y < 5
+print(z)  // Output: true
+```
+
+In the example above, the expression ` x > 3 || y < 5` evaluates to `true` because at least one of the conditions is true (in this case, `x > 3` is true).
+
+##### AND
+
+The AND operator is a logical operator that operates on two or more operands, and it returns true only if all the operands are true. It can be represented using the symbol "&&". Here's an example of the AND operator in action:
+
+```js
+var x = 5
+var y = 10
+var z = x > 3 && y < 5
+print(z)  // Output: false
+```
+In the example above, the expression ` x > 3 && y < 5` evaluates to `false` because one of the conditions `y < 5` is false.
+
+##### NOT
+
+The NOT operator is a logical operator that operates on a single operand and returns the opposite boolean value. It can be represented using the symbol "!". Here's an example of the NOT operator in action:
+
+```js
+var x = 5
+var y = 10
+var z = !(x > 3)
+print(z)  // Output: false
+```
+
+In the example above, the expression `!(x > 3)` evaluates to `false` because the condition `x > 3` is true, but the NOT operator reverses the boolean value.
+
+#### Ternary operator
+
+Ternary operators, also known as conditional operators, are operators that evaluate a boolean expression and return a result based on that evaluation. They have the following general syntax:
+
+```js
+condition ? true_expression : false_expression
+```
+
+The condition is a boolean expression that is evaluated first. If the condition is true, the value of true_expression is returned. If the condition is false, the value of false_expression is returned.
+
+```js
+var age = 18
+var message = age >= 18 ? "You are an adult" : "You are a minor"
+```
+
+In this example, the condition `age >= 18` is evaluated. If the age is greater than or equal to 18, the result will be "You are an adult". Otherwise, the result will be "You are a minor". The resulting value is assigned to the variable `message`.
 
 #### String operators
 
