@@ -33,6 +33,8 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 		return evalCallExpr(astNode.(ast.CallExpr), env)
 	case ast_types.AssigmentExpr:
 		return evalAssignment(astNode.(ast.AssigmentExpr), env)
+	case ast_types.ConditionalExpr:
+		return evalConditionalExpr(astNode.(ast.ConditionalExpr), env)
 
 	// STATEMENTS
 	case ast_types.Program:

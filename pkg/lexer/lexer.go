@@ -132,6 +132,8 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			tokens = append(tokens, token_type.Token{Type: token_type.Less, Value: string(tokenChar)})
 		case ';':
 			tokens = append(tokens, token_type.Token{Type: token_type.SemiColon, Value: string(tokenChar)})
+		case '?':
+			tokens = append(tokens, token_type.Token{Type: token_type.QuestionMark, Value: string(tokenChar)})
 		case '(':
 			tokens = append(tokens, token_type.Token{Type: token_type.LeftParen, Value: string(tokenChar)})
 		case ')':

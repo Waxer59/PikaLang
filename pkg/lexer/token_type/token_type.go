@@ -37,6 +37,7 @@ const (
 	Dot          // .
 	DoubleQoute  // "
 	SingleQoute  // '
+	QuestionMark // ?
 
 	// Comparison operators
 	EqualEqual   // ==

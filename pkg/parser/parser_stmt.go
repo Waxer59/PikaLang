@@ -57,8 +57,8 @@ func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
 			}
 
 			caseStmts = append(caseStmts, ast.CaseStatement{
-				Condition: caseCondition,
-				Body:      body,
+				Test: caseCondition,
+				Body: body,
 			})
 		}
 
@@ -72,8 +72,8 @@ func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
 			}
 
 			defaultStmt = ast.CaseStatement{
-				Condition: nil,
-				Body:      body,
+				Test: nil,
+				Body: body,
 			}
 			break
 		}
@@ -82,10 +82,10 @@ func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
 	p.expect(token_type.RightBrace, compilerErrors.ErrSyntaxExpectedRightBrace)
 
 	return ast.SwitchStatement{
-		Kind:        ast_types.SwitchStatement,
-		Condition:   condition,
-		CaseStmts:   caseStmts,
-		DefaultStmt: defaultStmt,
+		Kind:         ast_types.SwitchStatement,
+		Discriminant: condition,
+		CaseStmts:    caseStmts,
+		DefaultStmt:  defaultStmt,
 	}, nil
 }
 
@@ -126,7 +126,7 @@ func (p *Parser) parseIfStatement() (ast.Stmt, error) {
 
 	return ast.IfStatement{
 		Kind:       ast_types.IfStatement,
-		Condition:  condition,
+		Test:       condition,
 		Body:       body,
 		ElseBody:   elseBody,
 		ElseIfStmt: elseIfStmt,
@@ -153,8 +153,8 @@ func (p *Parser) parseElseIfStatement() ([]ast.ElseIfStatement, error) {
 		}
 
 		elseIfStmt = append(elseIfStmt, ast.ElseIfStatement{
-			Condition: condition,
-			Body:      body,
+			Test: condition,
+			Body: body,
 		})
 	}
 

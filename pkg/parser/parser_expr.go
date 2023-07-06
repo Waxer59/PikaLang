@@ -13,6 +13,11 @@ import (
 	"golang.org/x/exp/slices"
 )
 
+func (p *Parser) parseExpr() (ast.Expr, error) {
+	expr, err := p.parseAssigmentExpr()
+	return expr, err
+}
+
 func (p *Parser) parseAdditiveExpr() (ast.Expr, error) {
 	left, err := p.parseExponentialExpr()
 
@@ -168,11 +173,6 @@ func (p *Parser) parseMemberExpr() (ast.Expr, error) {
 	return obj, nil
 }
 
-func (p *Parser) parseExpr() (ast.Expr, error) {
-	expr, err := p.parseAssigmentExpr()
-	return expr, err
-}
-
 func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 	if p.at().Type != token_type.LeftBrace {
 		additiveExpr, err := p.parseAdditiveExpr()
@@ -230,29 +230,6 @@ func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 	}, nil
 }
 
-func (p *Parser) parseEqualityExpr() (ast.Expr, error) {
-	left, err := p.parseComparisonExpr()
-	if err != nil {
-		return nil, err
-	}
-
-	for slices.Contains(ast_types.EqualityExpr, p.at().Value) && p.notEOF() {
-		op := p.subtract().Value // consume operator
-		right, err := p.parseComparisonExpr()
-		if err != nil {
-			return nil, err
-		}
-		left = ast.BinaryExpr{
-			Kind:     ast_types.BinaryExpr,
-			Left:     left,
-			Right:    right,
-			Operator: op,
-		}
-	}
-
-	return left, nil
-}
-
 func (p *Parser) parseComparisonExpr() (ast.Expr, error) {
 	left, err := p.parseObjectExpr()
 
@@ -279,8 +256,66 @@ func (p *Parser) parseComparisonExpr() (ast.Expr, error) {
 	return left, nil
 }
 
+func (p *Parser) parseEqualityExpr() (ast.Expr, error) {
+	left, err := p.parseComparisonExpr()
+	if err != nil {
+		return nil, err
+	}
+
+	for slices.Contains(ast_types.EqualityExpr, p.at().Value) && p.notEOF() {
+		op := p.subtract().Value // consume operator
+		right, err := p.parseComparisonExpr()
+		if err != nil {
+			return nil, err
+		}
+		left = ast.BinaryExpr{
+			Kind:     ast_types.BinaryExpr,
+			Left:     left,
+			Right:    right,
+			Operator: op,
+		}
+	}
+
+	return left, nil
+}
+
+func (p *Parser) parseTernaryExpr() (ast.Expr, error) {
+	condition, err := p.parseEqualityExpr()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for p.at().Type == token_type.QuestionMark && p.notEOF() {
+		p.subtract() // consume '?'
+		consequent, err := p.parseExpr()
+
+		if err != nil {
+			return nil, err
+		}
+
+		p.expect(token_type.Colon, compilerErrors.ErrSyntaxExpectedColon)
+
+		alternate, err := p.parseExpr()
+
+		if err != nil {
+			return nil, err
+		}
+
+		return ast.ConditionalExpr{
+			Kind:       ast_types.ConditionalExpr,
+			Condition:  condition,
+			Consequent: consequent,
+			Alternate:  alternate,
+		}, nil
+
+	}
+
+	return condition, nil
+}
+
 func (p *Parser) parseAssigmentExpr() (ast.Expr, error) {
-	left, err := p.parseEqualityExpr()
+	left, err := p.parseTernaryExpr()
 
 	if err != nil {
 		return nil, err
@@ -288,7 +323,7 @@ func (p *Parser) parseAssigmentExpr() (ast.Expr, error) {
 
 	if p.at().Type == token_type.Equals {
 		p.subtract() // consume '='
-		value, err := p.parseEqualityExpr()
+		value, err := p.parseTernaryExpr()
 		if err != nil {
 			return nil, err
 		}

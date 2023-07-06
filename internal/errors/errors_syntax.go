@@ -23,4 +23,5 @@ const (
 	ErrSyntaxExpectedExpr                 = "ERROR: Expected an expression"
 	ErrConditionCannotBeEmpty             = "ERROR: Condition cannot be empty"
 	ErrSyntaxCaseCannotBeEmpty            = "ERROR: Case cannot be empty"
+	ErrSyntaxExpectedQuestionMark         = "ERROR: Expected '?'"
 )

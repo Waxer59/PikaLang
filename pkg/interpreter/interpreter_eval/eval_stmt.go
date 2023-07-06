@@ -26,7 +26,11 @@ func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env in
 
 func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	for _, caseStatement := range declaration.CaseStmts {
-		if slices.Contains(caseStatement.Condition, declaration.Condition) {
+
+		if slices.ContainsFunc(caseStatement.Test, func(expr ast.Expr) bool {
+			eval, err := Evaluate(expr, env)
+			return err == nil && eval.GetValue() == declaration.Discriminant || eval.GetValue() == true
+		}) {
 			for _, statement := range caseStatement.Body {
 				_, err := Evaluate(statement, env)
 				if err != nil {
@@ -52,7 +56,7 @@ func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.En
 }
 
 func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
-	conditionRawValue, err := Evaluate(declaration.Condition, env)
+	conditionRawValue, err := Evaluate(declaration.Test, env)
 
 	if err != nil {
 		return nil, err
@@ -82,7 +86,7 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 
 	// Handle else if
 	for _, elseIfStatement := range declaration.ElseIfStmt {
-		conditionRawValue, err := Evaluate(elseIfStatement.Condition, env)
+		conditionRawValue, err := Evaluate(elseIfStatement.Test, env)
 
 		if err != nil {
 			return nil, err

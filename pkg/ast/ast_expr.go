@@ -56,3 +56,14 @@ type Identifier struct {
 func (i Identifier) GetKind() ast_types.NodeType {
 	return i.Kind
 }
+
+type ConditionalExpr struct {
+	Kind       ast_types.NodeType
+	Condition  Expr
+	Consequent Expr
+	Alternate  Expr
+}
+
+func (c ConditionalExpr) GetKind() ast_types.NodeType {
+	return c.Kind
+}

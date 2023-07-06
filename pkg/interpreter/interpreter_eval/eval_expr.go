@@ -110,6 +110,22 @@ func evalIdentifier(ident ast.Identifier, env interpreter_env.Environment) (inte
 	return val, err
 }
 
+func evalConditionalExpr(conditionalExpr ast.ConditionalExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	evalCondition, err := Evaluate(conditionalExpr.Condition, env)
+
+	if err != nil {
+		return nil, err
+	}
+
+	val := EvaluateTruthyFalsyValues(evalCondition)
+
+	if val {
+		return Evaluate(conditionalExpr.Consequent, env)
+	}
+
+	return Evaluate(conditionalExpr.Alternate, env)
+}
+
 func evalStringBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
 	var result string = ""
 	valLhs, okLhs := lhs.(interpreter_env.StringVal)
