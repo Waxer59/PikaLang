@@ -78,3 +78,14 @@ type LogicalExpr struct {
 func (l LogicalExpr) GetKind() ast_types.NodeType {
 	return l.Kind
 }
+
+type UnaryExpr struct {
+	Kind     ast_types.NodeType
+	Operator string
+	Argument Expr
+	Prefix   bool
+}
+
+func (u UnaryExpr) GetKind() ast_types.NodeType {
+	return u.Kind
+}

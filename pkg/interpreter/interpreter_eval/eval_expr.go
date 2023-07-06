@@ -172,7 +172,7 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue
 		result = math.Pow(valLhs.Value, valRhs.Value)
 	}
 
-	return interpreter_env.NumberVal{Value: result, Type: interpreter_env.Number}, nil
+	return interpreter_makers.MK_Number(result), nil
 }
 
 func evalLogicalExpr(logicalExpr ast.LogicalExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
@@ -197,6 +197,24 @@ func evalLogicalExpr(logicalExpr ast.LogicalExpr, env interpreter_env.Environmen
 		result = valLhs && valRhs
 	case "||":
 		result = valLhs || valRhs
+	}
+
+	return interpreter_makers.MK_Boolean(result), nil
+}
+
+func evalUnaryExpr(expr ast.UnaryExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	result := false
+	eval, err := Evaluate(expr.Argument, env)
+
+	if err != nil {
+		return nil, err
+	}
+
+	boolVal := EvaluateTruthyFalsyValues(eval.GetValue())
+
+	switch expr.Operator {
+	case "!":
+		result = !boolVal
 	}
 
 	return interpreter_makers.MK_Boolean(result), nil

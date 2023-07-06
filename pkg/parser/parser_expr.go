@@ -44,93 +44,58 @@ func (p *Parser) parseAdditiveExpr() (ast.Expr, error) {
 	return left, nil
 }
 
-func (p *Parser) parseMultiplicativeExpr() (ast.Expr, error) {
-	left, err := p.parseCallMemberExpr()
+func (p *Parser) parsePrimaryExpr() ast.Expr {
+	tk := p.at().Type
+	errorMsg := ""
 
-	if err != nil {
-		return nil, err
-	}
-
-	for slices.Contains(ast_types.MultiplicativeExpr, p.at().Value) {
-		var op = p.subtract().Value
-		right, err := p.parseCallMemberExpr()
+	switch tk {
+	case token_type.BooleanLiteral:
+		b, err := strconv.ParseBool(p.subtract().Value)
+		if err != nil {
+			errorMsg = err.Error()
+			break
+		}
+		return ast.BooleanLiteral{Kind: ast_types.BooleanLiteral, Value: b}
+	case token_type.Null:
+		p.subtract() // consume 'null'
+		return ast.NullLiteral{Kind: ast_types.NullLiteral, Value: nil}
+	case token_type.Identifier:
+		return ast.Identifier{Kind: ast_types.Identifier, Symbol: p.subtract().Value}
+	case token_type.Number:
+		n, err := strconv.ParseFloat(p.subtract().Value, 64)
 
 		if err != nil {
-			return nil, err
+			errorMsg = err.Error()
+			break
 		}
 
-		left = ast.BinaryExpr{
-			Kind:     ast_types.BinaryExpr,
-			Left:     left,
-			Right:    right,
-			Operator: op,
+		return ast.NumericLiteral{Kind: ast_types.NumericLiteral, Value: n}
+	case token_type.DoubleQoute:
+		p.subtract() // consume '"'
+		value := p.subtract().Value
+		p.expect(token_type.DoubleQoute, compilerErrors.ErrSyntaxExpectedDoubleQoute)
+		return ast.StringLiteral{
+			Kind:  ast_types.StringLiteral,
+			Value: value,
 		}
-	}
-
-	return left, nil
-}
-
-func (p *Parser) parseExponentialExpr() (ast.Expr, error) {
-	left, err := p.parseMultiplicativeExpr()
-
-	if err != nil {
-		return nil, err
-	}
-
-	for p.at().Value == "**" {
-		op := p.subtract().Value
-		right, err := p.parseMultiplicativeExpr()
+	case token_type.LeftParen:
+		p.subtract() // consume '('
+		value, err := p.parseExpr()
 
 		if err != nil {
-			return nil, err
+			errorMsg = err.Error()
+			break
 		}
 
-		left = ast.BinaryExpr{
-			Kind:     ast_types.BinaryExpr,
-			Left:     left,
-			Right:    right,
-			Operator: op,
-		}
+		p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
+		return value
+	default:
+		errorMsg = "Expected an expression"
 	}
 
-	return left, nil
-}
-
-func (p *Parser) parseCallMemberExpr() (ast.Expr, error) {
-	member, err := p.parseMemberExpr()
-	if err != nil {
-		return nil, err
-	}
-
-	if p.at().Type == token_type.LeftParen {
-		callExpr, err := p.parseCallExpr(member)
-		return callExpr, err
-	}
-
-	return member, nil
-}
-
-func (p *Parser) parseCallExpr(caller ast.Expr) (ast.Expr, error) {
-	args, err := p.parseArgs(token_type.Fn)
-	if err != nil {
-		return nil, err
-	}
-	var callExpr ast.Expr = ast.CallExpr{
-		Kind:   ast_types.CallExpr,
-		Caller: caller,
-		Args:   args,
-	}
-
-	if p.at().Type == token_type.LeftParen {
-		var err error
-
-		callExpr, err = p.parseCallExpr(callExpr)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return callExpr, nil
+	color.Red("Something went wrong with parsing: " + errorMsg)
+	os.Exit(0)
+	return nil
 }
 
 func (p *Parser) parseMemberExpr() (ast.Expr, error) {
@@ -171,6 +136,113 @@ func (p *Parser) parseMemberExpr() (ast.Expr, error) {
 	}
 
 	return obj, nil
+}
+
+func (p *Parser) parseCallMemberExpr() (ast.Expr, error) {
+	member, err := p.parseMemberExpr()
+	if err != nil {
+		return nil, err
+	}
+
+	if p.at().Type == token_type.LeftParen {
+		callExpr, err := p.parseCallExpr(member)
+		return callExpr, err
+	}
+
+	return member, nil
+}
+
+func (p *Parser) parseMultiplicativeExpr() (ast.Expr, error) {
+	left, err := p.parseCallMemberExpr()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for slices.Contains(ast_types.MultiplicativeExpr, p.at().Value) {
+		var op = p.subtract().Value
+		right, err := p.parseCallMemberExpr()
+
+		if err != nil {
+			return nil, err
+		}
+
+		left = ast.BinaryExpr{
+			Kind:     ast_types.BinaryExpr,
+			Left:     left,
+			Right:    right,
+			Operator: op,
+		}
+	}
+
+	return left, nil
+}
+
+func (p *Parser) parseLogicalNotExpr() (ast.Expr, error) {
+	if p.at().Type == token_type.Not {
+		op := p.subtract().Value // consume '!'
+		argument, err := p.parseLogicalNotExpr()
+		if err != nil {
+			return nil, err
+		}
+		return ast.UnaryExpr{
+			Kind:     ast_types.UnaryExpr,
+			Operator: op,
+			Argument: argument,
+			Prefix:   false,
+		}, nil
+	}
+
+	return p.parseMultiplicativeExpr()
+}
+
+func (p *Parser) parseExponentialExpr() (ast.Expr, error) {
+	left, err := p.parseLogicalNotExpr()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for p.at().Value == "**" {
+		op := p.subtract().Value
+		right, err := p.parseLogicalNotExpr()
+
+		if err != nil {
+			return nil, err
+		}
+
+		left = ast.BinaryExpr{
+			Kind:     ast_types.BinaryExpr,
+			Left:     left,
+			Right:    right,
+			Operator: op,
+		}
+	}
+
+	return left, nil
+}
+
+func (p *Parser) parseCallExpr(caller ast.Expr) (ast.Expr, error) {
+	args, err := p.parseArgs(token_type.Fn)
+	if err != nil {
+		return nil, err
+	}
+	var callExpr ast.Expr = ast.CallExpr{
+		Kind:   ast_types.CallExpr,
+		Caller: caller,
+		Args:   args,
+	}
+
+	if p.at().Type == token_type.LeftParen {
+		var err error
+
+		callExpr, err = p.parseCallExpr(callExpr)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return callExpr, nil
 }
 
 func (p *Parser) parseObjectExpr() (ast.Expr, error) {
@@ -382,58 +454,4 @@ func (p *Parser) parseAssigmentExpr() (ast.Expr, error) {
 	}
 
 	return left, nil
-}
-
-func (p *Parser) parsePrimaryExpr() ast.Expr {
-	tk := p.at().Type
-	errorMsg := ""
-
-	switch tk {
-	case token_type.BooleanLiteral:
-		b, err := strconv.ParseBool(p.subtract().Value)
-		if err != nil {
-			errorMsg = err.Error()
-			break
-		}
-		return ast.BooleanLiteral{Kind: ast_types.BooleanLiteral, Value: b}
-	case token_type.Null:
-		p.subtract() // consume 'null'
-		return ast.NullLiteral{Kind: ast_types.NullLiteral, Value: nil}
-	case token_type.Identifier:
-		return ast.Identifier{Kind: ast_types.Identifier, Symbol: p.subtract().Value}
-	case token_type.Number:
-		n, err := strconv.ParseFloat(p.subtract().Value, 64)
-
-		if err != nil {
-			errorMsg = err.Error()
-			break
-		}
-
-		return ast.NumericLiteral{Kind: ast_types.NumericLiteral, Value: n}
-	case token_type.DoubleQoute:
-		p.subtract() // consume '"'
-		value := p.subtract().Value
-		p.expect(token_type.DoubleQoute, compilerErrors.ErrSyntaxExpectedDoubleQoute)
-		return ast.StringLiteral{
-			Kind:  ast_types.StringLiteral,
-			Value: value,
-		}
-	case token_type.LeftParen:
-		p.subtract() // consume '('
-		value, err := p.parseExpr()
-
-		if err != nil {
-			errorMsg = err.Error()
-			break
-		}
-
-		p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
-		return value
-	default:
-		errorMsg = "Expected an expression"
-	}
-
-	color.Red("Something went wrong with parsing: " + errorMsg)
-	os.Exit(0)
-	return nil
 }
