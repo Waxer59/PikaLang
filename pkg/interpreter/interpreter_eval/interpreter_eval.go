@@ -25,6 +25,8 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 		return interpreter_makers.MK_Boolean(astNode.(ast.BooleanLiteral).Value), nil
 	case ast_types.StringLiteral:
 		return interpreter_makers.MK_String(astNode.(ast.StringLiteral).Value), nil
+	case ast_types.NaNLiteral:
+		return interpreter_makers.MK_NaN(), nil
 
 	// EXPRESSIONS
 	case ast_types.BinaryExpr:

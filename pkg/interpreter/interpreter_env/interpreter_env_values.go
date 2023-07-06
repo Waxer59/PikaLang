@@ -103,3 +103,16 @@ func (s StringVal) GetType() ValueType {
 func (s StringVal) GetValue() interface{} {
 	return s.Value
 }
+
+type NaNVal struct {
+	Type  ValueType
+	Value string
+}
+
+func (n NaNVal) GetType() ValueType {
+	return n.Type
+}
+
+func (n NaNVal) GetValue() interface{} {
+	return n.Value
+}

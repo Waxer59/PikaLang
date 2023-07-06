@@ -29,3 +29,10 @@ func MK_String(s string) interpreter_env.StringVal {
 		Value: s,
 	}
 }
+
+func MK_NaN() interpreter_env.NaNVal {
+	return interpreter_env.NaNVal{
+		Type:  interpreter_env.Number,
+		Value: "NaN",
+	}
+}

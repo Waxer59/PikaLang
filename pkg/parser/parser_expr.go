@@ -59,6 +59,9 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 	case token_type.Null:
 		p.subtract() // consume 'null'
 		return ast.NullLiteral{Kind: ast_types.NullLiteral, Value: nil}
+	case token_type.NaN:
+		p.subtract() // consume 'NaN'
+		return ast.NaNLiteral{Kind: ast_types.NaNLiteral, Value: nil}
 	case token_type.Identifier:
 		return ast.Identifier{Kind: ast_types.Identifier, Symbol: p.subtract().Value}
 	case token_type.Number:

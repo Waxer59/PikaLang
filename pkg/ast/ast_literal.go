@@ -60,3 +60,12 @@ type StringLiteral struct {
 func (s StringLiteral) GetKind() ast_types.NodeType {
 	return s.Kind
 }
+
+type NaNLiteral struct {
+	Kind  ast_types.NodeType
+	Value interface{}
+}
+
+func (n NaNLiteral) GetKind() ast_types.NodeType {
+	return n.Kind
+}

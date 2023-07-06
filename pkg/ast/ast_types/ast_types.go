@@ -27,6 +27,7 @@ const (
 	NullLiteral    NodeType = "NullLiteral"
 	BooleanLiteral NodeType = "BooleanLiteral"
 	StringLiteral  NodeType = "StringLiteral"
+	NaNLiteral     NodeType = "NaNLiteral"
 )
 
 var (
