@@ -1,5 +1,7 @@
 package interpreter_eval
 
+import "pika/pkg/ast"
+
 func EvaluateTruthyFalsyValues(val interface{}) bool {
 	switch v := val.(type) {
 	case bool:
@@ -10,6 +12,8 @@ func EvaluateTruthyFalsyValues(val interface{}) bool {
 		return v != ""
 	case nil:
 		return false
+	case []ast.Expr:
+		return len(v) != 0
 	default:
 		return true
 	}

@@ -163,20 +163,68 @@ func evalObjectExpr(objectExpr ast.ObjectLiteral, env interpreter_env.Environmen
 }
 
 func evalAssignment(assignment ast.AssigmentExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
-	if assignment.Assigne.GetKind() != ast_types.Identifier {
-		return nil, errors.New(compilerErrors.ErrSyntaxInvalidAssignment)
-	}
-
-	varName := assignment.Assigne.(ast.Identifier).Symbol
-	eval, err := Evaluate(assignment.Value, env)
+	assignmentVal, err := Evaluate(assignment.Value, env)
 
 	if err != nil {
 		return nil, err
 	}
 
-	variable, err := env.AssignVar(varName, eval)
+	switch assignment.Assigne.GetKind() {
+	case ast_types.Identifier:
+		varName := assignment.Assigne.(ast.Identifier).Symbol
 
-	return variable, err
+		variable, err := env.AssignVar(varName, assignmentVal)
+
+		return variable, err
+	case ast_types.MemberExpr:
+		identifier := assignment.Assigne.(ast.MemberExpr).Object.(ast.Identifier).Symbol
+		property := assignment.Assigne.(ast.MemberExpr).Property
+		isComputed := assignment.Assigne.(ast.MemberExpr).Computed
+
+		obj, err := Evaluate(assignment.Assigne.(ast.MemberExpr).Object, env)
+
+		if err != nil {
+			return nil, err
+		}
+
+		var propertyVal interpreter_env.RuntimeValue
+		if isComputed {
+			propertyVal, err = Evaluate(property, env)
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		switch objVal := obj.(type) {
+		case interpreter_env.ObjectVal:
+			if isComputed {
+				objVal.Properties[fmt.Sprint(propertyVal.GetValue())] = assignmentVal
+			} else {
+				objVal.Properties[fmt.Sprint(property.(ast.Identifier).Symbol)] = assignmentVal
+			}
+			return env.AssignVar(identifier, objVal)
+		case interpreter_env.ArrayVal:
+			if propertyVal.GetType() != interpreter_env.Number {
+				return nil, errors.New(compilerErrors.ErrSyntaxInvalidAssignment)
+			}
+
+			idx := int(propertyVal.GetValue().(float64))
+
+			if idx >= len(objVal.Elements) {
+				for i := len(objVal.Elements); i <= idx; i++ {
+					objVal.Elements = append(objVal.Elements, interpreter_makers.MK_Null())
+				}
+			}
+
+			objVal.Elements[idx] = assignmentVal
+
+			return env.AssignVar(identifier, objVal)
+		default:
+			return nil, errors.New(compilerErrors.ErrSyntaxInvalidAssignment)
+		}
+	default:
+		return nil, errors.New(compilerErrors.ErrSyntaxInvalidAssignment)
+	}
 }
 
 func evalIdentifier(ident ast.Identifier, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
