@@ -36,14 +36,14 @@ var ConsoleFns = map[string]NativeFunction{
 			}
 		}
 
-		return interpreter_makers.MK_NULL()
+		return interpreter_makers.MK_Null()
 	},
 	"printe": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
 		for _, arg := range args {
 			s := fmt.Sprintf("%v", arg.GetValue())
 			color.Red(s)
 		}
-		return interpreter_makers.MK_NULL()
+		return interpreter_makers.MK_Null()
 	},
 	"prompt": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
 		if len(args) < 1 {

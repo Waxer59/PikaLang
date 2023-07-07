@@ -32,7 +32,7 @@ func (n NullVal) GetType() ValueType {
 }
 
 func (n NullVal) GetValue() interface{} {
-	return nil
+	return n.Value
 }
 
 type BooleanVal struct {
@@ -129,4 +129,13 @@ func (a ArrayVal) GetType() ValueType {
 
 func (a ArrayVal) GetValue() interface{} {
 	return a.Elements
+}
+
+func (a ArrayVal) GetElements() []interface{} {
+	arr := make([]interface{}, len(a.Elements))
+	for idx, element := range a.Elements {
+		arr[idx] = element.GetValue()
+	}
+
+	return arr
 }

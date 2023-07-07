@@ -46,7 +46,7 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 		scope.DeclareVar(arg, args[idx], false)
 	}
 
-	var result interpreter_env.RuntimeValue = interpreter_makers.MK_NULL()
+	var result interpreter_env.RuntimeValue = interpreter_makers.MK_Null()
 
 	// Evaluate the function body line by line
 	for _, statement := range function.Body {
@@ -346,5 +346,5 @@ func evalBinaryExpr(binop ast.BinaryExpr, env interpreter_env.Environment) (inte
 		return eval, err
 	}
 
-	return interpreter_makers.MK_NULL(), nil
+	return interpreter_makers.MK_Null(), nil
 }

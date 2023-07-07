@@ -9,7 +9,7 @@ import (
 )
 
 func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
-	var value interpreter_env.RuntimeValue = interpreter_makers.MK_NULL()
+	var value interpreter_env.RuntimeValue = interpreter_makers.MK_Null()
 
 	if variableDeclaration.Value != nil {
 		eval, err := Evaluate(variableDeclaration.Value, env)
@@ -138,7 +138,7 @@ func evalFunctionDeclaration(declaration ast.FunctionDeclaration, env interprete
 }
 
 func evalProgram(program ast.Program, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
-	var lastEvaluated interpreter_env.RuntimeValue = interpreter_makers.MK_NULL()
+	var lastEvaluated interpreter_env.RuntimeValue = interpreter_makers.MK_Null()
 
 	for _, statement := range program.Body {
 		eval, err := Evaluate(statement, env)

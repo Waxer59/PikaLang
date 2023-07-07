@@ -20,7 +20,7 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 	case ast_types.ObjectLiteral:
 		return evalObjectExpr(astNode.(ast.ObjectLiteral), env)
 	case ast_types.NullLiteral:
-		return interpreter_makers.MK_NULL(), nil
+		return interpreter_makers.MK_Null(), nil
 	case ast_types.BooleanLiteral:
 		return interpreter_makers.MK_Boolean(astNode.(ast.BooleanLiteral).Value), nil
 	case ast_types.StringLiteral:
