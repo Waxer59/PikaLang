@@ -18,9 +18,23 @@ func (p *Parser) parseStmt() (ast.Stmt, error) {
 		return p.parseIfStatement()
 	case token_type.Switch:
 		return p.parseSwitchStatement()
+	case token_type.Return:
+		return p.parseReturnStatement()
 	default:
 		return p.parseExpr()
 	}
+}
+
+func (p *Parser) parseReturnStatement() (ast.Stmt, error) {
+	p.subtract() // consume 'return'
+	arg, err := p.parseExpr()
+	if err != nil {
+		return nil, err
+	}
+	return ast.ReturnStatement{
+		Kind:     ast_types.ReturnStatement,
+		Argument: arg,
+	}, nil
 }
 
 func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {

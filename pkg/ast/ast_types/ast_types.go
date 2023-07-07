@@ -9,6 +9,7 @@ const (
 	FunctionDeclaration NodeType = "FunctionDeclaration"
 	IfStatement         NodeType = "IfStatement"
 	SwitchStatement     NodeType = "SwitchStatement"
+	ReturnStatement     NodeType = "ReturnStatement"
 
 	// EXPRESSIONS
 	AssigmentExpr   NodeType = "AssigmentExpr"

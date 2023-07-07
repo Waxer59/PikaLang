@@ -71,3 +71,12 @@ type CaseStatement struct {
 func (cs SwitchStatement) GetKind() ast_types.NodeType {
 	return cs.Kind
 }
+
+type ReturnStatement struct {
+	Kind     ast_types.NodeType
+	Argument Expr
+}
+
+func (rs ReturnStatement) GetKind() ast_types.NodeType {
+	return rs.Kind
+}

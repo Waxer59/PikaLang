@@ -24,6 +24,15 @@ func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env in
 	return variable, err
 }
 
+func evalReturnStatement(declaration ast.ReturnStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	value, err := Evaluate(declaration.Argument, env)
+	if err != nil {
+		return nil, err
+	}
+
+	return value, nil
+}
+
 func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	for _, caseStatement := range declaration.CaseStmts {
 

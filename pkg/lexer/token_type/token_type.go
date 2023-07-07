@@ -20,6 +20,7 @@ const (
 	Case
 	Default
 	NaN
+	Return
 
 	// Operators
 	BinaryOperator // + - * / ** %
@@ -68,6 +69,7 @@ var KEYWORDS = map[string]TokenType{
 	"case":    Case,
 	"default": Default,
 	"NaN":     NaN,
+	"return":  Return,
 }
 
 var SkippableChars = []rune{' ', '\t', '\n', '\r'}

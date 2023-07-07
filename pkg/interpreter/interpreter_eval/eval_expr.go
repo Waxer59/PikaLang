@@ -46,19 +46,18 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 		scope.DeclareVar(arg, args[idx], false)
 	}
 
-	var result interpreter_env.RuntimeValue = interpreter_makers.MK_Null()
-
 	// Evaluate the function body line by line
 	for _, statement := range function.Body {
 		eval, err := Evaluate(statement, scope)
 		if err != nil {
 			return nil, err
 		}
-		result = eval
+		if statement.GetKind() == ast_types.ReturnStatement {
+			return eval, nil
+		}
 	}
 
-	return result, nil
-
+	return interpreter_makers.MK_Null(), nil
 }
 
 func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
