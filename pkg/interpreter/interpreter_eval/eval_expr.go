@@ -2,6 +2,7 @@ package interpreter_eval
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	compilerErrors "pika/internal/errors"
 	"pika/pkg/ast"
@@ -58,6 +59,78 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 
 	return result, nil
 
+}
+
+func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	property := expr.Property
+
+	evalObj, err := Evaluate(expr.Object, env)
+	if err != nil {
+		return nil, err
+	}
+
+	valObj := evalObj.GetValue()
+	if expr.Computed {
+		evalProperty, err := Evaluate(property, env)
+		if err != nil {
+			return nil, err
+		}
+		switch obj := valObj.(type) {
+		case []interpreter_env.RuntimeValue:
+			if evalProperty.GetType() != interpreter_env.Number {
+				return nil, errors.New(compilerErrors.ErrIndexNotFound)
+			}
+			if int(evalProperty.GetValue().(float64)) >= len(obj) {
+				return nil, errors.New(compilerErrors.ErrIndexNotFound)
+			}
+			val := obj[int(evalProperty.GetValue().(float64))]
+			return val, nil
+		case map[string]interpreter_env.RuntimeValue:
+			valProperty := fmt.Sprint(evalProperty.GetValue())
+			if _, ok := obj[valProperty]; ok {
+				return obj[valProperty], nil
+			} else {
+				return nil, errors.New(compilerErrors.ErrPropertyNotFound)
+			}
+		default:
+			return nil, errors.New(compilerErrors.ErrIndexNotFound)
+		}
+	}
+
+	valProperty := fmt.Sprint(property.(ast.Identifier).Symbol)
+	val, ok := valObj.(map[string]interpreter_env.RuntimeValue)[valProperty]
+	if !ok {
+		return nil, errors.New(compilerErrors.ErrPropertyNotFound)
+	}
+	return val, nil
+}
+
+func evalArrayExpr(arrayExpr ast.ArrayLiteral, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	arr := interpreter_env.ArrayVal{
+		Type:     interpreter_env.Array,
+		Elements: make([]interpreter_env.RuntimeValue, len(arrayExpr.Elements)),
+	}
+
+	for idx, element := range arrayExpr.Elements {
+		eval, err := Evaluate(element, env)
+
+		if err != nil {
+			return nil, err
+		}
+
+		if element.GetKind() == ast_types.Identifier {
+			eval, err = env.LookupVar(eval.GetValue().(string))
+
+			if err != nil {
+				return nil, err
+			}
+
+		}
+
+		arr.Elements[idx] = eval
+	}
+
+	return arr, nil
 }
 
 func evalObjectExpr(objectExpr ast.ObjectLiteral, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {

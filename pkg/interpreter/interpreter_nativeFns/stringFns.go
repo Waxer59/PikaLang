@@ -7,17 +7,6 @@ import (
 )
 
 var StringFns = map[string]NativeFunction{
-	"len": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
-		if len(args) < 1 || args[0].GetType() != interpreter_env.String {
-			return interpreter_makers.MK_NaN()
-		}
-
-		arg, ok := args[0].GetValue().(string)
-		if !ok {
-			return interpreter_makers.MK_NaN()
-		}
-		return interpreter_makers.MK_Number(float64(len(arg)))
-	},
 	"toUpperCase": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
 		if len(args) < 1 || args[0].GetType() != interpreter_env.String {
 			return interpreter_makers.MK_String("")

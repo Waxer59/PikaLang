@@ -14,6 +14,7 @@ const (
 	Boolean  ValueType = "boolean"
 	Object   ValueType = "object"
 	Function ValueType = "function"
+	Array    ValueType = "array"
 )
 
 type RuntimeValue interface {
@@ -115,4 +116,17 @@ func (n NaNVal) GetType() ValueType {
 
 func (n NaNVal) GetValue() interface{} {
 	return n.Value
+}
+
+type ArrayVal struct {
+	Type     ValueType
+	Elements []RuntimeValue
+}
+
+func (a ArrayVal) GetType() ValueType {
+	return a.Type
+}
+
+func (a ArrayVal) GetValue() interface{} {
+	return a.Elements
 }

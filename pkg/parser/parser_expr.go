@@ -305,8 +305,39 @@ func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 	}, nil
 }
 
+func (p *Parser) parseArrayExpr() (ast.Expr, error) {
+	if p.at().Type != token_type.LeftBracket {
+		additiveExpr, err := p.parseObjectExpr()
+		return additiveExpr, err
+	}
+
+	p.subtract() // advance post open bracket
+
+	elements := []ast.Expr{}
+
+	for p.notEOF() && p.at().Type != token_type.RightBracket {
+		val, err := p.parseExpr()
+
+		if err != nil {
+			return nil, err
+		}
+
+		if p.at().Type != token_type.RightBracket {
+			p.expect(token_type.Comma, compilerErrors.ErrSyntaxExpectedComma)
+		}
+
+		elements = append(elements, val)
+	}
+
+	p.expect(token_type.RightBracket, compilerErrors.ErrSyntaxExpectedRightBracket)
+	return ast.ArrayLiteral{
+		Kind:     ast_types.ArrayLiteral,
+		Elements: elements,
+	}, nil
+}
+
 func (p *Parser) parseComparisonExpr() (ast.Expr, error) {
-	left, err := p.parseObjectExpr()
+	left, err := p.parseArrayExpr()
 
 	if err != nil {
 		return nil, err

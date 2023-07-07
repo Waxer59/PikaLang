@@ -69,3 +69,12 @@ type NaNLiteral struct {
 func (n NaNLiteral) GetKind() ast_types.NodeType {
 	return n.Kind
 }
+
+type ArrayLiteral struct {
+	Kind     ast_types.NodeType
+	Elements []Expr
+}
+
+func (a ArrayLiteral) GetKind() ast_types.NodeType {
+	return a.Kind
+}
