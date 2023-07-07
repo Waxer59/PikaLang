@@ -8,6 +8,7 @@ import (
 	"pika/pkg/ast/ast_types"
 	"pika/pkg/interpreter/interpreter_env"
 	"pika/pkg/interpreter/interpreter_makers"
+	"pika/pkg/interpreter/interpreter_utils"
 
 	"golang.org/x/exp/slices"
 )
@@ -25,7 +26,7 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 
 	fn, err := Evaluate(expr.Caller, env)
 	fnName := expr.Caller.(ast.Identifier).Symbol
-	nativeFn, nativeFnOk := interpreter_env.IsNativeFunction(fnName)
+	nativeFn, nativeFnOk := interpreter_utils.IsNativeFunction(fnName)
 
 	if err != nil && nativeFnOk {
 		result := nativeFn(args, env)
