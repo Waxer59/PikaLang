@@ -370,9 +370,28 @@ func evalUnaryExpr(expr ast.UnaryExpr, env interpreter_env.Environment) (interpr
 	switch expr.Operator {
 	case "!":
 		result = !boolVal
+		return interpreter_makers.MK_Boolean(result), nil
+	case "+":
+		if eval.GetType() != interpreter_env.Number {
+			return nil, errors.New(compilerErrors.ErrSyntaxUnaryInvalidUnaryExpr)
+		}
+		result, ok := eval.GetValue().(float64)
+		if !ok {
+			return nil, errors.New(compilerErrors.ErrSyntaxUnaryInvalidUnaryExpr)
+		}
+		return interpreter_makers.MK_Number(result), nil
+	case "-":
+		if eval.GetType() != interpreter_env.Number {
+			return nil, errors.New(compilerErrors.ErrSyntaxUnaryInvalidUnaryExpr)
+		}
+		result, ok := eval.GetValue().(float64)
+		if !ok {
+			return nil, errors.New(compilerErrors.ErrSyntaxUnaryInvalidUnaryExpr)
+		}
+		return interpreter_makers.MK_Number(-result), nil
+	default:
+		return interpreter_makers.MK_Null(), nil
 	}
-
-	return interpreter_makers.MK_Boolean(result), nil
 }
 
 func evalComparisonBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {

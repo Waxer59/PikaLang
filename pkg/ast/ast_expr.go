@@ -90,3 +90,13 @@ type UnaryExpr struct {
 func (u UnaryExpr) GetKind() ast_types.NodeType {
 	return u.Kind
 }
+
+type UpdateExpr struct {
+	Kind     ast_types.NodeType
+	Operator string
+	Prefix   bool
+}
+
+func (u UpdateExpr) GetKind() ast_types.NodeType {
+	return u.Kind
+}

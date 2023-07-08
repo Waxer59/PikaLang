@@ -181,6 +181,24 @@ func (p *Parser) parseMultiplicativeExpr() (ast.Expr, error) {
 	return left, nil
 }
 
+func (p *Parser) parseNegativeAndPositiveExpr() (ast.Expr, error) {
+	if p.at().Value == "+" || p.at().Value == "-" {
+		op := p.subtract().Value // consume '-' or '+'
+		argument, err := p.parseNegativeAndPositiveExpr()
+		if err != nil {
+			return nil, err
+		}
+		return ast.UnaryExpr{
+			Kind:     ast_types.UnaryExpr,
+			Operator: op,
+			Argument: argument,
+			Prefix:   true,
+		}, nil
+	}
+
+	return p.parseMultiplicativeExpr()
+}
+
 func (p *Parser) parseLogicalNotExpr() (ast.Expr, error) {
 	if p.at().Type == token_type.Not {
 		op := p.subtract().Value // consume '!'
@@ -196,7 +214,7 @@ func (p *Parser) parseLogicalNotExpr() (ast.Expr, error) {
 		}, nil
 	}
 
-	return p.parseMultiplicativeExpr()
+	return p.parseNegativeAndPositiveExpr()
 }
 
 func (p *Parser) parseExponentialExpr() (ast.Expr, error) {
