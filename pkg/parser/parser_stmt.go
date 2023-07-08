@@ -20,17 +20,32 @@ func (p *Parser) parseStmt() (ast.Stmt, error) {
 		return p.parseSwitchStatement()
 	case token_type.Return:
 		return p.parseReturnStatement()
+	case token_type.While:
+		return p.parseWhileStatement()
 	default:
 		return p.parseExpr()
 	}
 }
 
+func (p *Parser) parseWhileStatement() (ast.Stmt, error) {
+	return nil, nil
+}
+
 func (p *Parser) parseReturnStatement() (ast.Stmt, error) {
 	p.subtract() // consume 'return'
+
+	if p.at().Type == token_type.Semicolon {
+		return ast.ReturnStatement{
+			Kind:     ast_types.ReturnStatement,
+			Argument: nil,
+		}, nil
+	}
+
 	arg, err := p.parseExpr()
 	if err != nil {
 		return nil, err
 	}
+
 	return ast.ReturnStatement{
 		Kind:     ast_types.ReturnStatement,
 		Argument: arg,

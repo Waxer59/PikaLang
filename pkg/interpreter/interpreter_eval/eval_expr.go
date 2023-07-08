@@ -27,9 +27,9 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 
 	fn, err := Evaluate(expr.Caller, env)
 	fnName := expr.Caller.(ast.Identifier).Symbol
-	nativeFn, nativeFnOk := interpreter_utils.IsNativeFunction(fnName)
+	nativeFn, isNativeFn := interpreter_utils.IsNativeFunction(fnName)
 
-	if err != nil && nativeFnOk {
+	if err != nil && isNativeFn {
 		result := nativeFn(args, env)
 		return result, nil
 	}
@@ -49,11 +49,11 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 	// Evaluate the function body line by line
 	for _, statement := range function.Body {
 		eval, err := Evaluate(statement, scope)
+		if err != nil && err.Error() == compilerErrors.ErrReturn { // Return statement
+			return eval, nil
+		}
 		if err != nil {
 			return nil, err
-		}
-		if statement.GetKind() == ast_types.ReturnStatement {
-			return eval, nil
 		}
 	}
 

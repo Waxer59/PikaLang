@@ -21,6 +21,7 @@ const (
 	Default
 	NaN
 	Return
+	While
 
 	// Operators
 	BinaryOperator // + - * / ** %
@@ -34,7 +35,7 @@ const (
 	RightBracket // ]
 	LeftBracket  // [
 	Colon        // :
-	SemiColon    // ;
+	Semicolon    // ;
 	Comma        // ,
 	Dot          // .
 	DoubleQoute  // "
@@ -70,6 +71,7 @@ var KEYWORDS = map[string]TokenType{
 	"default": Default,
 	"NaN":     NaN,
 	"return":  Return,
+	"while":   While,
 }
 
 var SkippableChars = []rune{' ', '\t', '\n', '\r'}

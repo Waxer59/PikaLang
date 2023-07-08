@@ -2,7 +2,6 @@ package lexer
 
 import (
 	"errors"
-	"fmt"
 	compilerErrors "pika/internal/errors"
 	"pika/pkg/lexer/token_type"
 )
@@ -93,7 +92,6 @@ func Tokenize(input string) ([]token_type.Token, error) {
 				substract(2) // consume /*
 				for len(src) > 0 && src[0] != '*' && nextChar() != '/' {
 					substract(1)
-					fmt.Println(string(src))
 					if len(src) <= 1 { // if the comment is not terminated
 						return nil, errors.New(string(compilerErrors.ErrSyntaxUnterminatedMultilineComment))
 					}
@@ -131,7 +129,7 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.Less, Value: string(tokenChar)})
 		case ';':
-			tokens = append(tokens, token_type.Token{Type: token_type.SemiColon, Value: string(tokenChar)})
+			tokens = append(tokens, token_type.Token{Type: token_type.Semicolon, Value: string(tokenChar)})
 		case '?':
 			tokens = append(tokens, token_type.Token{Type: token_type.QuestionMark, Value: string(tokenChar)})
 		case '(':

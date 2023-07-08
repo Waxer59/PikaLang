@@ -10,6 +10,7 @@ import (
 
 var ConsoleFns = map[string]NativeFunction{
 	"print": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
+
 		for _, arg := range args {
 			switch arg.GetType() {
 			case interpreter_env.Array:

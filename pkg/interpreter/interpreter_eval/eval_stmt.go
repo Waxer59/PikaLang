@@ -1,6 +1,8 @@
 package interpreter_eval
 
 import (
+	"errors"
+	compilerErrors "pika/internal/errors"
 	"pika/pkg/ast"
 	"pika/pkg/interpreter/interpreter_env"
 	"pika/pkg/interpreter/interpreter_makers"
@@ -14,7 +16,7 @@ func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env in
 	if variableDeclaration.Value != nil {
 		eval, err := Evaluate(variableDeclaration.Value, env)
 		if err != nil {
-			return nil, err
+			return eval, err
 		}
 		value = eval
 	}
@@ -25,12 +27,19 @@ func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env in
 }
 
 func evalReturnStatement(declaration ast.ReturnStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
-	value, err := Evaluate(declaration.Argument, env)
-	if err != nil {
-		return nil, err
+
+	var returnValue interpreter_env.RuntimeValue = interpreter_makers.MK_Null()
+
+	if declaration.Argument != nil {
+		eval, err := Evaluate(declaration.Argument, env)
+		if err != nil {
+			return eval, err
+		}
+		returnValue = eval
 	}
 
-	return value, nil
+	// Throw a error to stop the execution
+	return returnValue, errors.New(compilerErrors.ErrReturn)
 }
 
 func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
@@ -38,12 +47,19 @@ func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.En
 
 		if slices.ContainsFunc(caseStatement.Test, func(expr ast.Expr) bool {
 			eval, err := Evaluate(expr, env)
-			return err == nil && eval.GetValue() == declaration.Discriminant || eval.GetValue() == true
+			if err != nil {
+				return false
+			}
+			evalDiscriminant, err := Evaluate(declaration.Discriminant, env)
+			if err != nil {
+				return false
+			}
+			return err == nil && eval.GetValue() == evalDiscriminant.GetValue() || eval.GetValue() == true
 		}) {
 			for _, statement := range caseStatement.Body {
-				_, err := Evaluate(statement, env)
+				eval, err := Evaluate(statement, env)
 				if err != nil {
-					return nil, err
+					return eval, err
 				}
 			}
 			return nil, nil
@@ -55,9 +71,9 @@ func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.En
 	}
 
 	for _, statement := range declaration.DefaultStmt.Body {
-		_, err := Evaluate(statement, env)
+		eval, err := Evaluate(statement, env)
 		if err != nil {
-			return nil, err
+			return eval, err
 		}
 	}
 
@@ -80,10 +96,10 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 	// Handle first if
 	if val {
 		for _, statement := range declaration.Body {
-			_, err := Evaluate(statement, env)
+			eval, err := Evaluate(statement, env)
 
 			if err != nil {
-				return nil, err
+				return eval, err
 			}
 		}
 		return nil, nil
@@ -103,16 +119,12 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 
 		val := EvaluateTruthyFalsyValues(conditionRawValue.GetValue())
 
-		if err != nil {
-			return nil, err
-		}
-
 		if val {
 			for _, statement := range elseIfStatement.Body {
-				_, err := Evaluate(statement, env)
+				eval, err := Evaluate(statement, env)
 
 				if err != nil {
-					return nil, err
+					return eval, err
 				}
 			}
 			return nil, nil
@@ -121,10 +133,10 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 
 	// Handle else
 	for _, statement := range declaration.ElseBody {
-		_, err := Evaluate(statement, env)
+		eval, err := Evaluate(statement, env)
 
 		if err != nil {
-			return nil, err
+			return eval, err
 		}
 	}
 
@@ -152,7 +164,7 @@ func evalProgram(program ast.Program, env interpreter_env.Environment) (interpre
 	for _, statement := range program.Body {
 		eval, err := Evaluate(statement, env)
 		if err != nil {
-			return nil, err
+			return eval, err
 		}
 		lastEvaluated = eval
 	}

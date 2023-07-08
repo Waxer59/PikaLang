@@ -80,3 +80,13 @@ type ReturnStatement struct {
 func (rs ReturnStatement) GetKind() ast_types.NodeType {
 	return rs.Kind
 }
+
+type WhileStatement struct {
+	Kind ast_types.NodeType
+	Test Expr
+	Body []Stmt
+}
+
+func (ws WhileStatement) GetKind() ast_types.NodeType {
+	return ws.Kind
+}
