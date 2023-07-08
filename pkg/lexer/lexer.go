@@ -59,11 +59,28 @@ func Tokenize(input string) ([]token_type.Token, error) {
 
 		// Check for operators
 		switch tokenChar {
-		case '+', '%':
+		case '+':
+			if nextChar() == '=' {
+				substract(2) // consume ' += '
+				tokens = append(tokens, token_type.Token{Type: token_type.PlusEquals, Value: string(tokenChar) + "="})
+				continue
+			}
+			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
+		case '%':
+			if nextChar() == '=' {
+				substract(2) // consume ' %= '
+				tokens = append(tokens, token_type.Token{Type: token_type.ModuleEquals, Value: string(tokenChar) + "="})
+				continue
+			}
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 		case '-':
+			if nextChar() == '=' {
+				substract(2) // consume ' -= '
+				tokens = append(tokens, token_type.Token{Type: token_type.MinusEquals, Value: string(tokenChar) + "="})
+				continue
+			}
+
 			if IsInt(nextChar()) { // Check for negative numbers
-				substract(1) // advance '-'
 				num, rest := ExtractInt(src)
 				tokens = append(tokens, token_type.Token{Type: token_type.Number, Value: num})
 				src = rest
@@ -71,8 +88,19 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 		case '*':
+			if nextChar() == '=' {
+				substract(2) // consume ' *= '
+				tokens = append(tokens, token_type.Token{Type: token_type.TimesEquals, Value: string(tokenChar) + "="})
+				continue
+			}
+
 			if nextChar() == '*' { // Check for power
 				substract(2) // consume ' ** '
+				if src[0] == '=' {
+					substract(1) // advance '='
+					tokens = append(tokens, token_type.Token{Type: token_type.PowerEquals, Value: "**="})
+					continue
+				}
 				tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: "**"})
 				continue
 			}
@@ -97,6 +125,9 @@ func Tokenize(input string) ([]token_type.Token, error) {
 					}
 				}
 				substract(2) // consume */
+			case '=':
+				substract(2) // consume '/='
+				tokens = append(tokens, token_type.Token{Type: token_type.DivideEquals, Value: "/="})
 			default:
 				tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 			}

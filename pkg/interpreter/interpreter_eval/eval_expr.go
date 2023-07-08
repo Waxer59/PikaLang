@@ -171,12 +171,45 @@ func evalAssignment(assignment ast.AssigmentExpr, env interpreter_env.Environmen
 
 	switch assignment.Assigne.GetKind() {
 	case ast_types.Identifier:
+
 		varName := assignment.Assigne.(ast.Identifier).Symbol
+
+		switch assignment.Operator {
+		case "+=":
+			assignmentVal, err = evalBinaryExpr(ast.BinaryExpr{Kind: ast_types.BinaryExpr, Operator: "+", Left: assignment.Assigne, Right: assignment.Value}, env)
+			if err != nil {
+				return nil, err
+			}
+		case "-=":
+			assignmentVal, err = evalBinaryExpr(ast.BinaryExpr{Kind: ast_types.BinaryExpr, Operator: "-", Left: assignment.Assigne, Right: assignment.Value}, env)
+			if err != nil {
+				return nil, err
+			}
+		case "*=":
+			assignmentVal, err = evalBinaryExpr(ast.BinaryExpr{Kind: ast_types.BinaryExpr, Operator: "*", Left: assignment.Assigne, Right: assignment.Value}, env)
+			if err != nil {
+				return nil, err
+			}
+		case "**=":
+			assignmentVal, err = evalBinaryExpr(ast.BinaryExpr{Kind: ast_types.BinaryExpr, Operator: "**", Left: assignment.Assigne, Right: assignment.Value}, env)
+			if err != nil {
+				return nil, err
+			}
+		case "/=":
+			assignmentVal, err = evalBinaryExpr(ast.BinaryExpr{Kind: ast_types.BinaryExpr, Operator: "/", Left: assignment.Assigne, Right: assignment.Value}, env)
+			if err != nil {
+				return nil, err
+			}
+		}
 
 		variable, err := env.AssignVar(varName, assignmentVal)
 
 		return variable, err
 	case ast_types.MemberExpr:
+		if assignment.Operator != "=" {
+			return nil, errors.New(compilerErrors.ErrSyntaxInvalidAssignment)
+		}
+
 		identifier := assignment.Assigne.(ast.MemberExpr).Object.(ast.Identifier).Symbol
 		property := assignment.Assigne.(ast.MemberExpr).Property
 		isComputed := assignment.Assigne.(ast.MemberExpr).Computed

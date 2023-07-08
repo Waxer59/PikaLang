@@ -474,8 +474,8 @@ func (p *Parser) parseAssigmentExpr() (ast.Expr, error) {
 		return nil, err
 	}
 
-	if p.at().Type == token_type.Equals {
-		op := p.subtract().Value // consume '='
+	if slices.Contains(token_type.AssigmentOperators, p.at().Type) {
+		op := p.subtract().Value // consume assigment operator
 		value, err := p.parseTernaryExpr()
 		if err != nil {
 			return nil, err
