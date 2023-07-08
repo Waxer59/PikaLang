@@ -7,9 +7,10 @@ type Expr interface {
 }
 
 type AssigmentExpr struct {
-	Kind    ast_types.NodeType
-	Assigne Expr
-	Value   Expr
+	Kind     ast_types.NodeType
+	Assigne  Expr
+	Value    Expr
+	Operator string
 }
 
 func (a AssigmentExpr) GetKind() ast_types.NodeType {

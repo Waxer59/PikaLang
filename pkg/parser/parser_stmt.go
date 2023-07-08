@@ -22,13 +22,59 @@ func (p *Parser) parseStmt() (ast.Stmt, error) {
 		return p.parseReturnStatement()
 	case token_type.While:
 		return p.parseWhileStatement()
+	case token_type.Break:
+		return p.parseBreakStatement()
+	case token_type.Continue:
+		return p.parseContinueStatement()
 	default:
 		return p.parseExpr()
 	}
 }
 
+func (p *Parser) parseContinueStatement() (ast.Stmt, error) {
+	p.subtract() // consume 'continue'
+
+	return ast.ContinueStatement{
+		Kind: ast_types.ContinueStatement,
+	}, nil
+}
+
+func (p *Parser) parseBreakStatement() (ast.Stmt, error) {
+	p.subtract() // consume 'break'
+
+	return ast.BreakStatement{
+		Kind: ast_types.BreakStatement,
+	}, nil
+}
+
 func (p *Parser) parseWhileStatement() (ast.Stmt, error) {
-	return nil, nil
+	p.subtract() // consume 'while'
+
+	if p.at().Type == token_type.LeftParen { // Optional parenthesis
+		p.subtract()
+	}
+
+	test, err := p.parseExpr()
+
+	if err != nil {
+		return test, err
+	}
+
+	if p.at().Type == token_type.RightParen { // Optional parenthesis
+		p.subtract()
+	}
+
+	body, err := p.parseBlockBodyStmt()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return ast.WhileStatement{
+		Kind: ast_types.WhileStatement,
+		Test: test,
+		Body: body,
+	}, nil
 }
 
 func (p *Parser) parseReturnStatement() (ast.Stmt, error) {

@@ -10,6 +10,9 @@ const (
 	IfStatement         NodeType = "IfStatement"
 	SwitchStatement     NodeType = "SwitchStatement"
 	ReturnStatement     NodeType = "ReturnStatement"
+	WhileStatement      NodeType = "WhileStatement"
+	ContinueStatement   NodeType = "ContinueStatement"
+	BreakStatement      NodeType = "BreakStatement"
 
 	// EXPRESSIONS
 	AssigmentExpr   NodeType = "AssigmentExpr"

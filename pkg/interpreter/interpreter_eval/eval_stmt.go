@@ -42,6 +42,43 @@ func evalReturnStatement(declaration ast.ReturnStatement, env interpreter_env.En
 	return returnValue, errors.New(compilerErrors.ErrReturn)
 }
 
+func evalBreakStatement(declaration ast.BreakStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	return nil, errors.New(compilerErrors.ErrLoopsBreakNotInLoop)
+}
+
+func evalContinueStatement(declaration ast.ContinueStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	return nil, errors.New(compilerErrors.ErrLoopsContinueNotInLoop)
+}
+
+func evalWhileStatement(declaration ast.WhileStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	testEval, err := Evaluate(declaration.Test, env)
+	if err != nil {
+		return nil, err
+	}
+
+	testVal := EvaluateTruthyFalsyValues(testEval.GetValue())
+
+	for testVal {
+		eval, err := EvaluateBodyStmt(declaration.Body, env)
+		if err != nil && err.Error() == compilerErrors.ErrLoopsBreakNotInLoop {
+			break
+		} else if err != nil && err.Error() == compilerErrors.ErrLoopsContinueNotInLoop {
+			continue
+		} else if err != nil {
+			return eval, err
+		}
+		testEval, err = Evaluate(declaration.Test, env)
+
+		if err != nil {
+			return eval, err
+		}
+
+		testVal = EvaluateTruthyFalsyValues(testEval.GetValue())
+	}
+
+	return interpreter_makers.MK_Null(), nil
+}
+
 func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	for _, caseStatement := range declaration.CaseStmts {
 
@@ -56,11 +93,9 @@ func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.En
 			}
 			return err == nil && eval.GetValue() == evalDiscriminant.GetValue() || eval.GetValue() == true
 		}) {
-			for _, statement := range caseStatement.Body {
-				eval, err := Evaluate(statement, env)
-				if err != nil {
-					return eval, err
-				}
+			eval, err := EvaluateBodyStmt(caseStatement.Body, env)
+			if err != nil {
+				return eval, err
 			}
 			return nil, nil
 		}
@@ -70,11 +105,9 @@ func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.En
 		return nil, nil
 	}
 
-	for _, statement := range declaration.DefaultStmt.Body {
-		eval, err := Evaluate(statement, env)
-		if err != nil {
-			return eval, err
-		}
+	eval, err := EvaluateBodyStmt(declaration.DefaultStmt.Body, env)
+	if err != nil {
+		return eval, err
 	}
 
 	return nil, nil
@@ -95,12 +128,9 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 
 	// Handle first if
 	if val {
-		for _, statement := range declaration.Body {
-			eval, err := Evaluate(statement, env)
-
-			if err != nil {
-				return eval, err
-			}
+		eval, err := EvaluateBodyStmt(declaration.Body, env)
+		if err != nil {
+			return eval, err
 		}
 		return nil, nil
 	}
@@ -120,24 +150,18 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 		val := EvaluateTruthyFalsyValues(conditionRawValue.GetValue())
 
 		if val {
-			for _, statement := range elseIfStatement.Body {
-				eval, err := Evaluate(statement, env)
-
-				if err != nil {
-					return eval, err
-				}
+			eval, err := EvaluateBodyStmt(elseIfStatement.Body, env)
+			if err != nil {
+				return eval, err
 			}
 			return nil, nil
 		}
 	}
 
 	// Handle else
-	for _, statement := range declaration.ElseBody {
-		eval, err := Evaluate(statement, env)
-
-		if err != nil {
-			return eval, err
-		}
+	eval, err := EvaluateBodyStmt(declaration.ElseBody, env)
+	if err != nil {
+		return eval, err
 	}
 
 	return nil, nil
@@ -159,15 +183,5 @@ func evalFunctionDeclaration(declaration ast.FunctionDeclaration, env interprete
 }
 
 func evalProgram(program ast.Program, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
-	var lastEvaluated interpreter_env.RuntimeValue = interpreter_makers.MK_Null()
-
-	for _, statement := range program.Body {
-		eval, err := Evaluate(statement, env)
-		if err != nil {
-			return eval, err
-		}
-		lastEvaluated = eval
-	}
-
-	return lastEvaluated, nil
+	return EvaluateBodyStmt(program.Body, env)
 }

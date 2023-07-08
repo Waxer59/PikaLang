@@ -59,6 +59,12 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 		return evalSwitchStatement(astNode.(ast.SwitchStatement), env)
 	case ast_types.ReturnStatement:
 		return evalReturnStatement(astNode.(ast.ReturnStatement), env)
+	case ast_types.WhileStatement:
+		return evalWhileStatement(astNode.(ast.WhileStatement), env)
+	case ast_types.BreakStatement:
+		return evalBreakStatement(astNode.(ast.BreakStatement), env)
+	case ast_types.ContinueStatement:
+		return evalContinueStatement(astNode.(ast.ContinueStatement), env)
 
 	default:
 		return nil, errors.New("ERROR: Unknown node type")

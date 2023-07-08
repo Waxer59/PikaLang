@@ -475,15 +475,16 @@ func (p *Parser) parseAssigmentExpr() (ast.Expr, error) {
 	}
 
 	if p.at().Type == token_type.Equals {
-		p.subtract() // consume '='
+		op := p.subtract().Value // consume '='
 		value, err := p.parseTernaryExpr()
 		if err != nil {
 			return nil, err
 		}
 		return ast.AssigmentExpr{
-			Kind:    ast_types.AssigmentExpr,
-			Assigne: left,
-			Value:   value,
+			Kind:     ast_types.AssigmentExpr,
+			Assigne:  left,
+			Value:    value,
+			Operator: op,
 		}, nil
 	}
 

@@ -22,6 +22,8 @@ const (
 	NaN
 	Return
 	While
+	Continue
+	Break
 
 	// Operators
 	BinaryOperator // + - * / ** %
@@ -58,20 +60,22 @@ const (
 )
 
 var KEYWORDS = map[string]TokenType{
-	"var":     Var,
-	"const":   Const,
-	"fn":      Fn,
-	"null":    Null,
-	"true":    BooleanLiteral,
-	"false":   BooleanLiteral,
-	"if":      If,
-	"else":    Else,
-	"switch":  Switch,
-	"case":    Case,
-	"default": Default,
-	"NaN":     NaN,
-	"return":  Return,
-	"while":   While,
+	"var":      Var,
+	"const":    Const,
+	"fn":       Fn,
+	"null":     Null,
+	"true":     BooleanLiteral,
+	"false":    BooleanLiteral,
+	"if":       If,
+	"else":     Else,
+	"switch":   Switch,
+	"case":     Case,
+	"default":  Default,
+	"NaN":      NaN,
+	"return":   Return,
+	"while":    While,
+	"continue": Continue,
+	"break":    Break,
 }
 
 var SkippableChars = []rune{' ', '\t', '\n', '\r'}

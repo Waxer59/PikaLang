@@ -90,3 +90,19 @@ type WhileStatement struct {
 func (ws WhileStatement) GetKind() ast_types.NodeType {
 	return ws.Kind
 }
+
+type ContinueStatement struct {
+	Kind ast_types.NodeType
+}
+
+func (cs ContinueStatement) GetKind() ast_types.NodeType {
+	return cs.Kind
+}
+
+type BreakStatement struct {
+	Kind ast_types.NodeType
+}
+
+func (bs BreakStatement) GetKind() ast_types.NodeType {
+	return bs.Kind
+}
