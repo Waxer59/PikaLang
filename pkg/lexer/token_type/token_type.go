@@ -37,6 +37,10 @@ const (
 	PowerEquals  // **=
 	ModuleEquals // %=
 
+	// Update operators
+	Increment // ++
+	Decrement // --
+
 	// Grouping
 	LeftParen    // (
 	RightParen   // )

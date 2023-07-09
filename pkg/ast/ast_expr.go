@@ -94,6 +94,7 @@ func (u UnaryExpr) GetKind() ast_types.NodeType {
 type UpdateExpr struct {
 	Kind     ast_types.NodeType
 	Operator string
+	Argument Identifier
 	Prefix   bool
 }
 

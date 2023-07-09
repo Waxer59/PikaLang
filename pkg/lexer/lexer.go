@@ -65,6 +65,13 @@ func Tokenize(input string) ([]token_type.Token, error) {
 				tokens = append(tokens, token_type.Token{Type: token_type.PlusEquals, Value: string(tokenChar) + "="})
 				continue
 			}
+
+			if nextChar() == '+' {
+				substract(2) // consume ' ++ '
+				tokens = append(tokens, token_type.Token{Type: token_type.Increment, Value: "++"})
+				continue
+			}
+
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 		case '%':
 			if nextChar() == '=' {
@@ -77,6 +84,12 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			if nextChar() == '=' {
 				substract(2) // consume ' -= '
 				tokens = append(tokens, token_type.Token{Type: token_type.MinusEquals, Value: string(tokenChar) + "="})
+				continue
+			}
+
+			if nextChar() == '-' {
+				substract(2) // consume ' ++ '
+				tokens = append(tokens, token_type.Token{Type: token_type.Decrement, Value: "--"})
 				continue
 			}
 

@@ -181,6 +181,47 @@ func (p *Parser) parseMultiplicativeExpr() (ast.Expr, error) {
 	return left, nil
 }
 
+func (p *Parser) parseSufixUpdateExpr() (ast.Expr, error) {
+	if p.at().Type == token_type.Identifier && p.atNext().Value == "++" || p.atNext().Value == "--" {
+		argument := p.parsePrimaryExpr()
+		ident, ok := argument.(ast.Identifier)
+
+		if !ok {
+			return nil, errors.New(compilerErrors.ErrSyntaxExpectedIdentifier)
+		}
+
+		op := p.subtract().Value // consume '++' or '--'
+
+		return ast.UpdateExpr{
+			Kind:     ast_types.UpdateExpr,
+			Operator: op,
+			Argument: ident,
+			Prefix:   false,
+		}, nil
+	}
+
+	return p.parseMultiplicativeExpr()
+}
+
+func (p *Parser) parsePrefixUpdateExpr() (ast.Expr, error) {
+	if p.at().Value == "++" || p.at().Value == "--" {
+		op := p.subtract().Value // consume '++' or '--'
+		argument := p.parsePrimaryExpr()
+		ident, ok := argument.(ast.Identifier)
+		if !ok {
+			return nil, errors.New(compilerErrors.ErrSyntaxExpectedIdentifier)
+		}
+
+		return ast.UpdateExpr{
+			Kind:     ast_types.UpdateExpr,
+			Operator: op,
+			Argument: ident,
+			Prefix:   true,
+		}, nil
+	}
+	return p.parseSufixUpdateExpr()
+}
+
 func (p *Parser) parseNegativeAndPositiveExpr() (ast.Expr, error) {
 	if p.at().Value == "+" || p.at().Value == "-" {
 		op := p.subtract().Value // consume '-' or '+'
@@ -196,7 +237,7 @@ func (p *Parser) parseNegativeAndPositiveExpr() (ast.Expr, error) {
 		}, nil
 	}
 
-	return p.parseMultiplicativeExpr()
+	return p.parsePrefixUpdateExpr()
 }
 
 func (p *Parser) parseLogicalNotExpr() (ast.Expr, error) {

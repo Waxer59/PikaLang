@@ -394,6 +394,49 @@ func evalUnaryExpr(expr ast.UnaryExpr, env interpreter_env.Environment) (interpr
 	}
 }
 
+func evalUpdateExpr(expr ast.UpdateExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	isPrefix := expr.Prefix
+	op := expr.Operator
+	identifier := expr.Argument.Symbol
+	eval, err := Evaluate(expr.Argument, env)
+	if err != nil {
+		return nil, err
+	}
+
+	if eval.GetType() != interpreter_env.Number {
+		return nil, errors.New(compilerErrors.ErrSyntaxInvalidUpdateExpr)
+	}
+
+	switch op {
+	case "++":
+		num, err := env.AssignVar(identifier, interpreter_makers.MK_Number(eval.GetValue().(float64)+1))
+
+		if err != nil {
+			return nil, err
+		}
+
+		if isPrefix {
+			return num, nil
+		}
+
+		return eval, nil
+	case "--":
+		num, err := env.AssignVar(identifier, interpreter_makers.MK_Number(eval.GetValue().(float64)-1))
+
+		if err != nil {
+			return nil, err
+		}
+
+		if isPrefix {
+			return num, nil
+		}
+
+		return eval, nil
+	default:
+		return nil, errors.New(compilerErrors.ErrSyntaxInvalidUpdateExpr)
+	}
+}
+
 func evalComparisonBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
 	var result bool = false
 
