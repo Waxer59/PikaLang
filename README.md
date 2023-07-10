@@ -15,14 +15,23 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
     - [If statements](#if-statements)
       - [Else Statement](#else-statement)
       - [Else If Statement:](#else-if-statement)
-    - [Function declaration](#function-declaration)
+    - [Function Declaration](#function-declaration)
     - [Switch statement](#switch-statement)
       - [Multiple Cases](#multiple-cases)
       - [Logical Cases](#logical-cases)
     - [Comments](#comments)
       - [Single-line Comments](#single-line-comments)
       - [Multi-line Comments](#multi-line-comments)
+      - [While Loop](#while-loop)
+      - [Break Statement](#break-statement)
+      - [Continue Statement](#continue-statement)
     - [Operators](#operators)
+      - [Assignment Operators](#assignment-operators)
+      - [Increment and Decrement Operators](#increment-and-decrement-operators)
+      - [++ (Post-increment)](#-post-increment)
+      - [-- (Post-decrement)](#---post-decrement)
+      - [++ (Pre-increment)](#-pre-increment)
+      - [-- (Pre-decrement)](#---pre-decrement)
       - [Logical operators](#logical-operators)
         - [OR](#or)
         - [AND](#and)
@@ -52,8 +61,28 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
       - [boolean](#boolean)
       - [null](#null)
     - [Native functions](#native-functions)
-      - [print()](#print)
-      - [len()](#len)
+      - [`print()`](#print)
+      - [`len()`](#len)
+      - [`includes()`](#includes)
+      - [`push()`](#push)
+      - [`pop()`](#pop)
+      - [`shift()`](#shift)
+      - [`indexOf()`](#indexof)
+      - [`isNaN()`](#isnan)
+      - [`isNull()`](#isnull)
+      - [`prompt()`](#prompt)
+      - [`randNum()`](#randnum)
+      - [`pow()`](#pow)
+      - [`string()`](#string-1)
+      - [`num()`](#num)
+      - [`bool()`](#bool)
+      - [`toUpperCase()`](#touppercase)
+      - [`toLowerCase()`](#tolowercase)
+      - [`capitalize()`](#capitalize)
+      - [`startsWith()`](#startswith)
+      - [`endsWith()`](#endswith)
+      - [`reverseString()`](#reversestring)
+      - [`typeof()`](#typeof)
 
 ## CLI
 
@@ -157,15 +186,36 @@ if (x > 5) {
 
 Please note that nested 'if' statements are supported, allowing the inclusion of further 'if,' 'else if,' or 'else' statements within the code blocks.
 
-### Function declaration
+### Function Declaration
 
-In Pikalang, functions are defined using the keyword `fn`, followed by the function name, the parameters in parentheses and the return type. For example:
+In Pikalang, functions are defined using the keyword `fn`, followed by the function name, the parameters in parentheses, and the return type. The `return` statement is used to specify the value to be returned by the function.
+
+Example:
 
 ```rs
-fn add(x,y) {
-  // Do something...
+fn add(x, y) {
+  return x + y;
 }
 ```
+
+In the example above, the `add` function takes two parameters, `x` and `y`, and returns their sum using the `return` statement. The return type of the function is not explicitly specified in the example, but it can be inferred based on the returned value.
+
+The `return` statement is used to exit a function and return a value. Once a `return` statement is encountered, the function terminates, and the value specified after the `return` keyword is returned to the caller.
+
+Example usage:
+
+```rs
+fn main() {
+  var result = add(3, 4);
+  print(result); // Output: 7
+}
+
+fn add(x, y) {
+  return x + y;
+}
+```
+
+In the example above, the `add` function is called within the `main` function, and the returned value is assigned to the variable `result`. The value of `result` is then printed, resulting in the output `7`.
 
 ### Switch statement
 
@@ -250,9 +300,189 @@ var x = 10;
 
 > Remember that comments are for humans reading the code, so write clear and concise comments that enhance code readability and maintainability.
 
+#### While Loop
+
+The `while` loop is a control flow statement that executes a block of code repeatedly as long as a specified condition is true. It is used when the number of iterations is unknown and depends on the condition being evaluated.
+
+Example of use:
+
+```js
+var i = 0
+while i < 5 {
+    print(i)
+    i++
+}
+```
+
+In the example above, the code inside the `while` loop will execute repeatedly as long as the condition `i < 5` is true. The variable `i` is incremented on each iteration.
+
+#### Break Statement
+
+The `break` statement is used to exit from a loop prematurely. It is often used when a certain condition is met and there is no need to continue the remaining iterations of the loop.
+
+Example of use:
+
+```js
+var i = 0
+while i < 5 {
+    if i == 2 {
+        i++
+        break
+    }
+    print(i)
+    i++
+}
+```
+
+In the example above, the `break` statement is encountered when `i` is equal to 5, causing the loop to exit immediately.
+
+#### Continue Statement
+
+The `continue` statement is used to skip the remaining code in a loop iteration and move to the next iteration. It is often used when a certain condition is met, and you want to skip executing the rest of the loop's code for that specific iteration.
+
+Example of use:
+
+```js
+var i = 0
+while i < 5 {
+    if i == 2 {
+        i++
+        continue
+    }
+    print(i)
+    i++
+}
+```
+
 ### Operators
 
 Operators are symbols or characters used in programming languages to perform operations on variables, values, or expressions. They are used to manipulate and compare data, control program flow, and perform logical operations.
+
+#### Assignment Operators
+
+Assignment operators are used to assign values to variables and perform operations simultaneously. They combine the assignment (=) operator with another arithmetic or logical operator to perform the operation and assign the result to the variable in a concise way.
+
+Here are the assignment operators:
+
+- `+=`: Adds a value to the variable and assigns the result to the variable.
+
+Example of use:
+```js
+var x = 5
+x += 3 // Equivalent to x = x + 3
+// After this operation, the value of x will be 8
+```
+
+- `-=`: Subtracts a value from the variable and assigns the result to the variable.
+
+Example of use:
+```js
+var x = 10
+x -= 4 // Equivalent to x = x - 4
+// After this operation, the value of x will be 6
+```
+
+- `*=`: Multiplies the variable by a value and assigns the result to the variable.
+
+Example of use:
+```js
+var x = 3
+x *= 5 // Equivalent to x = x * 5
+// After this operation, the value of x will be 15
+```
+
+- `**=`: Raises the variable to a power and assigns the result to the variable.
+
+Example of use:
+```js
+var x = 2
+x **= 3 // Equivalent to x = x ** 3
+// After this operation, the value of x will be 8
+```
+
+- `/=`: Divides the variable by a value and assigns the result to the variable.
+
+Example of use:
+```js
+var x = 10
+x /= 2 // Equivalent to x = x / 2
+// After this operation, the value of x will be 5
+```
+
+- `%=`: Calculates the remainder of dividing the variable by a value and assigns the result to the variable.
+
+Example of use:
+```js
+var x = 10
+x %= 3 // Equivalent to x = x % 3
+// After this operation, the value of x will be 1
+```
+
+- `=`: Assigns a value to the variable.
+
+Example of use:
+```js
+var x = 5
+var y = 10
+x = y // Assigns the value of y to x
+// After this operation, the value of x will be 10
+```
+
+#### Increment and Decrement Operators
+
+The increment and decrement operators are used to modify the value of a variable by incrementing or decrementing it by 1. These operators can be applied both as post-increment/post-decrement operators and pre-increment/pre-decrement operators.
+
+#### ++ (Post-increment)
+
+The `++` operator is used to increment the value of a variable by 1. It can be used both as a post-increment and a pre-increment operator.
+
+As a post-increment operator, the value of the variable is first used in the expression, and then it is incremented.
+
+Example of post-increment use:
+
+```js
+var x = 5
+var y = x++ // The value of y is assigned the current value of x (5), and then x is incremented to 6
+// After this operation, the value of y is 5 and the value of x is 6
+```
+
+#### -- (Post-decrement)
+
+The `--` operator is used to decrement the value of a variable by 1. It can be used both as a post-decrement and a pre-decrement operator.
+
+As a post-decrement operator, the value of the variable is first used in the expression, and then it is decremented.
+
+Example of post-decrement use:
+
+```js
+var x = 5
+var y = x-- // The value of y is assigned the current value of x (5), and then x is decremented to 4
+// After this operation, the value of y is 5 and the value of x is 4
+```
+
+#### ++ (Pre-increment)
+
+As a pre-increment operator, the value of the variable is first incremented, and then it is used in the expression.
+
+Example of pre-increment use:
+
+```js
+var x = 5
+var y = ++x // The value of x is first incremented to 6, and then the value of y is assigned 6
+// After this operation, the value of y is 6 and the value of x is 6
+```
+
+#### -- (Pre-decrement)
+
+As a pre-decrement operator, the value of the variable is first decremented, and then it is used in the expression.
+
+Example of pre-decrement use:
+
+```js
+var x = 5
+var y = --x // The value of x is first decremented to 4, and then the value of y is assigned 4
+// After this operation, the value of y is 4 and the value of x is 4
+```
 
 #### Logical operators
 
@@ -516,7 +746,7 @@ var name = null
 
 The PikaLang language provides some predefined native functions to perform common tasks. These functions can be used directly without the need to define them beforehand.
 
-#### print()
+#### `print()`
 
 The print function is used to `print` a value to standard output. It takes an argument of any type and displays its representation in text form.
 
@@ -526,7 +756,7 @@ Example of use:
 print("Hi, Pika!!")
 ```
 
-#### len()
+#### `len()`
 
 The `len` function is used to obtain the length of a string.
 
@@ -534,4 +764,226 @@ Example of use:
 
 ```go
 len("Hi, Pika!!") // This will return the number 10
+```
+
+#### `includes()`
+
+The `includes` function is used to check if an array contains a specific element.
+
+Example of use:
+
+```go
+arr := [1, 2, 3, 4, 5]
+includes(arr, 3) // This will return true
+includes(arr, 6) // This will return false
+```
+
+#### `push()`
+
+The `push` function is used to add elements to the end of an array.
+
+Example of use:
+
+```go
+arr := [1, 2, 3]
+push(arr, 4, 5) // This will modify the array to [1, 2, 3, 4, 5]
+```
+
+#### `pop()`
+
+The `pop` function is used to remove the last element from an array.
+
+Example of use:
+
+```go
+arr := [1, 2, 3, 4, 5]
+pop(arr) // This will modify the array to [1, 2, 3, 4]
+```
+
+#### `shift()`
+
+The `shift` function is used to obtain the first element from an array.
+
+Example of use:
+
+```go
+arr := [1, 2, 3, 4, 5]
+shift(arr) // This will return [1]
+```
+
+#### `indexOf()`
+
+The `indexOf` function is used to find the index of an element in an array.
+
+Example of use:
+
+```go
+arr := [1, 2, 3, 4, 5]
+indexOf(arr, 3) // This will return 2
+indexOf(arr, 6) // This will return -1
+```
+
+#### `isNaN()`
+
+The `isNaN` function is used to check if a value is NaN (Not-a-Number).
+
+Example of use:
+
+```go
+isNaN(10) // This will return false
+isNaN(NaN) // This will return true
+```
+
+#### `isNull()`
+
+The `isNull` function is used to check if a value is null.
+
+Example of use:
+
+```go
+isNull(null) // This will return true
+isNull(10) // This will return false
+```
+
+#### `prompt()`
+
+The `prompt` function is used to display a message to the user and wait for input from the console.
+
+Example of use:
+
+```go
+name := prompt("Enter your name: ") // This will display "Enter your name: " and wait for user input.
+```
+
+#### `randNum()`
+
+The `randNum` function is used to generate a random number within a specified range.
+
+Example of use:
+
+```go
+randNum(1, 10) // This will return a random number between 1 and 10 (inclusive).
+```
+
+#### `pow()`
+
+The `pow` function is used to calculate the power of a number.
+
+Example of use:
+
+```go
+pow(2, 3) // This will return 8, as 2 raised to the power of 3 is 8.
+```
+
+#### `string()`
+
+The `string` function is used to convert a value into a string representation.
+
+Example of use:
+
+```go
+string(10) // This will return the string "10"
+string(null) // This will return the string "null"
+string(true) // This will return the string "true"
+```
+
+#### `num()`
+
+The `num` function is used to convert a value into a numeric representation.
+
+Example of use:
+
+```go
+num("10") // This will return the number 10
+num("3.14") // This will return the number 3.14
+```
+
+#### `bool()`
+
+The `bool` function is used to convert a value into a boolean representation.
+
+Example of use:
+
+```go
+bool(0) // This will return false
+bool("hello") // This will return true
+bool(null) // This will return false
+```
+
+#### `toUpperCase()`
+
+The `toUpperCase` function is used to convert a string to uppercase.
+
+Example of use:
+
+```go
+toUpperCase("hello") // This will return "HELLO"
+toUpperCase("WORLD") // This will return "WORLD"
+```
+
+#### `toLowerCase()`
+
+The `toLowerCase` function is used to convert a string to lowercase.
+
+Example of use:
+
+```go
+toLowerCase("Hello") // This will return "hello"
+toLowerCase("WORLD") // This will return "world"
+```
+
+#### `capitalize()`
+
+The `capitalize` function is used to capitalize the first letter of a string.
+
+Example of use:
+
+```go
+capitalize("hello") // This will return "Hello"
+capitalize("world") // This will return "World"
+```
+
+#### `startsWith()`
+
+The `startsWith` function is used to check if a string starts with a specific prefix.
+
+Example of use:
+
+```go
+startsWith("hello world", "hello") // This will return true
+startsWith("hello world", "world") // This will return false
+```
+
+#### `endsWith()`
+
+The `endsWith` function is used to check if a string ends with a specific suffix.
+
+Example of use:
+
+```go
+endsWith("hello world", "world") // This will return true
+endsWith("hello world", "hello") // This will return false
+```
+
+#### `reverseString()`
+
+The `reverseString` function is used to reverse the characters in a string.
+
+Example of use:
+
+```go
+reverseString("hello") // This will return "olleh"
+reverseString("world") // This will return "dlrow"
+```
+
+#### `typeof()`
+
+The `typeof` function is used to determine the type of a value.
+
+Example of use:
+
+```go
+typeof(10) // This will return "number"
+typeof("hello") // This will return "string"
+typeof(true) // This will return "boolean"
 ```
