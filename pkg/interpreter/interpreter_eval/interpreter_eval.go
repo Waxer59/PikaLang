@@ -20,11 +20,15 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 	case ast_types.ObjectLiteral:
 		return evalObjectExpr(astNode.(ast.ObjectLiteral), env)
 	case ast_types.NullLiteral:
-		return interpreter_makers.MK_NULL(), nil
+		return interpreter_makers.MK_Null(), nil
 	case ast_types.BooleanLiteral:
 		return interpreter_makers.MK_Boolean(astNode.(ast.BooleanLiteral).Value), nil
 	case ast_types.StringLiteral:
 		return interpreter_makers.MK_String(astNode.(ast.StringLiteral).Value), nil
+	case ast_types.NaNLiteral:
+		return interpreter_makers.MK_NaN(), nil
+	case ast_types.ArrayLiteral:
+		return evalArrayExpr(astNode.(ast.ArrayLiteral), env)
 
 	// EXPRESSIONS
 	case ast_types.BinaryExpr:
@@ -39,6 +43,10 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 		return evalLogicalExpr(astNode.(ast.LogicalExpr), env)
 	case ast_types.UnaryExpr:
 		return evalUnaryExpr(astNode.(ast.UnaryExpr), env)
+	case ast_types.MemberExpr:
+		return evalMemberExpr(astNode.(ast.MemberExpr), env)
+	case ast_types.UpdateExpr:
+		return evalUpdateExpr(astNode.(ast.UpdateExpr), env)
 
 	// STATEMENTS
 	case ast_types.Program:
@@ -51,6 +59,15 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 		return evalIfStatement(astNode.(ast.IfStatement), env)
 	case ast_types.SwitchStatement:
 		return evalSwitchStatement(astNode.(ast.SwitchStatement), env)
+	case ast_types.ReturnStatement:
+		return evalReturnStatement(astNode.(ast.ReturnStatement), env)
+	case ast_types.WhileStatement:
+		return evalWhileStatement(astNode.(ast.WhileStatement), env)
+	case ast_types.BreakStatement:
+		return evalBreakStatement(astNode.(ast.BreakStatement), env)
+	case ast_types.ContinueStatement:
+		return evalContinueStatement(astNode.(ast.ContinueStatement), env)
+
 	default:
 		return nil, errors.New("ERROR: Unknown node type")
 	}

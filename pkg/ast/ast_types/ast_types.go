@@ -9,6 +9,10 @@ const (
 	FunctionDeclaration NodeType = "FunctionDeclaration"
 	IfStatement         NodeType = "IfStatement"
 	SwitchStatement     NodeType = "SwitchStatement"
+	ReturnStatement     NodeType = "ReturnStatement"
+	WhileStatement      NodeType = "WhileStatement"
+	ContinueStatement   NodeType = "ContinueStatement"
+	BreakStatement      NodeType = "BreakStatement"
 
 	// EXPRESSIONS
 	AssigmentExpr   NodeType = "AssigmentExpr"
@@ -19,6 +23,7 @@ const (
 	CallExpr        NodeType = "CallExpr"
 	LogicalExpr     NodeType = "LogicalExpr"
 	UnaryExpr       NodeType = "UnaryExpr"
+	UpdateExpr      NodeType = "UpdateExpr"
 
 	// LITERALS
 	ObjectLiteral  NodeType = "ObjectLiteral"
@@ -27,6 +32,8 @@ const (
 	NullLiteral    NodeType = "NullLiteral"
 	BooleanLiteral NodeType = "BooleanLiteral"
 	StringLiteral  NodeType = "StringLiteral"
+	NaNLiteral     NodeType = "NaNLiteral"
+	ArrayLiteral   NodeType = "ArrayLiteral"
 )
 
 var (

@@ -9,6 +9,7 @@ import (
 	"pika/pkg/interpreter/interpreter_env"
 	"pika/pkg/interpreter/interpreter_eval"
 	"pika/pkg/parser"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/urfave/cli/v2"
@@ -28,6 +29,11 @@ func SetUpRunCommand(app *cli.App) *cli.Command {
 
 func runApp(cCtx *cli.Context) error {
 	fileName := cCtx.Args().Get(0)
+	ext := filepath.Ext(fileName)
+	if ext != ".pk" && !strings.HasSuffix(fileName, "/") {
+		return cli.Exit("File extension must be .pk", int(exitCodes.FileExtensionError))
+	}
+
 	env := interpreter_env.New(nil)
 	wd, err := os.Getwd()
 
@@ -40,7 +46,7 @@ func runApp(cCtx *cli.Context) error {
 		return cli.Exit("File name is required", int(exitCodes.FileNameError))
 	}
 
-	if fileName == "." {
+	if fileName == "." || strings.HasSuffix(fileName, "/") {
 		fileName = filepath.Join(wd, DEFAULT_FILE_NAME)
 	} else {
 		fileName = filepath.Join(wd, fileName)

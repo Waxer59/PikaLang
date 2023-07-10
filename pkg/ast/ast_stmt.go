@@ -71,3 +71,38 @@ type CaseStatement struct {
 func (cs SwitchStatement) GetKind() ast_types.NodeType {
 	return cs.Kind
 }
+
+type ReturnStatement struct {
+	Kind     ast_types.NodeType
+	Argument Expr
+}
+
+func (rs ReturnStatement) GetKind() ast_types.NodeType {
+	return rs.Kind
+}
+
+type WhileStatement struct {
+	Kind ast_types.NodeType
+	Test Expr
+	Body []Stmt
+}
+
+func (ws WhileStatement) GetKind() ast_types.NodeType {
+	return ws.Kind
+}
+
+type ContinueStatement struct {
+	Kind ast_types.NodeType
+}
+
+func (cs ContinueStatement) GetKind() ast_types.NodeType {
+	return cs.Kind
+}
+
+type BreakStatement struct {
+	Kind ast_types.NodeType
+}
+
+func (bs BreakStatement) GetKind() ast_types.NodeType {
+	return bs.Kind
+}

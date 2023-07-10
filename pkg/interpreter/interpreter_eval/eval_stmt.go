@@ -1,6 +1,8 @@
 package interpreter_eval
 
 import (
+	"errors"
+	compilerErrors "pika/internal/errors"
 	"pika/pkg/ast"
 	"pika/pkg/interpreter/interpreter_env"
 	"pika/pkg/interpreter/interpreter_makers"
@@ -9,12 +11,12 @@ import (
 )
 
 func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
-	var value interpreter_env.RuntimeValue = interpreter_makers.MK_NULL()
+	var value interpreter_env.RuntimeValue = interpreter_makers.MK_Null()
 
 	if variableDeclaration.Value != nil {
 		eval, err := Evaluate(variableDeclaration.Value, env)
 		if err != nil {
-			return nil, err
+			return eval, err
 		}
 		value = eval
 	}
@@ -24,18 +26,76 @@ func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env in
 	return variable, err
 }
 
+func evalReturnStatement(declaration ast.ReturnStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+
+	var returnValue interpreter_env.RuntimeValue = interpreter_makers.MK_Null()
+
+	if declaration.Argument != nil {
+		eval, err := Evaluate(declaration.Argument, env)
+		if err != nil {
+			return eval, err
+		}
+		returnValue = eval
+	}
+
+	// Throw a error to stop the execution
+	return returnValue, errors.New(compilerErrors.ErrReturn)
+}
+
+func evalBreakStatement(declaration ast.BreakStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	return nil, errors.New(compilerErrors.ErrLoopsBreakNotInLoop)
+}
+
+func evalContinueStatement(declaration ast.ContinueStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	return nil, errors.New(compilerErrors.ErrLoopsContinueNotInLoop)
+}
+
+func evalWhileStatement(declaration ast.WhileStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	testEval, err := Evaluate(declaration.Test, env)
+	if err != nil {
+		return nil, err
+	}
+
+	testVal := EvaluateTruthyFalsyValues(testEval.GetValue())
+
+	for testVal {
+		eval, err := EvaluateBodyStmt(declaration.Body, env)
+		if err != nil && err.Error() == compilerErrors.ErrLoopsBreakNotInLoop {
+			break
+		} else if err != nil && err.Error() == compilerErrors.ErrLoopsContinueNotInLoop {
+			continue
+		} else if err != nil {
+			return eval, err
+		}
+		testEval, err = Evaluate(declaration.Test, env)
+
+		if err != nil {
+			return eval, err
+		}
+
+		testVal = EvaluateTruthyFalsyValues(testEval.GetValue())
+	}
+
+	return interpreter_makers.MK_Null(), nil
+}
+
 func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	for _, caseStatement := range declaration.CaseStmts {
 
 		if slices.ContainsFunc(caseStatement.Test, func(expr ast.Expr) bool {
 			eval, err := Evaluate(expr, env)
-			return err == nil && eval.GetValue() == declaration.Discriminant || eval.GetValue() == true
+			if err != nil {
+				return false
+			}
+			evalDiscriminant, err := Evaluate(declaration.Discriminant, env)
+			if err != nil {
+				return false
+			}
+			return err == nil && eval.GetValue() == evalDiscriminant.GetValue() || eval.GetValue() == true
 		}) {
-			for _, statement := range caseStatement.Body {
-				_, err := Evaluate(statement, env)
-				if err != nil {
-					return nil, err
-				}
+			eval, err := EvaluateBodyStmt(caseStatement.Body, env)
+			if err != nil {
+				return eval, err
 			}
 			return nil, nil
 		}
@@ -45,11 +105,9 @@ func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.En
 		return nil, nil
 	}
 
-	for _, statement := range declaration.DefaultStmt.Body {
-		_, err := Evaluate(statement, env)
-		if err != nil {
-			return nil, err
-		}
+	eval, err := EvaluateBodyStmt(declaration.DefaultStmt.Body, env)
+	if err != nil {
+		return eval, err
 	}
 
 	return nil, nil
@@ -70,12 +128,9 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 
 	// Handle first if
 	if val {
-		for _, statement := range declaration.Body {
-			_, err := Evaluate(statement, env)
-
-			if err != nil {
-				return nil, err
-			}
+		eval, err := EvaluateBodyStmt(declaration.Body, env)
+		if err != nil {
+			return eval, err
 		}
 		return nil, nil
 	}
@@ -94,29 +149,19 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 
 		val := EvaluateTruthyFalsyValues(conditionRawValue.GetValue())
 
-		if err != nil {
-			return nil, err
-		}
-
 		if val {
-			for _, statement := range elseIfStatement.Body {
-				_, err := Evaluate(statement, env)
-
-				if err != nil {
-					return nil, err
-				}
+			eval, err := EvaluateBodyStmt(elseIfStatement.Body, env)
+			if err != nil {
+				return eval, err
 			}
 			return nil, nil
 		}
 	}
 
 	// Handle else
-	for _, statement := range declaration.ElseBody {
-		_, err := Evaluate(statement, env)
-
-		if err != nil {
-			return nil, err
-		}
+	eval, err := EvaluateBodyStmt(declaration.ElseBody, env)
+	if err != nil {
+		return eval, err
 	}
 
 	return nil, nil
@@ -138,15 +183,5 @@ func evalFunctionDeclaration(declaration ast.FunctionDeclaration, env interprete
 }
 
 func evalProgram(program ast.Program, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
-	var lastEvaluated interpreter_env.RuntimeValue = interpreter_makers.MK_NULL()
-
-	for _, statement := range program.Body {
-		eval, err := Evaluate(statement, env)
-		if err != nil {
-			return nil, err
-		}
-		lastEvaluated = eval
-	}
-
-	return lastEvaluated, nil
+	return EvaluateBodyStmt(program.Body, env)
 }

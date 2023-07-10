@@ -7,9 +7,10 @@ type Expr interface {
 }
 
 type AssigmentExpr struct {
-	Kind    ast_types.NodeType
-	Assigne Expr
-	Value   Expr
+	Kind     ast_types.NodeType
+	Assigne  Expr
+	Value    Expr
+	Operator string
 }
 
 func (a AssigmentExpr) GetKind() ast_types.NodeType {
@@ -87,5 +88,16 @@ type UnaryExpr struct {
 }
 
 func (u UnaryExpr) GetKind() ast_types.NodeType {
+	return u.Kind
+}
+
+type UpdateExpr struct {
+	Kind     ast_types.NodeType
+	Operator string
+	Argument Identifier
+	Prefix   bool
+}
+
+func (u UpdateExpr) GetKind() ast_types.NodeType {
 	return u.Kind
 }

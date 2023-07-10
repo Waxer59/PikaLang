@@ -24,4 +24,6 @@ const (
 	ErrConditionCannotBeEmpty             = "ERROR: Condition cannot be empty"
 	ErrSyntaxCaseCannotBeEmpty            = "ERROR: Case cannot be empty"
 	ErrSyntaxExpectedQuestionMark         = "ERROR: Expected '?'"
+	ErrSyntaxUnaryInvalidUnaryExpr        = "ERROR: Invalid unary expression"
+	ErrSyntaxInvalidUpdateExpr            = "ERROR: Invalid update expression"
 )

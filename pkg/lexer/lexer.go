@@ -2,7 +2,6 @@ package lexer
 
 import (
 	"errors"
-	"fmt"
 	compilerErrors "pika/internal/errors"
 	"pika/pkg/lexer/token_type"
 )
@@ -60,11 +59,41 @@ func Tokenize(input string) ([]token_type.Token, error) {
 
 		// Check for operators
 		switch tokenChar {
-		case '+', '%':
+		case '+':
+			if nextChar() == '=' {
+				substract(2) // consume ' += '
+				tokens = append(tokens, token_type.Token{Type: token_type.PlusEquals, Value: string(tokenChar) + "="})
+				continue
+			}
+
+			if nextChar() == '+' {
+				substract(2) // consume ' ++ '
+				tokens = append(tokens, token_type.Token{Type: token_type.Increment, Value: "++"})
+				continue
+			}
+
+			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
+		case '%':
+			if nextChar() == '=' {
+				substract(2) // consume ' %= '
+				tokens = append(tokens, token_type.Token{Type: token_type.ModuleEquals, Value: string(tokenChar) + "="})
+				continue
+			}
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 		case '-':
+			if nextChar() == '=' {
+				substract(2) // consume ' -= '
+				tokens = append(tokens, token_type.Token{Type: token_type.MinusEquals, Value: string(tokenChar) + "="})
+				continue
+			}
+
+			if nextChar() == '-' {
+				substract(2) // consume ' ++ '
+				tokens = append(tokens, token_type.Token{Type: token_type.Decrement, Value: "--"})
+				continue
+			}
+
 			if IsInt(nextChar()) { // Check for negative numbers
-				substract(1) // advance '-'
 				num, rest := ExtractInt(src)
 				tokens = append(tokens, token_type.Token{Type: token_type.Number, Value: num})
 				src = rest
@@ -72,8 +101,19 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 		case '*':
+			if nextChar() == '=' {
+				substract(2) // consume ' *= '
+				tokens = append(tokens, token_type.Token{Type: token_type.TimesEquals, Value: string(tokenChar) + "="})
+				continue
+			}
+
 			if nextChar() == '*' { // Check for power
 				substract(2) // consume ' ** '
+				if src[0] == '=' {
+					substract(1) // advance '='
+					tokens = append(tokens, token_type.Token{Type: token_type.PowerEquals, Value: "**="})
+					continue
+				}
 				tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: "**"})
 				continue
 			}
@@ -93,12 +133,14 @@ func Tokenize(input string) ([]token_type.Token, error) {
 				substract(2) // consume /*
 				for len(src) > 0 && src[0] != '*' && nextChar() != '/' {
 					substract(1)
-					fmt.Println(string(src))
 					if len(src) <= 1 { // if the comment is not terminated
 						return nil, errors.New(string(compilerErrors.ErrSyntaxUnterminatedMultilineComment))
 					}
 				}
 				substract(2) // consume */
+			case '=':
+				substract(2) // consume '/='
+				tokens = append(tokens, token_type.Token{Type: token_type.DivideEquals, Value: "/="})
 			default:
 				tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 			}
@@ -131,7 +173,7 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.Less, Value: string(tokenChar)})
 		case ';':
-			tokens = append(tokens, token_type.Token{Type: token_type.SemiColon, Value: string(tokenChar)})
+			tokens = append(tokens, token_type.Token{Type: token_type.Semicolon, Value: string(tokenChar)})
 		case '?':
 			tokens = append(tokens, token_type.Token{Type: token_type.QuestionMark, Value: string(tokenChar)})
 		case '(':
