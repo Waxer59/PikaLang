@@ -54,6 +54,11 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
         - [Greater than or equal to operator (\>=)](#greater-than-or-equal-to-operator-)
         - [Less than or equal to operator (\<=)](#less-than-or-equal-to-operator-)
     - [Data structures](#data-structures)
+      - [arrays](#arrays)
+        - [Array Declaration](#array-declaration)
+        - [Accessing Array Elements](#accessing-array-elements)
+        - [Modifying Array Elements](#modifying-array-elements)
+        - [Array Length](#array-length)
       - [object](#object)
     - [Primitive data types](#primitive-data-types)
       - [string](#string)
@@ -666,6 +671,68 @@ The less than or equal to operator compares two values and returns true if the v
 ### Data structures
 
 Data structures are fundamental tools used in computer science and programming to organize and manipulate data efficiently. They provide a way to store and manage data in a structured format, enabling operations such as insertion, deletion, searching, and sorting. There are various types of data structures, each with its own characteristics and uses.
+
+#### arrays
+
+In programming, an array is a data structure that allows you to store multiple values of the same type in a sequential manner. Each value in an array is called an element, and each element is accessed by its index, which represents its position in the array.
+
+##### Array Declaration
+
+In Pikalang, arrays can be declared using square brackets `[]` and the desired length or by initializing it with elements enclosed in curly braces `{}`.
+
+Example of array declaration:
+
+```rs
+let numbers = [1, 2, 3, 4, 5];
+let fruits = ["apple", "banana", "orange"];
+```
+
+In the example above, we declared an array named `numbers` with five elements and an array named `fruits` with three elements.
+
+##### Accessing Array Elements
+
+You can access individual elements in an array by specifying their index within square brackets `[]`. The index starts from 0 for the first element and increments by 1 for each subsequent element.
+
+Example of accessing array elements:
+
+```rs
+let numbers = [1, 2, 3, 4, 5];
+print(numbers[0]); // Output: 1
+print(numbers[2]); // Output: 3
+
+let fruits = ["apple", "banana", "orange"];
+print(fruits[1]); // Output: banana
+```
+
+In the example above, we accessed the first element of the `numbers` array (`numbers[0]`) and the second element of the `fruits` array (`fruits[1]`).
+
+##### Modifying Array Elements
+
+You can modify the value of an element in an array by assigning a new value to a specific index.
+
+Example of modifying array elements:
+
+```rs
+let numbers = [1, 2, 3, 4, 5];
+numbers[2] = 10;
+print(numbers); // Output: [1, 2, 10, 4, 5]
+```
+
+In the example above, we modified the value of the third element in the `numbers` array from 3 to 10.
+
+##### Array Length
+
+The length of an array is the number of elements it contains. In Pikalang, you can obtain the length of an array using the `len()` function.
+
+Example of getting the array length:
+
+```rs
+let numbers = [1, 2, 3, 4, 5];
+let length = len(numbers);
+print(length); // Output: 5
+```
+
+In the example above, we used the `len()` function to get the length of the `numbers` array, which is 5.
 
 #### object
 
