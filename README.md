@@ -443,7 +443,7 @@ x = y // Assigns the value of y to x
 
 The increment and decrement operators are used to modify the value of a variable by incrementing or decrementing it by 1. These operators can be applied both as post-increment/post-decrement operators and pre-increment/pre-decrement operators.
 
-#### ++ (Post-increment)
+##### ++ (Post-increment)
 
 The `++` operator is used to increment the value of a variable by 1. It can be used both as a post-increment and a pre-increment operator.
 
@@ -457,7 +457,7 @@ var y = x++ // The value of y is assigned the current value of x (5), and then x
 // After this operation, the value of y is 5 and the value of x is 6
 ```
 
-#### -- (Post-decrement)
+##### -- (Post-decrement)
 
 The `--` operator is used to decrement the value of a variable by 1. It can be used both as a post-decrement and a pre-decrement operator.
 
@@ -471,7 +471,7 @@ var y = x-- // The value of y is assigned the current value of x (5), and then x
 // After this operation, the value of y is 5 and the value of x is 4
 ```
 
-#### ++ (Pre-increment)
+##### ++ (Pre-increment)
 
 As a pre-increment operator, the value of the variable is first incremented, and then it is used in the expression.
 
@@ -483,7 +483,7 @@ var y = ++x // The value of x is first incremented to 6, and then the value of y
 // After this operation, the value of y is 6 and the value of x is 6
 ```
 
-#### -- (Pre-decrement)
+##### -- (Pre-decrement)
 
 As a pre-decrement operator, the value of the variable is first decremented, and then it is used in the expression.
 
