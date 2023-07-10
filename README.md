@@ -103,6 +103,12 @@ GLOBAL OPTIONS:
    --version, -v  print the version
 ```
 
+With go installed on your computer, run the following command to install the PikaLang CLI
+
+```bash
+go install github.com/Waxer59/PikaLang/cmd@latest
+```
+
 ## Syntax
 
 Pikalang is a programming language designed to be simple and expressive. This section describes the basic syntax of Pikalang and the fundamental elements that make up a program in this language.
