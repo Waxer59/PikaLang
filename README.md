@@ -22,6 +22,9 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
     - [Comments](#comments)
       - [Single-line Comments](#single-line-comments)
       - [Multi-line Comments](#multi-line-comments)
+      - [For Loop](#for-loop)
+  - [`for` loop](#for-loop-1)
+    - [Syntax](#syntax-1)
       - [While Loop](#while-loop)
       - [Break Statement](#break-statement)
       - [Continue Statement](#continue-statement)
@@ -310,6 +313,26 @@ var x = 10;
 ```
 
 > Remember that comments are for humans reading the code, so write clear and concise comments that enhance code readability and maintainability.
+
+#### For Loop
+
+## `for` loop
+
+The `for` loop is a control flow statement in programming that allows you to repeatedly execute a block of code based on a specified condition. It is commonly used to iterate over a collection of items or perform a certain task a specific number of times.
+
+### Syntax
+
+The syntax for a `for` loop in Go is as follows:
+
+```go
+for initialization; condition; post {
+    // Code to be executed
+}
+```
+
+- The `initialization` step is optional and is used to initialize variables or set up the loop.
+- The `condition` is evaluated before each iteration, and if it evaluates to `true`, the loop continues. If it evaluates to `false`, the loop terminates.
+- The `post` step is executed after each iteration and is typically used to update the loop variables.
 
 #### While Loop
 
