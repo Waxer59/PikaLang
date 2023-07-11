@@ -24,6 +24,7 @@ const (
 	While
 	Continue
 	Break
+	For
 
 	// Operators
 	BinaryOperator // + - * / ** %
@@ -88,6 +89,7 @@ var KEYWORDS = map[string]TokenType{
 	"while":    While,
 	"continue": Continue,
 	"break":    Break,
+	"for":      For,
 }
 
 var SkippableChars = []rune{' ', '\t', '\n', '\r'}
