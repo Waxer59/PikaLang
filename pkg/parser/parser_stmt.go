@@ -142,8 +142,10 @@ func (p *Parser) parseWhileStatement() (ast.Stmt, error) {
 func (p *Parser) parseReturnStatement() (ast.Stmt, error) {
 	p.subtract() // consume 'return'
 
-	if p.at().Type == token_type.Semicolon {
-		p.subtract() // consume ';'
+	if p.at().Type == token_type.Semicolon || p.at().Type == token_type.RightBrace {
+		if p.at().Type != token_type.RightBrace {
+			p.subtract() // consume ';'
+		}
 		return ast.ReturnStatement{
 			Kind:     ast_types.ReturnStatement,
 			Argument: nil,
