@@ -106,3 +106,15 @@ type BreakStatement struct {
 func (bs BreakStatement) GetKind() ast_types.NodeType {
 	return bs.Kind
 }
+
+type ForStatement struct {
+	Kind   ast_types.NodeType
+	Init   Expr
+	Test   Expr
+	Update Expr
+	Body   []Stmt
+}
+
+func (fs ForStatement) GetKind() ast_types.NodeType {
+	return fs.Kind
+}

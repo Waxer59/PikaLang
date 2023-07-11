@@ -22,6 +22,8 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
     - [Comments](#comments)
       - [Single-line Comments](#single-line-comments)
       - [Multi-line Comments](#multi-line-comments)
+    - [For Loop](#for-loop)
+      - [Syntax](#syntax-1)
       - [While Loop](#while-loop)
       - [Break Statement](#break-statement)
       - [Continue Statement](#continue-statement)
@@ -310,6 +312,24 @@ var x = 10;
 ```
 
 > Remember that comments are for humans reading the code, so write clear and concise comments that enhance code readability and maintainability.
+
+### For Loop
+
+The `for` loop is a control flow statement in programming that allows you to repeatedly execute a block of code based on a specified condition. It is commonly used to iterate over a collection of items or perform a certain task a specific number of times.
+
+#### Syntax
+
+The syntax for a `for` loop in Go is as follows:
+
+```go
+for initialization; condition; post {
+    // Code to be executed
+}
+```
+
+- The `initialization` step is optional and is used to initialize variables or set up the loop.
+- The `condition` is evaluated before each iteration, and if it evaluates to `true`, the loop continues. If it evaluates to `false`, the loop terminates.
+- The `post` step is executed after each iteration and is typically used to update the loop variables.
 
 #### While Loop
 
@@ -846,7 +866,7 @@ The `includes` function is used to check if an array contains a specific element
 Example of use:
 
 ```go
-arr := [1, 2, 3, 4, 5]
+var arr = [1, 2, 3, 4, 5]
 includes(arr, 3) // This will return true
 includes(arr, 6) // This will return false
 ```
@@ -858,7 +878,7 @@ The `push` function is used to add elements to the end of an array.
 Example of use:
 
 ```go
-arr := [1, 2, 3]
+var arr = [1, 2, 3]
 push(arr, 4, 5) // This will modify the array to [1, 2, 3, 4, 5]
 ```
 
@@ -869,7 +889,7 @@ The `pop` function is used to remove the last element from an array.
 Example of use:
 
 ```go
-arr := [1, 2, 3, 4, 5]
+var arr = [1, 2, 3, 4, 5]
 pop(arr) // This will modify the array to [1, 2, 3, 4]
 ```
 
@@ -880,7 +900,7 @@ The `shift` function is used to obtain the first element from an array.
 Example of use:
 
 ```go
-arr := [1, 2, 3, 4, 5]
+var arr = [1, 2, 3, 4, 5]
 shift(arr) // This will return [1]
 ```
 
@@ -891,7 +911,7 @@ The `indexOf` function is used to find the index of an element in an array.
 Example of use:
 
 ```go
-arr := [1, 2, 3, 4, 5]
+var arr = [1, 2, 3, 4, 5]
 indexOf(arr, 3) // This will return 2
 indexOf(arr, 6) // This will return -1
 ```
@@ -925,7 +945,7 @@ The `prompt` function is used to display a message to the user and wait for inpu
 Example of use:
 
 ```go
-name := prompt("Enter your name: ") // This will display "Enter your name: " and wait for user input.
+var name = prompt("Enter your name: ") // This will display "Enter your name: " and wait for user input.
 ```
 
 #### `randNum()`
