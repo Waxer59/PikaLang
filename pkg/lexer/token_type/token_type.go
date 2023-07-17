@@ -63,7 +63,7 @@ const (
 	GreaterEqual // >=
 	Less         // <
 	LessEqual    // <=
-	Not          // !
+	Bang         // !
 	NotEqual     // !=
 	Or           // ||
 	And          // &&
