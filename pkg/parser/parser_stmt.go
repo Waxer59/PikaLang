@@ -26,9 +26,71 @@ func (p *Parser) parseStmt() (ast.Stmt, error) {
 		return p.parseBreakStatement()
 	case token_type.Continue:
 		return p.parseContinueStatement()
+	case token_type.For:
+		return p.parseForStatement()
 	default:
 		return p.parseExpr()
 	}
+}
+
+func (p *Parser) parseForStatement() (ast.Stmt, error) {
+	p.subtract() // consume 'for'
+
+	if p.at().Type == token_type.LeftParen { // Optional parenthesis
+		p.subtract()
+	}
+
+	var init ast.Expr
+	var test ast.Expr
+	var update ast.Expr
+	var err error
+
+	if p.at().Type != token_type.Semicolon {
+		if p.at().Type == token_type.Var {
+			init, err = p.parseVarConstDeclaration()
+		} else {
+			init, err = p.parseExpr()
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	p.expect(token_type.Semicolon, compilerErrors.ErrSyntaxExpectedSemicolon)
+
+	if p.at().Type != token_type.Semicolon {
+		test, err = p.parseExpr()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	p.expect(token_type.Semicolon, compilerErrors.ErrSyntaxExpectedSemicolon)
+
+	if p.at().Type != token_type.Semicolon {
+		update, err = p.parseExpr()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if p.at().Type == token_type.RightParen { // Optional parenthesis
+		p.subtract()
+	}
+
+	body, err := p.parseBlockBodyStmt()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return ast.ForStatement{
+		Kind:   ast_types.ForStatement,
+		Init:   init,
+		Test:   test,
+		Update: update,
+		Body:   body,
+	}, nil
 }
 
 func (p *Parser) parseContinueStatement() (ast.Stmt, error) {
@@ -80,7 +142,10 @@ func (p *Parser) parseWhileStatement() (ast.Stmt, error) {
 func (p *Parser) parseReturnStatement() (ast.Stmt, error) {
 	p.subtract() // consume 'return'
 
-	if p.at().Type == token_type.Semicolon {
+	if p.at().Type == token_type.Semicolon || p.at().Type == token_type.RightBrace {
+		if p.at().Type != token_type.RightBrace {
+			p.subtract() // consume ';'
+		}
 		return ast.ReturnStatement{
 			Kind:     ast_types.ReturnStatement,
 			Argument: nil,

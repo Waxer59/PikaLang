@@ -13,6 +13,7 @@ const (
 	WhileStatement      NodeType = "WhileStatement"
 	ContinueStatement   NodeType = "ContinueStatement"
 	BreakStatement      NodeType = "BreakStatement"
+	ForStatement        NodeType = "ForStatement"
 
 	// EXPRESSIONS
 	AssigmentExpr   NodeType = "AssigmentExpr"

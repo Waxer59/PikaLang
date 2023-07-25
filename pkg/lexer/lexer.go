@@ -151,7 +151,7 @@ func Tokenize(input string) ([]token_type.Token, error) {
 				tokens = append(tokens, token_type.Token{Type: token_type.NotEqual, Value: "!="})
 				continue
 			}
-			tokens = append(tokens, token_type.Token{Type: token_type.Not, Value: string(tokenChar)})
+			tokens = append(tokens, token_type.Token{Type: token_type.Bang, Value: string(tokenChar)})
 		case '>':
 			if nextChar() == '=' {
 				substract(2) // consume '>='

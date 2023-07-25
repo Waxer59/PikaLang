@@ -241,7 +241,7 @@ func (p *Parser) parseNegativeAndPositiveExpr() (ast.Expr, error) {
 }
 
 func (p *Parser) parseLogicalNotExpr() (ast.Expr, error) {
-	if p.at().Type == token_type.Not {
+	if p.at().Type == token_type.Bang {
 		op := p.subtract().Value // consume '!'
 		argument, err := p.parseLogicalNotExpr()
 		if err != nil {
