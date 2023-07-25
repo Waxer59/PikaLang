@@ -200,6 +200,11 @@ func Tokenize(input string) ([]token_type.Token, error) {
 
 			var str string
 			for len(src) > 0 && src[0] != '"' {
+				if src[0] == '\\' {
+					substract(1)
+					str += string(substract(1))
+					continue
+				}
 				str += string(substract(1))
 			}
 
