@@ -42,6 +42,43 @@ func evalReturnStatement(declaration ast.ReturnStatement, env interpreter_env.En
 	return returnValue, errors.New(compilerErrors.ErrReturn)
 }
 
+func evalForStatement(declaration ast.ForStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+	if declaration.Init != nil {
+		eval, err := Evaluate(declaration.Init, env)
+		if err != nil {
+			return eval, err
+		}
+	}
+	for {
+		if declaration.Test != nil {
+			eval, err := Evaluate(declaration.Test, env)
+			if err != nil {
+				return eval, err
+			}
+			testVal := EvaluateTruthyFalsyValues(eval.GetValue())
+			if !testVal {
+				break
+			}
+		}
+		if declaration.Update != nil {
+			eval, err := Evaluate(declaration.Update, env)
+			if err != nil {
+				return eval, err
+			}
+		}
+		eval, err := EvaluateBodyStmt(declaration.Body, env)
+		if err != nil && err.Error() == compilerErrors.ErrLoopsBreakNotInLoop {
+			break
+		} else if err != nil && err.Error() == compilerErrors.ErrLoopsContinueNotInLoop {
+			continue
+		} else if err != nil {
+			return eval, err
+		}
+	}
+
+	return nil, nil
+}
+
 func evalBreakStatement(declaration ast.BreakStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	return nil, errors.New(compilerErrors.ErrLoopsBreakNotInLoop)
 }
