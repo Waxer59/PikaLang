@@ -49,22 +49,22 @@ func TestNextChar(t *testing.T) {
 	}
 }
 
-func TestExtractInt(t *testing.T) {
+func TestExtractNum(t *testing.T) {
 	tests := []struct {
 		src         []rune
 		expectedNum string
 		expectedSrc []rune
 	}{
 		{[]rune{'1', '2', '3', 'a', '4', '5'}, "123", []rune{'a', '4', '5'}},
-		{[]rune{'-', '5', '.', '6'}, "-5.6", []rune{}},
+		{[]rune{'-', '5', '.', '6'}, "", []rune{'-', '5', '.', '6'}},
 		{[]rune{}, "", []rune{}},
 	}
 
 	for _, test := range tests {
-		resultNum, resultSrc := ExtractInt(test.src)
+		resultNum, resultSrc := ExtractNum(test.src)
 
 		if resultNum != test.expectedNum {
-			t.Errorf("Expected ExtractInt(%v) to return '%s', but got '%s'", test.src, test.expectedNum, resultNum)
+			t.Errorf("Expected ExtractNum(%v) to return '%s', but got '%s'", test.src, test.expectedNum, resultNum)
 		}
 
 		if !reflect.DeepEqual(resultSrc, test.expectedSrc) {

@@ -41,9 +41,16 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 	function := fn.(interpreter_env.FunctionVal)
 	scope := interpreter_env.New(function.DeclarationEnv)
 
+	paramsNumber := len(function.Params)
+
+	if paramsNumber > len(args) {
+		return nil, errors.New(compilerErrors.ErrNotEnoughArguments)
+	} else if paramsNumber < len(args) {
+		return nil, errors.New(compilerErrors.ErrTooManyArguments)
+	}
+
 	// Create the variables for the function arguments
 	for idx, arg := range function.Params {
-		// TODO: CHECK ARITY OF FUNCTION
 		scope.DeclareVar(arg, args[idx], false)
 	}
 

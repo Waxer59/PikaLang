@@ -429,7 +429,7 @@ func (p *Parser) parseEqualityExpr() (ast.Expr, error) {
 
 	for slices.Contains(ast_types.EqualityExpr, p.at().Value) && p.notEOF() {
 		op := p.subtract().Value // consume operator
-		right, err := p.parseExpr()
+		right, err := p.parseComparisonExpr()
 		if err != nil {
 			return nil, err
 		}

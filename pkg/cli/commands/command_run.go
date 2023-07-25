@@ -30,7 +30,7 @@ func SetUpRunCommand(app *cli.App) *cli.Command {
 func runApp(cCtx *cli.Context) error {
 	fileName := cCtx.Args().Get(0)
 	ext := filepath.Ext(fileName)
-	if ext != ".pk" && !strings.HasSuffix(fileName, "/") {
+	if ext != ".pk" && !strings.HasSuffix(fileName, "/") && fileName != "." {
 		return cli.Exit("File extension must be .pk", int(exitCodes.FileExtensionError))
 	}
 
