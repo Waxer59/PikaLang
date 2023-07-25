@@ -279,7 +279,7 @@ func evalConditionalExpr(conditionalExpr ast.ConditionalExpr, env interpreter_en
 		return nil, err
 	}
 
-	val := EvaluateTruthyFalsyValues(evalCondition)
+	val := EvaluateTruthyFalsyValues(evalCondition.GetValue())
 
 	if val {
 		return Evaluate(conditionalExpr.Consequent, env)
