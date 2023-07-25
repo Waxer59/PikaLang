@@ -60,12 +60,6 @@ func evalForStatement(declaration ast.ForStatement, env interpreter_env.Environm
 				break
 			}
 		}
-		if declaration.Update != nil {
-			eval, err := Evaluate(declaration.Update, env)
-			if err != nil {
-				return eval, err
-			}
-		}
 		eval, err := EvaluateBodyStmt(declaration.Body, env)
 		if err != nil && err.Error() == compilerErrors.ErrLoopsBreakNotInLoop {
 			break
@@ -73,6 +67,13 @@ func evalForStatement(declaration ast.ForStatement, env interpreter_env.Environm
 			continue
 		} else if err != nil {
 			return eval, err
+		}
+
+		if declaration.Update != nil {
+			eval, err := Evaluate(declaration.Update, env)
+			if err != nil {
+				return eval, err
+			}
 		}
 	}
 

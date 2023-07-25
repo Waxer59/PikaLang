@@ -1,6 +1,8 @@
 package interpreter_makers
 
-import "pika/pkg/interpreter/interpreter_env"
+import (
+	"pika/pkg/interpreter/interpreter_env"
+)
 
 func MK_Null() interpreter_env.NullVal {
 	return interpreter_env.NullVal{

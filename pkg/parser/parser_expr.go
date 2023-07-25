@@ -93,7 +93,7 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 		p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
 		return value
 	default:
-		errorMsg = "Expected an expression"
+		errorMsg = "Expected an expression " + p.at().Value
 	}
 
 	color.Red("Something went wrong with parsing: " + errorMsg)
