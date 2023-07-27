@@ -93,7 +93,7 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 		p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
 		return value
 	default:
-		errorMsg = "Expected an expression"
+		errorMsg = "Expected an expression " + p.at().Value
 	}
 
 	color.Red("Something went wrong with parsing: " + errorMsg)
@@ -429,7 +429,7 @@ func (p *Parser) parseEqualityExpr() (ast.Expr, error) {
 
 	for slices.Contains(ast_types.EqualityExpr, p.at().Value) && p.notEOF() {
 		op := p.subtract().Value // consume operator
-		right, err := p.parseExpr()
+		right, err := p.parseComparisonExpr()
 		if err != nil {
 			return nil, err
 		}

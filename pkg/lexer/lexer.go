@@ -36,7 +36,7 @@ func Tokenize(input string) ([]token_type.Token, error) {
 
 		// Check for number
 		if IsInt(tokenChar) {
-			num, rest := ExtractInt(src)
+			num, rest := ExtractNum(src)
 			tokens = append(tokens, token_type.Token{Type: token_type.Number, Value: num})
 			src = rest
 			continue
@@ -88,17 +88,11 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			}
 
 			if nextChar() == '-' {
-				substract(2) // consume ' ++ '
+				substract(2) // consume ' -- '
 				tokens = append(tokens, token_type.Token{Type: token_type.Decrement, Value: "--"})
 				continue
 			}
 
-			if IsInt(nextChar()) { // Check for negative numbers
-				num, rest := ExtractInt(src)
-				tokens = append(tokens, token_type.Token{Type: token_type.Number, Value: num})
-				src = rest
-				continue
-			}
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 		case '*':
 			if nextChar() == '=' {
@@ -194,7 +188,7 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			tokens = append(tokens, token_type.Token{Type: token_type.Colon, Value: string(tokenChar)})
 		case '.':
 			if IsInt(nextChar()) { // Check for decimal numbers as .123 == 0.123
-				num, rest := ExtractInt(src)
+				num, rest := ExtractNum(src)
 				tokens = append(tokens, token_type.Token{Type: token_type.Number, Value: num})
 				src = rest
 				continue
@@ -206,6 +200,11 @@ func Tokenize(input string) ([]token_type.Token, error) {
 
 			var str string
 			for len(src) > 0 && src[0] != '"' {
+				if src[0] == '\\' {
+					substract(1)
+					str += string(substract(1))
+					continue
+				}
 				str += string(substract(1))
 			}
 

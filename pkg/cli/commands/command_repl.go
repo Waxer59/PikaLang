@@ -19,6 +19,13 @@ func SetUpRepl(app *cli.App) *cli.Command {
 		Name:   "repl",
 		Usage:  "Start the repl",
 		Action: startRepl,
+		Flags: []cli.Flag{
+			&cli.BoolFlag{
+				Name:    "ast",
+				Aliases: []string{"a"},
+				Usage:   "Print the AST",
+			},
+		},
 	}
 
 	return replCommand
@@ -27,6 +34,8 @@ func SetUpRepl(app *cli.App) *cli.Command {
 func startRepl(cCtx *cli.Context) error {
 	parser := parser.New()
 	env := interpreter_env.New(nil)
+
+	isAstActivated := cCtx.Bool("ast")
 
 	for {
 		c := color.New(color.FgBlue).Add(color.Bold)
@@ -45,6 +54,10 @@ func startRepl(cCtx *cli.Context) error {
 		}
 
 		program, err := parser.ProduceAST(code)
+
+		if isAstActivated {
+			fmt.Println(program)
+		}
 
 		if err != nil {
 			return fmt.Errorf(err.Error())

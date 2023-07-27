@@ -96,6 +96,15 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
 The Pikalang CLI (Command Line Interface) provides a convenient way to interact with the Pikalang interpreter and run programs written in this language.
 
 ```bash
+NAME:
+   pika - A simple pika compiler
+
+USAGE:
+   pika [global options] command [command options] [arguments...]
+
+VERSION:
+   0.3.1
+
 COMMANDS:
    run   Run a file
    help  Show help

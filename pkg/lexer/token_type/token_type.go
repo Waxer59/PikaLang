@@ -56,6 +56,8 @@ const (
 	DoubleQoute  // "
 	SingleQoute  // '
 	QuestionMark // ?
+	Minus
+	Plus
 
 	// Comparison operators
 	EqualEqual   // ==

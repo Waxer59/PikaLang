@@ -30,18 +30,12 @@ func NextChar(src *[]rune) string {
 /*  FirstReturn: Number extracted
  * 	SecondReturn: Rest of the string
  */
-func ExtractInt(src []rune) (string, []rune) {
+func ExtractNum(src []rune) (string, []rune) {
 	if len(src) <= 0 {
 		return "", src
 	}
 
-	isNegative := src[0] == '-'
 	num := ""
-
-	if isNegative {
-		num = "-"
-		NextChar(&src)
-	}
 
 	for len(src) > 0 && (IsInt(src[0]) || src[0] == '.') {
 		num += NextChar(&src)
