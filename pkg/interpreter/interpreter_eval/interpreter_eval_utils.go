@@ -6,7 +6,7 @@ import (
 	"pika/pkg/interpreter/interpreter_makers"
 )
 
-func EvaluateTruthyFalsyValues(val interface{}) bool {
+func EvaluateTruthyFalsyValues(val any) bool {
 	switch v := val.(type) {
 	case bool:
 		return v

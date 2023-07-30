@@ -7,15 +7,15 @@ import (
 
 type Environment struct {
 	parent    *Environment
-	variables map[string]interface{}
-	constants map[string]interface{}
+	variables map[string]any
+	constants map[string]any
 }
 
 func New(parentENV *Environment) Environment {
 	return Environment{
 		parent:    parentENV,
-		variables: make(map[string]interface{}),
-		constants: make(map[string]interface{}),
+		variables: make(map[string]any),
+		constants: make(map[string]any),
 	}
 }
 
