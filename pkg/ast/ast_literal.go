@@ -21,7 +21,7 @@ func (n NumericLiteral) GetKind() ast_types.NodeType {
 	return n.Kind
 }
 
-func (n NumericLiteral) GetValue() interface{} {
+func (n NumericLiteral) GetValue() any {
 	return n.Value
 }
 
@@ -36,7 +36,7 @@ func (o ObjectLiteral) GetKind() ast_types.NodeType {
 
 type NullLiteral struct {
 	Kind  ast_types.NodeType
-	Value interface{} // nil
+	Value any // nil
 }
 
 func (n NullLiteral) GetKind() ast_types.NodeType {
@@ -63,7 +63,7 @@ func (s StringLiteral) GetKind() ast_types.NodeType {
 
 type NaNLiteral struct {
 	Kind  ast_types.NodeType
-	Value interface{}
+	Value any // nil
 }
 
 func (n NaNLiteral) GetKind() ast_types.NodeType {

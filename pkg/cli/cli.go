@@ -11,7 +11,7 @@ func New() error {
 	app := cli.NewApp()
 	app.Name = "pika"
 	app.Usage = "A simple pika compiler"
-	app.Version = "0.3.1"
+	app.Version = "0.3.2"
 
 	setUp(app)
 

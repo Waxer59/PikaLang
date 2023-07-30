@@ -19,19 +19,19 @@ const (
 
 type RuntimeValue interface {
 	GetType() ValueType
-	GetValue() interface{}
+	GetValue() any
 }
 
 type NullVal struct {
 	Type  ValueType
-	Value interface{} // nil
+	Value any // nil
 }
 
 func (n NullVal) GetType() ValueType {
 	return n.Type
 }
 
-func (n NullVal) GetValue() interface{} {
+func (n NullVal) GetValue() any {
 	return n.Value
 }
 
@@ -44,7 +44,7 @@ func (b BooleanVal) GetType() ValueType {
 	return b.Type
 }
 
-func (b BooleanVal) GetValue() interface{} {
+func (b BooleanVal) GetValue() any {
 	return b.Value
 }
 
@@ -57,7 +57,7 @@ func (n NumberVal) GetType() ValueType {
 	return n.Type
 }
 
-func (n NumberVal) GetValue() interface{} {
+func (n NumberVal) GetValue() any {
 	return n.Value
 }
 
@@ -70,7 +70,7 @@ func (o ObjectVal) GetType() ValueType {
 	return o.Type
 }
 
-func (o ObjectVal) GetValue() interface{} {
+func (o ObjectVal) GetValue() any {
 	return o.Properties
 }
 
@@ -88,7 +88,7 @@ func (f FunctionVal) GetType() ValueType {
 	return f.Type
 }
 
-func (f FunctionVal) GetValue() interface{} {
+func (f FunctionVal) GetValue() any {
 	return f.Body
 }
 
@@ -101,7 +101,7 @@ func (s StringVal) GetType() ValueType {
 	return s.Type
 }
 
-func (s StringVal) GetValue() interface{} {
+func (s StringVal) GetValue() any {
 	return s.Value
 }
 
@@ -114,7 +114,7 @@ func (n NaNVal) GetType() ValueType {
 	return n.Type
 }
 
-func (n NaNVal) GetValue() interface{} {
+func (n NaNVal) GetValue() any {
 	return n.Value
 }
 
@@ -127,12 +127,12 @@ func (a ArrayVal) GetType() ValueType {
 	return a.Type
 }
 
-func (a ArrayVal) GetValue() interface{} {
+func (a ArrayVal) GetValue() any {
 	return a.Elements
 }
 
-func (a ArrayVal) GetElements() []interface{} {
-	arr := make([]interface{}, len(a.Elements))
+func (a ArrayVal) GetElements() []any {
+	arr := make([]any, len(a.Elements))
 	for idx, element := range a.Elements {
 		arr[idx] = element.GetValue()
 	}
