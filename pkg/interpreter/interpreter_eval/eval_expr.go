@@ -87,10 +87,31 @@ func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (inter
 			if evalProperty.GetType() != interpreter_env.Number {
 				return nil, errors.New(compilerErrors.ErrIndexNotFound)
 			}
-			if int(evalProperty.GetValue().(float64)) >= len(obj) {
+			number := evalProperty.GetValue().(float64)
+
+			if math.Mod(number, 1) != 0 { // Check if is a float number
 				return nil, errors.New(compilerErrors.ErrIndexNotFound)
 			}
-			val := obj[int(evalProperty.GetValue().(float64))]
+
+			idx := int(number)
+
+			isNegative := idx < 0
+
+			if isNegative {
+				idx = len(obj) + idx
+			}
+
+			isNegativeOutOfBounds := (idx < 0 || idx >= len(obj)) && isNegative
+
+			if isNegativeOutOfBounds {
+				return nil, errors.New(compilerErrors.ErrIndexNotFound)
+			}
+
+			if idx >= len(obj) {
+				return nil, errors.New(compilerErrors.ErrIndexNotFound)
+			}
+
+			val := obj[idx]
 			return val, nil
 		case map[string]interpreter_env.RuntimeValue:
 			valProperty := fmt.Sprint(evalProperty.GetValue())
@@ -248,7 +269,25 @@ func evalAssignment(assignment ast.AssigmentExpr, env interpreter_env.Environmen
 				return nil, errors.New(compilerErrors.ErrSyntaxInvalidAssignment)
 			}
 
-			idx := int(propertyVal.GetValue().(float64))
+			number := propertyVal.GetValue().(float64)
+
+			if math.Mod(number, 1) != 0 { // Check if is a float number
+				return nil, errors.New(compilerErrors.ErrSyntaxInvalidAssignment)
+			}
+
+			idx := int(number)
+
+			isNegative := idx < 0
+
+			if isNegative {
+				idx = len(objVal.Elements) + idx
+			}
+
+			isNegativeOutOfBounds := (idx < 0 || idx >= len(objVal.Elements)) && isNegative
+
+			if isNegativeOutOfBounds {
+				return nil, errors.New(compilerErrors.ErrSyntaxInvalidAssignment)
+			}
 
 			if idx >= len(objVal.Elements) {
 				for i := len(objVal.Elements); i <= idx; i++ {
