@@ -58,6 +58,7 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
     - [Data structures](#data-structures)
       - [arrays](#arrays)
         - [Array Declaration](#array-declaration)
+        - [Negative Indexes](#negative-indexes)
         - [Accessing Array Elements](#accessing-array-elements)
         - [Modifying Array Elements](#modifying-array-elements)
         - [Array Length](#array-length)
@@ -723,6 +724,18 @@ let fruits = ["apple", "banana", "orange"];
 ```
 
 In the example above, we declared an array named `numbers` with five elements and an array named `fruits` with three elements.
+
+##### Negative Indexes
+
+In PikaLang you can use negative indices to access positions in an array. `-1` would represent the last position in the array.
+
+```
+var arr = [ 1, 2, 3]
+//         -3  -2 -1
+arr[-1] = 4 // [ 1, 2, 4]
+print(arr[-2]) // 2
+arr[-20] = 123 // ERROR!
+```
 
 ##### Accessing Array Elements
 

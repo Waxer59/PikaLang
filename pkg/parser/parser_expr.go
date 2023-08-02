@@ -65,7 +65,8 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 	case token_type.Identifier:
 		return ast.Identifier{Kind: ast_types.Identifier, Symbol: p.subtract().Value}
 	case token_type.Number:
-		n, err := strconv.ParseFloat(p.subtract().Value, 64)
+		currToken := p.subtract()
+		n, err := strconv.ParseFloat(currToken.Value, 64)
 
 		if err != nil {
 			errorMsg = err.Error()

@@ -65,10 +65,10 @@ func startRepl(cCtx *cli.Context) error {
 
 		eval, err := interpreter_eval.Evaluate(*program, env)
 
-		fmt.Println(eval.GetValue())
-
 		if err != nil {
 			color.Red(err.Error())
+		} else {
+			fmt.Println(eval.GetValue())
 		}
 
 	}
