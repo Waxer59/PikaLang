@@ -729,7 +729,7 @@ In the example above, we declared an array named `numbers` with five elements an
 
 In PikaLang you can use negative indices to access positions in an array. `-1` would represent the last position in the array.
 
-```
+```js
 var arr = [ 1, 2, 3]
 //         -3  -2 -1
 arr[-1] = 4 // [ 1, 2, 4]
