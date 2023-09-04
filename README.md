@@ -329,7 +329,7 @@ The `for` loop is a control flow statement in programming that allows you to rep
 
 #### Syntax
 
-The syntax for a `for` loop in Go is as follows:
+The syntax for a `for` loop is as follows:
 
 ```go
 for initialization; condition; post {
