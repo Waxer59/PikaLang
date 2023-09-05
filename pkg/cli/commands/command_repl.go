@@ -4,11 +4,12 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"pika/internal/utils"
-	"pika/pkg/cli/exitCodes"
-	"pika/pkg/interpreter/interpreter_env"
-	"pika/pkg/interpreter/interpreter_eval"
-	"pika/pkg/parser"
+
+	"github.com/Waxer59/PikaLang/internal/utils"
+	"github.com/Waxer59/PikaLang/pkg/cli/exitCodes"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_eval"
+	"github.com/Waxer59/PikaLang/pkg/parser"
 
 	"github.com/fatih/color"
 	"github.com/urfave/cli/v2"

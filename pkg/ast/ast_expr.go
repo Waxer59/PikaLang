@@ -1,6 +1,6 @@
 package ast
 
-import "pika/pkg/ast/ast_types"
+import "github.com/Waxer59/PikaLang/pkg/ast/ast_types"
 
 type Expr interface {
 	Stmt
@@ -100,4 +100,14 @@ type UpdateExpr struct {
 
 func (u UpdateExpr) GetKind() ast_types.NodeType {
 	return u.Kind
+}
+
+type ArrowFunctionExpr struct {
+	Kind   ast_types.NodeType
+	Params []Identifier
+	Body   any // Expr or []Stmt
+}
+
+func (a ArrowFunctionExpr) GetKind() ast_types.NodeType {
+	return a.Kind
 }

@@ -16,15 +16,16 @@ const (
 	ForStatement        NodeType = "ForStatement"
 
 	// EXPRESSIONS
-	AssigmentExpr   NodeType = "AssigmentExpr"
-	ConditionalExpr NodeType = "ConditionalExp"
-	BinaryExpr      NodeType = "BinaryExpr"
-	Identifier      NodeType = "Identifier"
-	MemberExpr      NodeType = "MemberExpr"
-	CallExpr        NodeType = "CallExpr"
-	LogicalExpr     NodeType = "LogicalExpr"
-	UnaryExpr       NodeType = "UnaryExpr"
-	UpdateExpr      NodeType = "UpdateExpr"
+	AssigmentExpr     NodeType = "AssigmentExpr"
+	ConditionalExpr   NodeType = "ConditionalExp"
+	BinaryExpr        NodeType = "BinaryExpr"
+	Identifier        NodeType = "Identifier"
+	MemberExpr        NodeType = "MemberExpr"
+	CallExpr          NodeType = "CallExpr"
+	LogicalExpr       NodeType = "LogicalExpr"
+	UnaryExpr         NodeType = "UnaryExpr"
+	UpdateExpr        NodeType = "UpdateExpr"
+	ArrowFunctionExpr NodeType = "ArrowFunctionExpr"
 
 	// LITERALS
 	ObjectLiteral  NodeType = "ObjectLiteral"

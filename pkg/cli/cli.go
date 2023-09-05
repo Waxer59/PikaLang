@@ -2,7 +2,8 @@ package cli
 
 import (
 	"os"
-	"pika/pkg/cli/commands"
+
+	"github.com/Waxer59/PikaLang/pkg/cli/commands"
 
 	"github.com/urfave/cli/v2"
 )

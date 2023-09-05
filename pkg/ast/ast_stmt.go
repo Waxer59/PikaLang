@@ -1,7 +1,7 @@
 package ast
 
 import (
-	"pika/pkg/ast/ast_types"
+	"github.com/Waxer59/PikaLang/pkg/ast/ast_types"
 )
 
 type Stmt interface {
@@ -19,7 +19,7 @@ func (p Program) GetKind() ast_types.NodeType {
 
 type FunctionDeclaration struct {
 	Kind   ast_types.NodeType
-	Params []string
+	Params []Identifier
 	Name   string
 	Body   []Stmt
 }

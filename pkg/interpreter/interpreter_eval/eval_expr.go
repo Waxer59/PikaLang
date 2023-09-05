@@ -4,12 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	compilerErrors "pika/internal/errors"
-	"pika/pkg/ast"
-	"pika/pkg/ast/ast_types"
-	"pika/pkg/interpreter/interpreter_env"
-	"pika/pkg/interpreter/interpreter_makers"
-	"pika/pkg/interpreter/interpreter_utils"
+
+	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
+	"github.com/Waxer59/PikaLang/pkg/ast"
+	"github.com/Waxer59/PikaLang/pkg/ast/ast_types"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_utils"
 
 	"golang.org/x/exp/slices"
 )
@@ -51,7 +52,7 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 
 	// Create the variables for the function arguments
 	for idx, arg := range function.Params {
-		scope.DeclareVar(arg, args[idx], false)
+		scope.DeclareVar(arg.Symbol, args[idx], false)
 	}
 
 	// Evaluate the function body line by line

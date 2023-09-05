@@ -1,8 +1,8 @@
 package interpreter_nativeFns
 
 import (
-	"pika/pkg/interpreter/interpreter_env"
-	"pika/pkg/interpreter/interpreter_makers"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
 
 	"golang.org/x/exp/slices"
 )

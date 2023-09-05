@@ -104,7 +104,7 @@ USAGE:
    pika [global options] command [command options] [arguments...]
 
 VERSION:
-   0.3.1
+   0.5.0
 
 COMMANDS:
    run   Run a file

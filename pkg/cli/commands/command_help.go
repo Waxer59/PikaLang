@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"pika/pkg/cli/exitCodes"
+	"github.com/Waxer59/PikaLang/pkg/cli/exitCodes"
 
 	"github.com/urfave/cli/v2"
 )

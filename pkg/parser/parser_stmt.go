@@ -2,10 +2,11 @@ package parser
 
 import (
 	"errors"
-	compilerErrors "pika/internal/errors"
-	"pika/pkg/ast"
-	"pika/pkg/ast/ast_types"
-	"pika/pkg/lexer/token_type"
+
+	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
+	"github.com/Waxer59/PikaLang/pkg/ast"
+	"github.com/Waxer59/PikaLang/pkg/ast/ast_types"
+	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
 )
 
 func (p *Parser) parseStmt() (ast.Stmt, error) {
@@ -166,7 +167,7 @@ func (p *Parser) parseReturnStatement() (ast.Stmt, error) {
 func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
 	p.subtract() // consume 'switch'
 
-	args, err := p.parseArgs(token_type.Switch)
+	arg, err := p.parseConditionalArg()
 
 	if err != nil {
 		return nil, err
@@ -174,15 +175,15 @@ func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
 
 	var caseStmts []ast.CaseStatement
 	var defaultStmt ast.CaseStatement
-	condition := args[0]
+	condition := arg
 
 	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
 
-	for p.at().Type != token_type.RightBrace && p.at().Type != token_type.EOF {
+	for p.at().Type != token_type.RightBrace && p.notEOF() {
 		if p.at().Type == token_type.Case {
 			p.subtract() // consume 'case'
 
-			caseCondition, err := p.parseArgs(token_type.Case)
+			caseCondition, err := p.parseSwitchCaseArgs()
 
 			if err != nil {
 				return nil, err
@@ -234,13 +235,13 @@ func (p *Parser) parseIfStatement() (ast.Stmt, error) {
 
 	p.subtract() // consume 'if'
 
-	args, err := p.parseArgs(token_type.If)
+	arg, err := p.parseConditionalArg()
 
 	if err != nil {
 		return nil, err
 	}
 
-	condition := args[0]
+	condition := arg
 
 	body, err := p.parseBlockBodyStmt()
 
@@ -276,15 +277,15 @@ func (p *Parser) parseIfStatement() (ast.Stmt, error) {
 func (p *Parser) parseElseIfStatement() ([]ast.ElseIfStatement, error) {
 	var elseIfStmt []ast.ElseIfStatement = nil
 
-	for p.at().Type == token_type.Else && p.atNext().Type == token_type.If && p.at().Type != token_type.EOF {
+	for p.at().Type == token_type.Else && p.atNext().Type == token_type.If && p.notEOF() {
 		p.subtract(2) // consume 'else' & 'if'
-		args, err := p.parseArgs(token_type.If)
+		arg, err := p.parseConditionalArg()
 
 		if err != nil {
 			return nil, err
 		}
 
-		condition := args[0]
+		condition := arg
 
 		body, err := p.parseBlockBodyStmt()
 
@@ -306,19 +307,10 @@ func (p *Parser) parseFnDeclaration() (ast.Stmt, error) {
 
 	name := p.expect(token_type.Identifier, compilerErrors.ErrFuncExpectedIdentifer)
 
-	args, err := p.parseArgs(token_type.Fn)
+	params, err := p.parseFunctionArgs()
 
 	if err != nil {
 		return nil, err
-	}
-
-	var params = make([]string, len(args))
-
-	for i, arg := range args {
-		if arg.GetKind() != ast_types.Identifier {
-			return nil, errors.New(compilerErrors.ErrFuncExpectedIdentifer)
-		}
-		params[i] = arg.(ast.Identifier).Symbol
 	}
 
 	body, err := p.parseBlockBodyStmt()

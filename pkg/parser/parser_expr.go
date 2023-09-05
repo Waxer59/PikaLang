@@ -3,11 +3,12 @@ package parser
 import (
 	"errors"
 	"os"
-	compilerErrors "pika/internal/errors"
-	"pika/pkg/ast"
-	"pika/pkg/ast/ast_types"
-	"pika/pkg/lexer/token_type"
 	"strconv"
+
+	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
+	"github.com/Waxer59/PikaLang/pkg/ast"
+	"github.com/Waxer59/PikaLang/pkg/ast/ast_types"
+	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
 
 	"github.com/fatih/color"
 	"golang.org/x/exp/slices"
@@ -16,32 +17,6 @@ import (
 func (p *Parser) parseExpr() (ast.Expr, error) {
 	expr, err := p.parseAssigmentExpr()
 	return expr, err
-}
-
-func (p *Parser) parseAdditiveExpr() (ast.Expr, error) {
-	left, err := p.parseExponentialExpr()
-
-	if err != nil {
-		return nil, err
-	}
-
-	for slices.Contains(ast_types.AdditiveExpr, p.at().Value) {
-		var op = p.subtract().Value
-		right, err := p.parseExponentialExpr()
-
-		if err != nil {
-			return nil, err
-		}
-
-		left = ast.BinaryExpr{
-			Kind:     ast_types.BinaryExpr,
-			Left:     left,
-			Right:    right,
-			Operator: op,
-		}
-	}
-
-	return left, nil
 }
 
 func (p *Parser) parsePrimaryExpr() ast.Expr {
@@ -241,6 +216,29 @@ func (p *Parser) parseNegativeAndPositiveExpr() (ast.Expr, error) {
 	return p.parsePrefixUpdateExpr()
 }
 
+func (p *Parser) parseCallExpr(caller ast.Expr) (ast.Expr, error) {
+	args, err := p.parseCallExprArgs()
+	if err != nil {
+		return nil, err
+	}
+	var callExpr ast.Expr = ast.CallExpr{
+		Kind:   ast_types.CallExpr,
+		Caller: caller,
+		Args:   args,
+	}
+
+	if p.at().Type == token_type.LeftParen {
+		var err error
+
+		callExpr, err = p.parseCallExpr(callExpr)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return callExpr, nil
+}
+
 func (p *Parser) parseLogicalNotExpr() (ast.Expr, error) {
 	if p.at().Type == token_type.Bang {
 		op := p.subtract().Value // consume '!'
@@ -285,33 +283,35 @@ func (p *Parser) parseExponentialExpr() (ast.Expr, error) {
 	return left, nil
 }
 
-func (p *Parser) parseCallExpr(caller ast.Expr) (ast.Expr, error) {
-	args, err := p.parseArgs(token_type.Fn)
+func (p *Parser) parseAdditiveExpr() (ast.Expr, error) {
+	left, err := p.parseExponentialExpr()
+
 	if err != nil {
 		return nil, err
 	}
-	var callExpr ast.Expr = ast.CallExpr{
-		Kind:   ast_types.CallExpr,
-		Caller: caller,
-		Args:   args,
-	}
 
-	if p.at().Type == token_type.LeftParen {
-		var err error
+	for slices.Contains(ast_types.AdditiveExpr, p.at().Value) {
+		var op = p.subtract().Value
+		right, err := p.parseExponentialExpr()
 
-		callExpr, err = p.parseCallExpr(callExpr)
 		if err != nil {
 			return nil, err
 		}
+
+		left = ast.BinaryExpr{
+			Kind:     ast_types.BinaryExpr,
+			Left:     left,
+			Right:    right,
+			Operator: op,
+		}
 	}
 
-	return callExpr, nil
+	return left, nil
 }
 
 func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 	if p.at().Type != token_type.LeftBrace {
-		additiveExpr, err := p.parseAdditiveExpr()
-		return additiveExpr, err
+		return p.parseAdditiveExpr()
 	}
 
 	p.subtract() // advance post open brace
@@ -367,8 +367,7 @@ func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 
 func (p *Parser) parseArrayExpr() (ast.Expr, error) {
 	if p.at().Type != token_type.LeftBracket {
-		additiveExpr, err := p.parseObjectExpr()
-		return additiveExpr, err
+		return p.parseObjectExpr()
 	}
 
 	p.subtract() // advance post open bracket
@@ -527,8 +526,43 @@ func (p *Parser) parseTernaryExpr() (ast.Expr, error) {
 	return condition, nil
 }
 
+func (p *Parser) parseArrowFunctionExpr() (ast.Expr, error) {
+	if p.at().Type != token_type.LeftParen {
+		return p.parseTernaryExpr()
+	}
+
+	params, err := p.parseFunctionArgs()
+
+	if err != nil {
+		return nil, err
+	}
+
+	p.expect(token_type.Arrow, compilerErrors.ErrSyntaxExpectedArrow)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if p.at().Type == token_type.LeftBrace {
+		p.subtract() // consume '{'
+	}
+
+	body, err := p.parseBlockBodyStmt()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return ast.ArrowFunctionExpr{
+		Kind:   ast_types.ArrowFunctionExpr,
+		Params: params,
+		Body:   body,
+	}, nil
+
+}
+
 func (p *Parser) parseAssigmentExpr() (ast.Expr, error) {
-	left, err := p.parseTernaryExpr()
+	left, err := p.parseArrowFunctionExpr()
 
 	if err != nil {
 		return nil, err
@@ -536,7 +570,7 @@ func (p *Parser) parseAssigmentExpr() (ast.Expr, error) {
 
 	if slices.Contains(token_type.AssigmentOperators, p.at().Type) {
 		op := p.subtract().Value // consume assigment operator
-		value, err := p.parseTernaryExpr()
+		value, err := p.parseArrowFunctionExpr()
 		if err != nil {
 			return nil, err
 		}

@@ -1,6 +1,6 @@
 package interpreter_utils
 
-import "pika/pkg/interpreter/interpreter_nativeFns"
+import "github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_nativeFns"
 
 /*
  * First return value is the function itself.

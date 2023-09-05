@@ -2,8 +2,9 @@ package interpreter_nativeFns
 
 import (
 	"fmt"
-	"pika/pkg/interpreter/interpreter_env"
-	"pika/pkg/interpreter/interpreter_makers"
+
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
 )
 
 var ConsoleFns = map[string]NativeFunction{
@@ -20,16 +21,23 @@ var ConsoleFns = map[string]NativeFunction{
 						fmt.Print(", ")
 					}
 				}
-				fmt.Print(" ]")
+				fmt.Println(" ]")
 			case interpreter_env.Object:
 				obj, _ := arg.GetValue().(map[string]interpreter_env.RuntimeValue)
+				objLen := len(obj) - 1
+				idx := 0
 
 				fmt.Print("{ ")
 				for key, value := range obj {
 					fmt.Print(key, ": ", value.GetValue())
+
+					idx++
+					if idx < objLen {
+						fmt.Print(", ")
+					}
 					fmt.Print(", ")
 				}
-				fmt.Print("}")
+				fmt.Println("}")
 			default:
 				fmt.Println(arg.GetValue(), " ")
 			}

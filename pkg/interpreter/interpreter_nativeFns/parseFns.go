@@ -2,9 +2,10 @@ package interpreter_nativeFns
 
 import (
 	"fmt"
-	"pika/pkg/interpreter/interpreter_env"
-	"pika/pkg/interpreter/interpreter_makers"
 	"strconv"
+
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
 )
 
 var ParseFns = map[string]NativeFunction{

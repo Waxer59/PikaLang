@@ -26,4 +26,6 @@ const (
 	ErrSyntaxExpectedQuestionMark         = "ERROR: Expected '?'"
 	ErrSyntaxUnaryInvalidUnaryExpr        = "ERROR: Invalid unary expression"
 	ErrSyntaxInvalidUpdateExpr            = "ERROR: Invalid update expression"
+	ErrSyntaxExpectedArrow                = "ERROR: Expected '=>'"
+	ErrSyntaxConditionCantBeEmpty         = "ERROR: Condition cannot be empty"
 )

@@ -2,8 +2,9 @@ package lexer
 
 import (
 	"errors"
-	compilerErrors "pika/internal/errors"
-	"pika/pkg/lexer/token_type"
+
+	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
+	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
 )
 
 func Tokenize(input string) ([]token_type.Token, error) {
