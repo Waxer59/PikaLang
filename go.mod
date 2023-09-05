@@ -1,4 +1,4 @@
-module pika
+module github.com/Waxer59/PikaLang
 
 go 1.20
 
