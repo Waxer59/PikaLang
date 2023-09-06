@@ -250,6 +250,16 @@ Anonymous functions are those functions that are defined without a specific name
 () => {
   // ...
 }
+
+const myFn = () => {
+  // ...
+}
+
+const obj = {
+  myObjFunc: () => {
+    // ...
+  }
+}
 ```
 
 ### Switch statement
