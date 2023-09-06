@@ -19,6 +19,17 @@ var ParseFns = map[string]NativeFunction{
 			return interpreter_makers.MK_String("null")
 		case interpreter_env.Object:
 			return interpreter_makers.MK_String("object")
+		case interpreter_env.Array:
+			arr := args[0].GetValue().([]interpreter_env.RuntimeValue)
+			s := "["
+			for i, v := range arr {
+				s += fmt.Sprintf("%v", v.GetValue())
+				if i != len(arr)-1 {
+					s += ", "
+				}
+			}
+			s += "]"
+			return interpreter_makers.MK_String(s)
 		default:
 			s := fmt.Sprintf("%v", args[0].GetValue())
 			return interpreter_makers.MK_String(s)
