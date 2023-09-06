@@ -16,6 +16,7 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
       - [Else Statement](#else-statement)
       - [Else If Statement:](#else-if-statement)
     - [Function Declaration](#function-declaration)
+    - [Anonymous functions](#anonymous-functions)
     - [Switch statement](#switch-statement)
       - [Multiple Cases](#multiple-cases)
       - [Logical Cases](#logical-cases)
@@ -239,6 +240,16 @@ fn add(x, y) {
 ```
 
 In the example above, the `add` function is called within the `main` function, and the returned value is assigned to the variable `result`. The value of `result` is then printed, resulting in the output `7`.
+
+### Anonymous functions
+
+Anonymous functions are those functions that are defined without a specific name. They are useful for situations where temporary functionality is needed without the requirement of declaring a function with a formal name.
+
+```js
+() => {
+  // ...
+}
+```
 
 ### Switch statement
 

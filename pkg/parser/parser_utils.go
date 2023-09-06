@@ -57,9 +57,8 @@ func (p *Parser) parseConditionalArg() (ast.Expr, error) {
 		return nil, errors.New(compilerErrors.ErrSyntaxConditionCantBeEmpty)
 	}
 
-	// TODO: REVISAR CODIGO Y REFACTORIZAR
 	// TODO: FUNCIONES ANONIMAS
-	// TODO: AÑADIR TESTS
+	// TODO: REVISAR CODIGO Y REFACTORIZAR
 	// TODO: MEJORAR SALIDA EN CONSOLA
 
 	condition, err := p.parseExpr()

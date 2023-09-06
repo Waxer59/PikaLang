@@ -38,6 +38,17 @@ func (c CallExpr) GetKind() ast_types.NodeType {
 	return c.Kind
 }
 
+func (c CallExpr) GetFnName() string {
+	switch c.Caller.(type) {
+	case Identifier:
+		return c.Caller.(Identifier).Symbol
+	case MemberExpr:
+		return c.Caller.(MemberExpr).Property.(Identifier).Symbol
+	default:
+		return ""
+	}
+}
+
 type MemberExpr struct {
 	Kind     ast_types.NodeType
 	Object   Expr
@@ -105,7 +116,7 @@ func (u UpdateExpr) GetKind() ast_types.NodeType {
 type ArrowFunctionExpr struct {
 	Kind   ast_types.NodeType
 	Params []Identifier
-	Body   any // Expr or []Stmt
+	Body   []Stmt
 }
 
 func (a ArrowFunctionExpr) GetKind() ast_types.NodeType {

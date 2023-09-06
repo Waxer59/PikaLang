@@ -47,6 +47,8 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 		return evalMemberExpr(astNode.(ast.MemberExpr), env)
 	case ast_types.UpdateExpr:
 		return evalUpdateExpr(astNode.(ast.UpdateExpr), env)
+	case ast_types.ArrowFunctionExpr:
+		return evalArrowFunctionExpr(astNode.(ast.ArrowFunctionExpr), env)
 
 	// STATEMENTS
 	case ast_types.Program:

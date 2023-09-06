@@ -27,16 +27,12 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 	}
 
 	fn, err := Evaluate(expr.Caller, env)
-	fnName := expr.Caller.(ast.Identifier).Symbol
+	fnName := expr.GetFnName()
 	nativeFn, isNativeFn := interpreter_utils.IsNativeFunction(fnName)
 
 	if err != nil && isNativeFn {
 		result := nativeFn(args, env)
 		return result, nil
-	}
-
-	if err != nil || fn.GetType() != interpreter_env.Function {
-		return nil, errors.New(compilerErrors.ErrFuncNotFound + fnName)
 	}
 
 	function := fn.(interpreter_env.FunctionVal)
@@ -45,9 +41,9 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 	paramsNumber := len(function.Params)
 
 	if paramsNumber > len(args) {
-		return nil, errors.New(compilerErrors.ErrNotEnoughArguments)
+		return nil, errors.New(compilerErrors.ErrNotEnoughArguments + ": " + fnName)
 	} else if paramsNumber < len(args) {
-		return nil, errors.New(compilerErrors.ErrTooManyArguments)
+		return nil, errors.New(compilerErrors.ErrTooManyArguments + ": " + fnName)
 	}
 
 	// Create the variables for the function arguments
@@ -160,6 +156,19 @@ func evalArrayExpr(arrayExpr ast.ArrayLiteral, env interpreter_env.Environment) 
 	}
 
 	return arr, nil
+}
+
+func evalArrowFunctionExpr(funcExpr ast.ArrowFunctionExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+
+	arrowFn := interpreter_env.FunctionVal{
+		Type:           interpreter_env.ArrowFunction,
+		Name:           nil,
+		Params:         funcExpr.Params,
+		DeclarationEnv: nil,
+		Body:           funcExpr.Body,
+	}
+
+	return arrowFn, nil
 }
 
 func evalObjectExpr(objectExpr ast.ObjectLiteral, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {

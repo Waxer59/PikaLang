@@ -543,10 +543,6 @@ func (p *Parser) parseArrowFunctionExpr() (ast.Expr, error) {
 		return nil, err
 	}
 
-	if p.at().Type == token_type.LeftBrace {
-		p.subtract() // consume '{'
-	}
-
 	body, err := p.parseBlockBodyStmt()
 
 	if err != nil {
