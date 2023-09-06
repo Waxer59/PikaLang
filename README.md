@@ -92,6 +92,7 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
       - [`endsWith()`](#endswith)
       - [`reverseString()`](#reversestring)
       - [`typeof()`](#typeof)
+      - [`concat()`](#concat)
 
 ## CLI
 
@@ -1112,4 +1113,14 @@ Example of use:
 typeof(10) // This will return "number"
 typeof("hello") // This will return "string"
 typeof(true) // This will return "boolean"
+```
+
+#### `concat()`
+
+The `concat` function is used to concatenate varius strings.
+
+Example of use:
+
+```js
+concat("Hello", " ", "World!") // This will return "Hello World!"
 ```

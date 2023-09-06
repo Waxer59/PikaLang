@@ -82,12 +82,12 @@ func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (inter
 		switch obj := valObj.(type) {
 		case []interpreter_env.RuntimeValue:
 			if evalProperty.GetType() != interpreter_env.Number {
-				return nil, errors.New(compilerErrors.ErrIndexNotFound)
+				return nil, errors.New(compilerErrors.ErrInvalidIndex)
 			}
 			number := evalProperty.GetValue().(float64)
 
 			if math.Mod(number, 1) != 0 { // Check if is a float number
-				return nil, errors.New(compilerErrors.ErrIndexNotFound)
+				return nil, errors.New(compilerErrors.ErrInvalidIndex)
 			}
 
 			idx := int(number)
@@ -101,7 +101,7 @@ func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (inter
 			isNegativeOutOfBounds := (idx < 0 || idx >= len(obj)) && isNegative
 
 			if isNegativeOutOfBounds {
-				return nil, errors.New(compilerErrors.ErrIndexNotFound)
+				return nil, errors.New(compilerErrors.ErrInvalidIndex)
 			}
 
 			if idx >= len(obj) {
@@ -110,6 +110,36 @@ func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (inter
 
 			val := obj[idx]
 			return val, nil
+		case string:
+			if evalProperty.GetType() != interpreter_env.Number {
+				return nil, errors.New(compilerErrors.ErrInvalidIndex)
+			}
+			number := evalProperty.GetValue().(float64)
+
+			if math.Mod(number, 1) != 0 { // Check if is a float number
+				return nil, errors.New(compilerErrors.ErrInvalidIndex)
+			}
+
+			idx := int(number)
+
+			isNegative := idx < 0
+
+			if isNegative {
+				idx = len(obj) + idx
+			}
+
+			isNegativeOutOfBounds := (idx < 0 || idx >= len(obj)) && isNegative
+
+			if isNegativeOutOfBounds {
+				return nil, errors.New(compilerErrors.ErrInvalidIndex)
+			}
+
+			if idx >= len(obj) {
+				return nil, errors.New(compilerErrors.ErrIndexNotFound)
+			}
+
+			val := obj[idx]
+			return interpreter_makers.MK_String(string(val)), nil
 		case map[string]interpreter_env.RuntimeValue:
 			valProperty := fmt.Sprint(evalProperty.GetValue())
 			if _, ok := obj[valProperty]; ok {

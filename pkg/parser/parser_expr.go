@@ -2,7 +2,6 @@ package parser
 
 import (
 	"errors"
-	"os"
 	"strconv"
 
 	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
@@ -10,7 +9,6 @@ import (
 	"github.com/Waxer59/PikaLang/pkg/ast/ast_types"
 	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
 
-	"github.com/fatih/color"
 	"golang.org/x/exp/slices"
 )
 
@@ -21,14 +19,12 @@ func (p *Parser) parseExpr() (ast.Expr, error) {
 
 func (p *Parser) parsePrimaryExpr() ast.Expr {
 	tk := p.at().Type
-	errorMsg := ""
 
 	switch tk {
 	case token_type.BooleanLiteral:
 		b, err := strconv.ParseBool(p.subtract().Value)
 		if err != nil {
-			errorMsg = err.Error()
-			break
+			p.parseError(err.Error())
 		}
 		return ast.BooleanLiteral{Kind: ast_types.BooleanLiteral, Value: b}
 	case token_type.Null:
@@ -44,8 +40,7 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 		n, err := strconv.ParseFloat(currToken.Value, 64)
 
 		if err != nil {
-			errorMsg = err.Error()
-			break
+			p.parseError(err.Error())
 		}
 
 		return ast.NumericLiteral{Kind: ast_types.NumericLiteral, Value: n}
@@ -57,23 +52,44 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 			Kind:  ast_types.StringLiteral,
 			Value: value,
 		}
+	case token_type.LeftBracket:
+		p.subtract() // advance post open bracket
+
+		elements := []ast.Expr{}
+
+		for p.notEOF() && p.at().Type != token_type.RightBracket {
+			val, err := p.parseExpr()
+
+			if err != nil {
+				p.parseError(err.Error())
+			}
+
+			if p.at().Type != token_type.RightBracket {
+				p.expect(token_type.Comma, compilerErrors.ErrSyntaxExpectedComma)
+			}
+
+			elements = append(elements, val)
+		}
+
+		p.expect(token_type.RightBracket, compilerErrors.ErrSyntaxExpectedRightBracket)
+		return ast.ArrayLiteral{
+			Kind:     ast_types.ArrayLiteral,
+			Elements: elements,
+		}
 	case token_type.LeftParen:
 		p.subtract() // consume '('
 		value, err := p.parseExpr()
 
 		if err != nil {
-			errorMsg = err.Error()
-			break
+			p.parseError(err.Error())
 		}
 
 		p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
 		return value
 	default:
-		errorMsg = "Expected an expression " + p.at().Value
+		p.parseError("Expected an expression " + p.at().Value)
 	}
 
-	color.Red("Something went wrong with parsing: " + errorMsg)
-	os.Exit(0)
 	return nil
 }
 
@@ -365,38 +381,8 @@ func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 	}, nil
 }
 
-func (p *Parser) parseArrayExpr() (ast.Expr, error) {
-	if p.at().Type != token_type.LeftBracket {
-		return p.parseObjectExpr()
-	}
-
-	p.subtract() // advance post open bracket
-
-	elements := []ast.Expr{}
-
-	for p.notEOF() && p.at().Type != token_type.RightBracket {
-		val, err := p.parseExpr()
-
-		if err != nil {
-			return nil, err
-		}
-
-		if p.at().Type != token_type.RightBracket {
-			p.expect(token_type.Comma, compilerErrors.ErrSyntaxExpectedComma)
-		}
-
-		elements = append(elements, val)
-	}
-
-	p.expect(token_type.RightBracket, compilerErrors.ErrSyntaxExpectedRightBracket)
-	return ast.ArrayLiteral{
-		Kind:     ast_types.ArrayLiteral,
-		Elements: elements,
-	}, nil
-}
-
 func (p *Parser) parseComparisonExpr() (ast.Expr, error) {
-	left, err := p.parseArrayExpr()
+	left, err := p.parseObjectExpr()
 
 	if err != nil {
 		return nil, err

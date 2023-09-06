@@ -169,6 +169,11 @@ func (p *Parser) parseArgsList() (any, error) {
 	return args, nil
 }
 
+func (p *Parser) parseError(errorMsg string) {
+	color.Red("Something went wrong with parsing: " + errorMsg)
+	os.Exit(0)
+}
+
 func (p *Parser) parseBlockBodyStmt() ([]ast.Stmt, error) {
 	var body []ast.Stmt
 
