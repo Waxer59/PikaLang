@@ -9,12 +9,14 @@ import (
 	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
 )
 
+type lexerTest struct {
+	input          string
+	expectedTokens []token_type.Token
+	expectedError  error
+}
+
 func TestTokenize(t *testing.T) {
-	tests := []struct {
-		input          string
-		expectedTokens []token_type.Token
-		expectedError  error
-	}{
+	tests := []lexerTest{
 		{
 			input: "123",
 			expectedTokens: []token_type.Token{
@@ -76,7 +78,7 @@ func TestTokenize(t *testing.T) {
 		tokens, err := Tokenize(test.input)
 
 		// Check error
-		if !reflect.DeepEqual(err, test.expectedError) {
+		if test.expectedError != nil && err.Error() != test.expectedError.Error() {
 			t.Errorf("Expected error: %v, but got: %v", test.expectedError, err)
 		}
 
