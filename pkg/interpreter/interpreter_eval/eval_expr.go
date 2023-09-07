@@ -27,13 +27,23 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 		args[idx] = eval
 	}
 
-	fn, err := Evaluate(expr.Caller, env)
-	fnName := expr.GetFnName()
+	fnName, err := GetFunctionName(expr, env)
+
+	if err != nil {
+		return nil, err
+	}
+
 	nativeFn, isNativeFn := interpreter_utils.IsNativeFunction(fnName)
 
-	if err != nil && isNativeFn {
+	if isNativeFn {
 		result := nativeFn(args, env)
 		return result, nil
+	}
+
+	fn, err := Evaluate(expr.Caller, env)
+
+	if err != nil {
+		return nil, err
 	}
 
 	function := fn.(interpreter_env.FunctionVal)

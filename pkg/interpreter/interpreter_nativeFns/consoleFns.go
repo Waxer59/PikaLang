@@ -53,18 +53,7 @@ func printPrimitive(val interpreter_env.RuntimeValue) {
 	case interpreter_env.String:
 		fmt.Print("\"" + val.GetValue().(string) + "\"")
 	case interpreter_env.Function, interpreter_env.ArrowFunction:
-		fn, _ := val.GetValue().(interpreter_env.FunctionVal)
-		if fn.Name != nil {
-			fmt.Print("fn " + *fn.Name + " ")
-		}
-		fmt.Print("(")
-		for idx, arg := range fn.Params {
-			fmt.Println(arg.Symbol)
-			if idx != len(fn.Params)-1 {
-				fmt.Print(", ")
-			}
-		}
-		fmt.Print(") { ... }")
+		fmt.Print("Function")
 	default:
 		fmt.Print(val.GetValue())
 	}
