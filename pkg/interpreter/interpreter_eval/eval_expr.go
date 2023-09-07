@@ -8,6 +8,7 @@ import (
 	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
 	"github.com/Waxer59/PikaLang/pkg/ast"
 	"github.com/Waxer59/PikaLang/pkg/ast/ast_types"
+
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_utils"
