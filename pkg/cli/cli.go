@@ -13,7 +13,7 @@ func New() error {
 	app := &cli.App{
 		Name:    "pika",
 		Usage:   "A simple pika compiler",
-		Version: "0.5.1",
+		Version: "0.5.2",
 	}
 
 	setUp(app)
