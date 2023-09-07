@@ -75,7 +75,6 @@ func (p *Parser) parseConditionalArg() (ast.Expr, error) {
 }
 
 func (p *Parser) parseFunctionArgs() ([]ast.Identifier, error) {
-
 	p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
 
 	args := []ast.Identifier{}
