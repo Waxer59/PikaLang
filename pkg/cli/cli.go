@@ -16,6 +16,8 @@ func New() error {
 		Version: "0.5.1",
 	}
 
+	setUp(app)
+
 	if err := app.Run(os.Args); err != nil {
 		log.Fatal(err)
 		return err
