@@ -335,7 +335,18 @@ func (p *Parser) parseObjectExpr() (ast.Expr, error) {
 	properties := []ast.Property{}
 
 	for p.notEOF() && p.at().Type != token_type.RightBrace {
-		key := p.expect(token_type.Identifier, compilerErrors.ErrSyntaxExpectedKey).Value
+
+		var key string
+		if p.at().Type == token_type.DoubleQoute {
+			p.subtract()
+			key = p.subtract().Value
+		} else {
+			key = p.expect(token_type.Identifier, compilerErrors.ErrSyntaxExpectedKey).Value
+		}
+
+		if p.at().Type == token_type.DoubleQoute {
+			p.subtract()
+		}
 
 		// Allows shorthand syntax: { key, } && { key }
 		switch p.at().Type {
