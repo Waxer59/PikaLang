@@ -528,13 +528,19 @@ func (p *Parser) parseArrowFunctionExpr() (ast.Expr, error) {
 		return p.parseTernaryExpr()
 	}
 
+	tokensCopy := p.tokens
 	params, err := p.parseFunctionArgs()
 
 	if err != nil {
 		return nil, err
 	}
 
-	p.expect(token_type.Arrow, compilerErrors.ErrSyntaxExpectedArrow)
+	if p.at().Type != token_type.Arrow { // Rollback
+		p.tokens = tokensCopy
+		return p.parseTernaryExpr()
+	}
+
+	p.subtract() // consume '=>'
 
 	if err != nil {
 		return nil, err
