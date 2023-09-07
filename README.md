@@ -106,7 +106,7 @@ USAGE:
    pika [global options] command [command options] [arguments...]
 
 VERSION:
-   0.5.0
+   <latest-version>
 
 COMMANDS:
    run   Run a file
@@ -120,7 +120,7 @@ GLOBAL OPTIONS:
 With go installed on your computer, run the following command to install the PikaLang CLI
 
 ```bash
-go install github.com/Waxer59/PikaLang/cmd@latest
+go install github.com/Waxer59/PikaLang/cmd/pika@latest
 ```
 
 ## Syntax
