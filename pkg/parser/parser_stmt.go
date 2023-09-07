@@ -9,7 +9,7 @@ import (
 	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
 )
 
-func (p *Parser) parseStmt() (ast.Stmt, error) {
+func (p *Parser) ParseStmt() (ast.Stmt, error) {
 	switch p.at().Type {
 	case token_type.Const, token_type.Var:
 		return p.parseVarConstDeclaration()

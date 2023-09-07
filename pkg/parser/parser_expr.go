@@ -2,12 +2,14 @@ package parser
 
 import (
 	"errors"
+	"os"
 	"strconv"
 
 	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
 	"github.com/Waxer59/PikaLang/pkg/ast"
 	"github.com/Waxer59/PikaLang/pkg/ast/ast_types"
 	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
+	"github.com/fatih/color"
 
 	"golang.org/x/exp/slices"
 )
@@ -17,33 +19,35 @@ func (p *Parser) parseExpr() (ast.Expr, error) {
 	return expr, err
 }
 
-func (p *Parser) parsePrimaryExpr() ast.Expr {
+func (p *Parser) parsePrimaryExpr() (ast.Expr, error) {
 	tk := p.at().Type
 
 	switch tk {
 	case token_type.BooleanLiteral:
 		b, err := strconv.ParseBool(p.subtract().Value)
+
 		if err != nil {
-			p.parseError(err.Error())
+			return nil, err
 		}
-		return ast.BooleanLiteral{Kind: ast_types.BooleanLiteral, Value: b}
+
+		return ast.BooleanLiteral{Kind: ast_types.BooleanLiteral, Value: b}, nil
 	case token_type.Null:
 		p.subtract() // consume 'null'
-		return ast.NullLiteral{Kind: ast_types.NullLiteral, Value: nil}
+		return ast.NullLiteral{Kind: ast_types.NullLiteral, Value: nil}, nil
 	case token_type.NaN:
 		p.subtract() // consume 'NaN'
-		return ast.NaNLiteral{Kind: ast_types.NaNLiteral, Value: nil}
+		return ast.NaNLiteral{Kind: ast_types.NaNLiteral, Value: nil}, nil
 	case token_type.Identifier:
-		return ast.Identifier{Kind: ast_types.Identifier, Symbol: p.subtract().Value}
+		return ast.Identifier{Kind: ast_types.Identifier, Symbol: p.subtract().Value}, nil
 	case token_type.Number:
 		currToken := p.subtract()
 		n, err := strconv.ParseFloat(currToken.Value, 64)
 
 		if err != nil {
-			p.parseError(err.Error())
+			return nil, err
 		}
 
-		return ast.NumericLiteral{Kind: ast_types.NumericLiteral, Value: n}
+		return ast.NumericLiteral{Kind: ast_types.NumericLiteral, Value: n}, nil
 	case token_type.DoubleQoute:
 		p.subtract() // consume '"'
 		value := p.subtract().Value
@@ -51,7 +55,7 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 		return ast.StringLiteral{
 			Kind:  ast_types.StringLiteral,
 			Value: value,
-		}
+		}, nil
 	case token_type.LeftBracket:
 		p.subtract() // advance post open bracket
 
@@ -61,7 +65,7 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 			val, err := p.parseExpr()
 
 			if err != nil {
-				p.parseError(err.Error())
+				return nil, err
 			}
 
 			if p.at().Type != token_type.RightBracket {
@@ -75,26 +79,30 @@ func (p *Parser) parsePrimaryExpr() ast.Expr {
 		return ast.ArrayLiteral{
 			Kind:     ast_types.ArrayLiteral,
 			Elements: elements,
-		}
+		}, nil
 	case token_type.LeftParen:
 		p.subtract() // consume '('
 		value, err := p.parseExpr()
 
 		if err != nil {
-			p.parseError(err.Error())
+			return nil, err
 		}
 
 		p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
-		return value
+		return value, nil
 	default:
-		p.parseError("Expected an expression " + p.at().Value)
+		color.Red("Unexpected token: %s", p.at().Value)
+		os.Exit(0)
+		return nil, errors.New(compilerErrors.ErrParsingError)
 	}
-
-	return nil
 }
 
 func (p *Parser) parseMemberExpr() (ast.Expr, error) {
-	obj := p.parsePrimaryExpr()
+	obj, err := p.parsePrimaryExpr()
+
+	if err != nil {
+		return nil, err
+	}
 
 	for p.at().Type == token_type.Dot || p.at().Type == token_type.LeftBracket {
 		operator := p.subtract()
@@ -104,7 +112,11 @@ func (p *Parser) parseMemberExpr() (ast.Expr, error) {
 		switch operator.Type {
 		case token_type.Dot:
 			computed = false
-			property = p.parsePrimaryExpr()
+			property, err = p.parsePrimaryExpr()
+
+			if err != nil {
+				return nil, err
+			}
 
 			if property.GetKind() != ast_types.Identifier {
 				return nil, errors.New(compilerErrors.ErrFuncExpectedIdentifer)
@@ -175,7 +187,12 @@ func (p *Parser) parseMultiplicativeExpr() (ast.Expr, error) {
 
 func (p *Parser) parseSufixUpdateExpr() (ast.Expr, error) {
 	if p.at().Type == token_type.Identifier && p.atNext().Value == "++" || p.atNext().Value == "--" {
-		argument := p.parsePrimaryExpr()
+		argument, err := p.parsePrimaryExpr()
+
+		if err != nil {
+			return nil, err
+		}
+
 		ident, ok := argument.(ast.Identifier)
 
 		if !ok {
@@ -198,7 +215,12 @@ func (p *Parser) parseSufixUpdateExpr() (ast.Expr, error) {
 func (p *Parser) parsePrefixUpdateExpr() (ast.Expr, error) {
 	if p.at().Value == "++" || p.at().Value == "--" {
 		op := p.subtract().Value // consume '++' or '--'
-		argument := p.parsePrimaryExpr()
+		argument, err := p.parsePrimaryExpr()
+
+		if err != nil {
+			return nil, err
+		}
+
 		ident, ok := argument.(ast.Identifier)
 		if !ok {
 			return nil, errors.New(compilerErrors.ErrSyntaxExpectedIdentifier)

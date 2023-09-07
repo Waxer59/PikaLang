@@ -29,7 +29,7 @@ func (p *Parser) ProduceAST(input string) (*ast.Program, error) {
 	}
 
 	for p.notEOF() {
-		stmt, err := p.parseStmt()
+		stmt, err := p.ParseStmt()
 		if err != nil {
 			return nil, err
 		}
@@ -37,4 +37,8 @@ func (p *Parser) ProduceAST(input string) (*ast.Program, error) {
 	}
 
 	return &program, nil
+}
+
+func (p *Parser) SetTokens(tokens []token_type.Token) {
+	p.tokens = tokens
 }

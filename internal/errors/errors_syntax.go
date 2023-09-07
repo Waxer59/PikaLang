@@ -28,4 +28,5 @@ const (
 	ErrSyntaxInvalidUpdateExpr            = "ERROR: Invalid update expression"
 	ErrSyntaxExpectedArrow                = "ERROR: Expected '=>'"
 	ErrSyntaxConditionCantBeEmpty         = "ERROR: Condition cannot be empty"
+	ErrParsingError                       = "ERROR: Parsing error"
 )

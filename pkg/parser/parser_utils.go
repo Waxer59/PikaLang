@@ -165,18 +165,13 @@ func (p *Parser) parseArgsList() (any, error) {
 	return args, nil
 }
 
-func (p *Parser) parseError(errorMsg string) {
-	color.Red("Something went wrong with parsing: " + errorMsg)
-	os.Exit(0)
-}
-
 func (p *Parser) parseBlockBodyStmt() ([]ast.Stmt, error) {
 	var body []ast.Stmt
 
 	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
 
 	for p.at().Type != token_type.RightBrace && p.notEOF() {
-		stmt, err := p.parseStmt()
+		stmt, err := p.ParseStmt()
 		if err != nil {
 			return nil, err
 		}
@@ -192,7 +187,7 @@ func (p *Parser) parseSwitchBodyStmt() ([]ast.Stmt, error) {
 	var body []ast.Stmt
 
 	for p.at().Type != token_type.RightBrace && p.at().Type != token_type.Case && p.at().Type != token_type.Default && p.notEOF() {
-		stmt, err := p.parseStmt()
+		stmt, err := p.ParseStmt()
 		if err != nil {
 			return nil, err
 		}
