@@ -1,9 +1,10 @@
 package interpreter_nativeFns
 
 import (
-	"pika/pkg/interpreter/interpreter_env"
-	"pika/pkg/interpreter/interpreter_makers"
 	"strings"
+
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
 )
 
 var StringFns = map[string]NativeFunction{
@@ -68,6 +69,19 @@ var StringFns = map[string]NativeFunction{
 			runes[i], runes[j] = runes[j], runes[i]
 		}
 		result := string(runes)
+		return interpreter_makers.MK_String(result)
+	},
+	"concat": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
+		if len(args) < 1 {
+			return interpreter_makers.MK_String("")
+		}
+		result := ""
+		for _, arg := range args {
+			if arg.GetType() != interpreter_env.String {
+				return interpreter_makers.MK_String("")
+			}
+			result += arg.GetValue().(string)
+		}
 		return interpreter_makers.MK_String(result)
 	},
 }

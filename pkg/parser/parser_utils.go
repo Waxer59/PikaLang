@@ -3,9 +3,10 @@ package parser
 import (
 	"errors"
 	"os"
-	compilerErrors "pika/internal/errors"
-	"pika/pkg/ast"
-	"pika/pkg/lexer/token_type"
+
+	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
+	"github.com/Waxer59/PikaLang/pkg/ast"
+	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
 
 	"github.com/fatih/color"
 )
@@ -46,22 +47,14 @@ func (p *Parser) notEOF() bool {
 	return p.at().Type != token_type.EOF
 }
 
-func (p *Parser) parseArgs(argType token_type.TokenType) ([]ast.Expr, error) {
-
-	switch argType {
-	case token_type.Fn, token_type.Case:
-		return p.parseMultipleArgs(argType)
-	case token_type.If, token_type.Switch:
-		return p.parseSingleArg()
-	}
-
-	return nil, errors.New(compilerErrors.ErrSyntaxStatementNotFound)
-}
-
-func (p *Parser) parseSingleArg() ([]ast.Expr, error) {
+func (p *Parser) parseConditionalArg() (ast.Expr, error) {
 
 	if p.at().Type == token_type.LeftParen { // Optional parens
 		p.subtract() // Remove the opening paren
+	}
+
+	if p.at().Type == token_type.RightParen || p.at().Type == token_type.LeftBrace {
+		return nil, errors.New(compilerErrors.ErrSyntaxConditionCantBeEmpty)
 	}
 
 	condition, err := p.parseExpr()
@@ -78,53 +71,103 @@ func (p *Parser) parseSingleArg() ([]ast.Expr, error) {
 		p.subtract() // Remove the closing paren
 	}
 
-	return []ast.Expr{condition}, nil
+	return condition, nil
 }
 
-func (p *Parser) parseMultipleArgs(argType token_type.TokenType) ([]ast.Expr, error) {
+func (p *Parser) parseFunctionArgs() ([]ast.Identifier, error) {
 
-	if argType == token_type.Fn {
-		p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
+	p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
+
+	args := []ast.Identifier{}
+
+	if p.at().Type == token_type.RightParen {
+		p.subtract() // Remove the closing paren
+		return args, nil
 	}
 
-	if argType == token_type.Case && p.at().Type == token_type.Colon {
-		return nil, errors.New(compilerErrors.ErrSyntaxCaseCannotBeEmpty)
-	}
+	for {
+		assigmentExpr, err := p.parseExpr()
+		identifier, ok := assigmentExpr.(ast.Identifier)
 
-	args := []ast.Expr{}
-
-	if p.at().Type != token_type.RightParen {
-		var err error
-		args, err = p.parseArgsList()
-
-		if err != nil {
+		if err != nil || !ok {
 			return nil, err
 		}
+		args = append(args, identifier)
+
+		if p.at().Type != token_type.Comma {
+			break
+		}
+
+		p.subtract() // consume ','
 	}
 
-	if argType == token_type.Fn {
-		p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
-	}
+	p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
 
 	return args, nil
 }
 
-func (p *Parser) parseArgsList() ([]ast.Expr, error) {
-	assigmentExpr, err := p.parseAssigmentExpr()
-	if err != nil {
+func (p *Parser) parseCallExprArgs() ([]ast.Expr, error) {
+	p.expect(token_type.LeftParen, compilerErrors.ErrSyntaxExpectedLeftParen)
+
+	if p.at().Type == token_type.RightParen {
+		p.subtract() // Remove the closing paren
+		return []ast.Expr{}, nil
+	}
+
+	argsList, err := p.parseArgsList()
+
+	args, ok := argsList.([]ast.Expr)
+
+	if err != nil || !ok {
 		return nil, err
 	}
-	args := []ast.Expr{assigmentExpr}
 
-	for p.at().Type == token_type.Comma && p.subtract().Type == token_type.Comma {
-		assigmentExpr, err := p.parseAssigmentExpr()
+	p.expect(token_type.RightParen, compilerErrors.ErrSyntaxExpectedRightParen)
+
+	return args, nil
+}
+
+func (p *Parser) parseSwitchCaseArgs() ([]ast.Expr, error) {
+	if p.at().Type == token_type.Colon {
+		return nil, errors.New(compilerErrors.ErrSyntaxCaseCannotBeEmpty)
+	}
+
+	argsList, err := p.parseArgsList()
+
+	args, ok := argsList.([]ast.Expr)
+
+	if err != nil || !ok {
+		return nil, err
+	}
+
+	p.expect(token_type.Colon, compilerErrors.ErrSyntaxExpectedColon)
+
+	return args, nil
+}
+
+func (p *Parser) parseArgsList() (any, error) {
+	args := []ast.Expr{}
+
+	for {
+		assigmentExpr, err := p.parseExpr()
 		if err != nil {
 			return nil, err
 		}
 		args = append(args, assigmentExpr)
+
+		if p.at().Type != token_type.Comma {
+			break
+		}
+
+		p.subtract() // consume ','
 	}
 
 	return args, nil
+}
+
+func (p *Parser) parseError(errorMsg string) {
+	color.Red("Something went wrong with parsing: " + errorMsg)
+	os.Exit(0)
 }
 
 func (p *Parser) parseBlockBodyStmt() ([]ast.Stmt, error) {
@@ -132,7 +175,7 @@ func (p *Parser) parseBlockBodyStmt() ([]ast.Stmt, error) {
 
 	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
 
-	for p.at().Type != token_type.RightBrace && p.at().Type != token_type.EOF {
+	for p.at().Type != token_type.RightBrace && p.notEOF() {
 		stmt, err := p.parseStmt()
 		if err != nil {
 			return nil, err
@@ -148,7 +191,7 @@ func (p *Parser) parseBlockBodyStmt() ([]ast.Stmt, error) {
 func (p *Parser) parseSwitchBodyStmt() ([]ast.Stmt, error) {
 	var body []ast.Stmt
 
-	for p.at().Type != token_type.RightBrace && p.at().Type != token_type.Case && p.at().Type != token_type.Default && p.at().Type != token_type.EOF {
+	for p.at().Type != token_type.RightBrace && p.at().Type != token_type.Case && p.at().Type != token_type.Default && p.notEOF() {
 		stmt, err := p.parseStmt()
 		if err != nil {
 			return nil, err

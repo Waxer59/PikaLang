@@ -2,10 +2,11 @@ package interpreter_eval
 
 import (
 	"errors"
-	"pika/pkg/ast"
-	"pika/pkg/ast/ast_types"
-	"pika/pkg/interpreter/interpreter_env"
-	"pika/pkg/interpreter/interpreter_makers"
+
+	"github.com/Waxer59/PikaLang/pkg/ast"
+	"github.com/Waxer59/PikaLang/pkg/ast/ast_types"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
 )
 
 func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
@@ -15,8 +16,7 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 	case ast_types.Identifier:
 		return evalIdentifier(astNode.(ast.Identifier), env)
 	case ast_types.NumericLiteral:
-		value := astNode.(ast.NumericLiteral).GetValue().(float64)
-		return interpreter_makers.MK_Number(value), nil
+		return interpreter_makers.MK_Number(astNode.(ast.NumericLiteral).Value), nil
 	case ast_types.ObjectLiteral:
 		return evalObjectExpr(astNode.(ast.ObjectLiteral), env)
 	case ast_types.NullLiteral:
@@ -47,6 +47,8 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 		return evalMemberExpr(astNode.(ast.MemberExpr), env)
 	case ast_types.UpdateExpr:
 		return evalUpdateExpr(astNode.(ast.UpdateExpr), env)
+	case ast_types.ArrowFunctionExpr:
+		return evalArrowFunctionExpr(astNode.(ast.ArrowFunctionExpr), env)
 
 	// STATEMENTS
 	case ast_types.Program:

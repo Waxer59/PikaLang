@@ -16,6 +16,7 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
       - [Else Statement](#else-statement)
       - [Else If Statement:](#else-if-statement)
     - [Function Declaration](#function-declaration)
+    - [Anonymous functions](#anonymous-functions)
     - [Switch statement](#switch-statement)
       - [Multiple Cases](#multiple-cases)
       - [Logical Cases](#logical-cases)
@@ -91,6 +92,7 @@ Pika, or Pikalang, is a programming language designed to be simple, efficient an
       - [`endsWith()`](#endswith)
       - [`reverseString()`](#reversestring)
       - [`typeof()`](#typeof)
+      - [`concat()`](#concat)
 
 ## CLI
 
@@ -104,7 +106,7 @@ USAGE:
    pika [global options] command [command options] [arguments...]
 
 VERSION:
-   0.4.2
+   0.5.0
 
 COMMANDS:
    run   Run a file
@@ -239,6 +241,26 @@ fn add(x, y) {
 ```
 
 In the example above, the `add` function is called within the `main` function, and the returned value is assigned to the variable `result`. The value of `result` is then printed, resulting in the output `7`.
+
+### Anonymous functions
+
+Anonymous functions are those functions that are defined without a specific name. They are useful for situations where temporary functionality is needed without the requirement of declaring a function with a formal name.
+
+```js
+() => {
+  // ...
+}
+
+const myFn = () => {
+  // ...
+}
+
+const obj = {
+  myObjFunc: () => {
+    // ...
+  }
+}
+```
 
 ### Switch statement
 
@@ -1101,4 +1123,14 @@ Example of use:
 typeof(10) // This will return "number"
 typeof("hello") // This will return "string"
 typeof(true) // This will return "boolean"
+```
+
+#### `concat()`
+
+The `concat` function is used to concatenate varius strings.
+
+Example of use:
+
+```js
+concat("Hello", " ", "World!") // This will return "Hello World!"
 ```

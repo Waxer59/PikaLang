@@ -1,6 +1,6 @@
 package ast
 
-import "pika/pkg/ast/ast_types"
+import "github.com/Waxer59/PikaLang/pkg/ast/ast_types"
 
 type Expr interface {
 	Stmt
@@ -36,6 +36,17 @@ type CallExpr struct {
 
 func (c CallExpr) GetKind() ast_types.NodeType {
 	return c.Kind
+}
+
+func (c CallExpr) GetFnName() string {
+	switch c.Caller.(type) {
+	case Identifier:
+		return c.Caller.(Identifier).Symbol
+	case MemberExpr:
+		return c.Caller.(MemberExpr).Property.(Identifier).Symbol
+	default:
+		return ""
+	}
 }
 
 type MemberExpr struct {
@@ -100,4 +111,14 @@ type UpdateExpr struct {
 
 func (u UpdateExpr) GetKind() ast_types.NodeType {
 	return u.Kind
+}
+
+type ArrowFunctionExpr struct {
+	Kind   ast_types.NodeType
+	Params []Identifier
+	Body   []Stmt
+}
+
+func (a ArrowFunctionExpr) GetKind() ast_types.NodeType {
+	return a.Kind
 }

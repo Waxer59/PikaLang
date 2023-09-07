@@ -2,8 +2,9 @@ package lexer
 
 import (
 	"errors"
-	compilerErrors "pika/internal/errors"
-	"pika/pkg/lexer/token_type"
+
+	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
+	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
 )
 
 func Tokenize(input string) ([]token_type.Token, error) {
@@ -139,12 +140,18 @@ func Tokenize(input string) ([]token_type.Token, error) {
 				tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 			}
 		case '=':
-			if nextChar() == '=' {
+			switch nextChar() {
+			case '=':
 				substract(2) // consume '=='
 				tokens = append(tokens, token_type.Token{Type: token_type.EqualEqual, Value: "=="})
 				continue
+			case '>':
+				substract(2) // consume '=>'
+				tokens = append(tokens, token_type.Token{Type: token_type.Arrow, Value: "=>"})
+				continue
+			default:
+				tokens = append(tokens, token_type.Token{Type: token_type.Equals, Value: string(tokenChar)})
 			}
-			tokens = append(tokens, token_type.Token{Type: token_type.Equals, Value: string(tokenChar)})
 		case '!':
 			if nextChar() == '=' {
 				substract(2) // consume '!='

@@ -2,10 +2,11 @@ package interpreter_eval
 
 import (
 	"errors"
-	compilerErrors "pika/internal/errors"
-	"pika/pkg/ast"
-	"pika/pkg/interpreter/interpreter_env"
-	"pika/pkg/interpreter/interpreter_makers"
+
+	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
+	"github.com/Waxer59/PikaLang/pkg/ast"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
 
 	"golang.org/x/exp/slices"
 )
@@ -209,15 +210,13 @@ func evalFunctionDeclaration(declaration ast.FunctionDeclaration, env interprete
 
 	fn := interpreter_env.FunctionVal{
 		Type:           interpreter_env.Function,
-		Name:           declaration.Name,
+		Name:           &declaration.Name,
 		Params:         declaration.Params,
 		DeclarationEnv: &env,
 		Body:           declaration.Body,
 	}
 
-	fnName, err := env.DeclareVar(declaration.Name, fn, true)
-
-	return fnName, err
+	return env.DeclareVar(declaration.Name, fn, true)
 }
 
 func evalProgram(program ast.Program, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {

@@ -3,9 +3,10 @@ package interpreter_nativeFns
 import (
 	"math"
 	"math/rand"
-	"pika/pkg/interpreter/interpreter_env"
-	"pika/pkg/interpreter/interpreter_makers"
 	"time"
+
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
 )
 
 var NumberFns = map[string]NativeFunction{

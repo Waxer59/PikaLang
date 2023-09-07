@@ -1,6 +1,6 @@
 package ast
 
-import "pika/pkg/ast/ast_types"
+import "github.com/Waxer59/PikaLang/pkg/ast/ast_types"
 
 type Property struct {
 	Kind  ast_types.NodeType
@@ -19,10 +19,6 @@ type NumericLiteral struct {
 
 func (n NumericLiteral) GetKind() ast_types.NodeType {
 	return n.Kind
-}
-
-func (n NumericLiteral) GetValue() any {
-	return n.Value
 }
 
 type ObjectLiteral struct {

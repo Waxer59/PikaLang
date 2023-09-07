@@ -2,7 +2,8 @@ package interpreter_env
 
 import (
 	"errors"
-	compilerErrors "pika/internal/errors"
+
+	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
 )
 
 type Environment struct {

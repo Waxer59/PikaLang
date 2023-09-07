@@ -1,9 +1,9 @@
 package interpreter_eval
 
 import (
-	"pika/pkg/ast"
-	"pika/pkg/interpreter/interpreter_env"
-	"pika/pkg/interpreter/interpreter_makers"
+	"github.com/Waxer59/PikaLang/pkg/ast"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
 )
 
 func EvaluateTruthyFalsyValues(val any) bool {

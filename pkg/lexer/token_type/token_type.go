@@ -37,6 +37,7 @@ const (
 	DivideEquals // /=
 	PowerEquals  // **=
 	ModuleEquals // %=
+	Arrow        // =>
 
 	// Update operators
 	Increment // ++
@@ -56,8 +57,8 @@ const (
 	DoubleQoute  // "
 	SingleQoute  // '
 	QuestionMark // ?
-	Minus
-	Plus
+	Minus        // +
+	Plus         // -
 
 	// Comparison operators
 	EqualEqual   // ==

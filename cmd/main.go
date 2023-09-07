@@ -2,7 +2,8 @@ package main
 
 import (
 	"os"
-	"pika/pkg/cli"
+
+	"github.com/Waxer59/PikaLang/pkg/cli"
 
 	"github.com/fatih/color"
 )

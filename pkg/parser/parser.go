@@ -1,10 +1,10 @@
 package parser
 
 import (
-	"pika/pkg/ast"
-	"pika/pkg/ast/ast_types"
-	"pika/pkg/lexer"
-	"pika/pkg/lexer/token_type"
+	"github.com/Waxer59/PikaLang/pkg/ast"
+	"github.com/Waxer59/PikaLang/pkg/ast/ast_types"
+	"github.com/Waxer59/PikaLang/pkg/lexer"
+	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
 )
 
 type Parser struct {

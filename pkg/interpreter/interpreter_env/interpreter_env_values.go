@@ -1,20 +1,21 @@
 package interpreter_env
 
 import (
-	"pika/pkg/ast"
+	"github.com/Waxer59/PikaLang/pkg/ast"
 )
 
 type ValueType string
 
 // Value types
 const (
-	Null     ValueType = "null"
-	Number   ValueType = "number"
-	String   ValueType = "string"
-	Boolean  ValueType = "boolean"
-	Object   ValueType = "object"
-	Function ValueType = "function"
-	Array    ValueType = "array"
+	Null          ValueType = "null"
+	Number        ValueType = "number"
+	String        ValueType = "string"
+	Boolean       ValueType = "boolean"
+	Object        ValueType = "object"
+	Function      ValueType = "function"
+	ArrowFunction ValueType = "arrow_function"
+	Array         ValueType = "array"
 )
 
 type RuntimeValue interface {
@@ -78,8 +79,8 @@ type FunctionCall = func(args []RuntimeValue, env Environment) RuntimeValue
 
 type FunctionVal struct {
 	Type           ValueType
-	Name           string
-	Params         []string
+	Name           *string
+	Params         []ast.Identifier
 	DeclarationEnv *Environment
 	Body           []ast.Stmt
 }

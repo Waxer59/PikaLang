@@ -1,9 +1,10 @@
 package lexer
 
 import (
-	"pika/pkg/lexer/token_type"
 	"strconv"
 	"strings"
+
+	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
 
 	"golang.org/x/exp/slices"
 )

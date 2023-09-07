@@ -4,12 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"math"
-	compilerErrors "pika/internal/errors"
-	"pika/pkg/ast"
-	"pika/pkg/ast/ast_types"
-	"pika/pkg/interpreter/interpreter_env"
-	"pika/pkg/interpreter/interpreter_makers"
-	"pika/pkg/interpreter/interpreter_utils"
+
+	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
+	"github.com/Waxer59/PikaLang/pkg/ast"
+	"github.com/Waxer59/PikaLang/pkg/ast/ast_types"
+
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_utils"
 
 	"golang.org/x/exp/slices"
 )
@@ -26,16 +28,12 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 	}
 
 	fn, err := Evaluate(expr.Caller, env)
-	fnName := expr.Caller.(ast.Identifier).Symbol
+	fnName := expr.GetFnName()
 	nativeFn, isNativeFn := interpreter_utils.IsNativeFunction(fnName)
 
 	if err != nil && isNativeFn {
 		result := nativeFn(args, env)
 		return result, nil
-	}
-
-	if err != nil || fn.GetType() != interpreter_env.Function {
-		return nil, errors.New(compilerErrors.ErrFuncNotFound + fnName)
 	}
 
 	function := fn.(interpreter_env.FunctionVal)
@@ -44,14 +42,14 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 	paramsNumber := len(function.Params)
 
 	if paramsNumber > len(args) {
-		return nil, errors.New(compilerErrors.ErrNotEnoughArguments)
+		return nil, errors.New(compilerErrors.ErrNotEnoughArguments + ": " + fnName)
 	} else if paramsNumber < len(args) {
-		return nil, errors.New(compilerErrors.ErrTooManyArguments)
+		return nil, errors.New(compilerErrors.ErrTooManyArguments + ": " + fnName)
 	}
 
 	// Create the variables for the function arguments
 	for idx, arg := range function.Params {
-		scope.DeclareVar(arg, args[idx], false)
+		scope.DeclareVar(arg.Symbol, args[idx], false)
 	}
 
 	// Evaluate the function body line by line
@@ -85,12 +83,12 @@ func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (inter
 		switch obj := valObj.(type) {
 		case []interpreter_env.RuntimeValue:
 			if evalProperty.GetType() != interpreter_env.Number {
-				return nil, errors.New(compilerErrors.ErrIndexNotFound)
+				return nil, errors.New(compilerErrors.ErrInvalidIndex)
 			}
 			number := evalProperty.GetValue().(float64)
 
 			if math.Mod(number, 1) != 0 { // Check if is a float number
-				return nil, errors.New(compilerErrors.ErrIndexNotFound)
+				return nil, errors.New(compilerErrors.ErrInvalidIndex)
 			}
 
 			idx := int(number)
@@ -104,7 +102,7 @@ func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (inter
 			isNegativeOutOfBounds := (idx < 0 || idx >= len(obj)) && isNegative
 
 			if isNegativeOutOfBounds {
-				return nil, errors.New(compilerErrors.ErrIndexNotFound)
+				return nil, errors.New(compilerErrors.ErrInvalidIndex)
 			}
 
 			if idx >= len(obj) {
@@ -113,6 +111,36 @@ func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (inter
 
 			val := obj[idx]
 			return val, nil
+		case string:
+			if evalProperty.GetType() != interpreter_env.Number {
+				return nil, errors.New(compilerErrors.ErrInvalidIndex)
+			}
+			number := evalProperty.GetValue().(float64)
+
+			if math.Mod(number, 1) != 0 { // Check if is a float number
+				return nil, errors.New(compilerErrors.ErrInvalidIndex)
+			}
+
+			idx := int(number)
+
+			isNegative := idx < 0
+
+			if isNegative {
+				idx = len(obj) + idx
+			}
+
+			isNegativeOutOfBounds := (idx < 0 || idx >= len(obj)) && isNegative
+
+			if isNegativeOutOfBounds {
+				return nil, errors.New(compilerErrors.ErrInvalidIndex)
+			}
+
+			if idx >= len(obj) {
+				return nil, errors.New(compilerErrors.ErrIndexNotFound)
+			}
+
+			val := obj[idx]
+			return interpreter_makers.MK_String(string(val)), nil
 		case map[string]interpreter_env.RuntimeValue:
 			valProperty := fmt.Sprint(evalProperty.GetValue())
 			if _, ok := obj[valProperty]; ok {
@@ -159,6 +187,19 @@ func evalArrayExpr(arrayExpr ast.ArrayLiteral, env interpreter_env.Environment) 
 	}
 
 	return arr, nil
+}
+
+func evalArrowFunctionExpr(funcExpr ast.ArrowFunctionExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+
+	arrowFn := interpreter_env.FunctionVal{
+		Type:           interpreter_env.ArrowFunction,
+		Name:           nil,
+		Params:         funcExpr.Params,
+		DeclarationEnv: nil,
+		Body:           funcExpr.Body,
+	}
+
+	return arrowFn, nil
 }
 
 func evalObjectExpr(objectExpr ast.ObjectLiteral, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
