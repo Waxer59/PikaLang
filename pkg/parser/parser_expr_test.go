@@ -6,19 +6,25 @@ import (
 
 	"github.com/Waxer59/PikaLang/pkg/ast"
 	"github.com/Waxer59/PikaLang/pkg/ast/ast_types"
-	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
+	"github.com/Waxer59/PikaLang/pkg/lexer"
 	"github.com/Waxer59/PikaLang/pkg/parser"
 )
 
 type ParserTest struct {
-	input        []token_type.Token
+	input        string
 	expectedExpr []ast.Expr
 	expectedErr  error
 }
 
 func testParseExpr(t *testing.T, tests []ParserTest, p *parser.Parser) {
 	for _, test := range tests {
-		p.SetTokens(test.input)
+		tokens, err := lexer.Tokenize(test.input)
+
+		if err != nil {
+			t.Errorf("Expected no error, but got: %v", err)
+		}
+
+		p.SetTokens(tokens)
 		stmt, err := p.ParseStmt()
 
 		t.Log(test)
@@ -40,12 +46,7 @@ func TestParseAssigmentExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.Identifier, Value: "a"},
-				{Type: token_type.Equals, Value: "="},
-				{Type: token_type.Number, Value: "1"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "a = 1",
 			expectedExpr: []ast.Expr{
 				ast.AssigmentExpr{
 					Kind: ast_types.AssigmentExpr,
@@ -63,14 +64,7 @@ func TestParseAssigmentExpr(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			input: []token_type.Token{
-				{Type: token_type.Identifier, Value: "a"},
-				{Type: token_type.Equals, Value: "="},
-				{Type: token_type.Number, Value: "1"},
-				{Type: token_type.Plus, Value: "+"},
-				{Type: token_type.Number, Value: "1"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "a = 1 + 1",
 			expectedExpr: []ast.Expr{
 				ast.AssigmentExpr{
 					Kind: ast_types.AssigmentExpr,
@@ -96,16 +90,7 @@ func TestParseAssigmentExpr(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			input: []token_type.Token{
-				{Type: token_type.Identifier, Value: "a"},
-				{Type: token_type.Equals, Value: "="},
-				{Type: token_type.Number, Value: "1"},
-				{Type: token_type.QuestionMark, Value: "?"},
-				{Type: token_type.Number, Value: "1"},
-				{Type: token_type.Colon, Value: ":"},
-				{Type: token_type.Number, Value: "1"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "a = 1 ? 1 : 1",
 			expectedExpr: []ast.Expr{
 				ast.AssigmentExpr{
 					Kind: ast_types.AssigmentExpr,
@@ -143,11 +128,7 @@ func TestParsePrefixUpdateExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.Decrement, Value: "++"},
-				{Type: token_type.Identifier, Value: "x"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "++x",
 			expectedExpr: []ast.Expr{
 				ast.UpdateExpr{
 					Kind:     ast_types.UpdateExpr,
@@ -159,11 +140,7 @@ func TestParsePrefixUpdateExpr(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			input: []token_type.Token{
-				{Type: token_type.Decrement, Value: "--"},
-				{Type: token_type.Identifier, Value: "y"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "--y",
 			expectedExpr: []ast.Expr{
 				ast.UpdateExpr{
 					Kind:     ast_types.UpdateExpr,
@@ -184,11 +161,7 @@ func TestParseLogicalNotExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.Bang, Value: "!"},
-				{Type: token_type.BooleanLiteral, Value: "true"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "!true",
 			expectedExpr: []ast.Expr{
 				ast.UnaryExpr{
 					Kind:     ast_types.UnaryExpr,
@@ -200,13 +173,7 @@ func TestParseLogicalNotExpr(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			input: []token_type.Token{
-				{Type: token_type.Bang, Value: "!"},
-				{Type: token_type.LeftParen, Value: "("},
-				{Type: token_type.BooleanLiteral, Value: "false"},
-				{Type: token_type.RightParen, Value: ")"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "!(false)",
 			expectedExpr: []ast.Expr{
 				ast.UnaryExpr{
 					Kind:     ast_types.UnaryExpr,
@@ -227,13 +194,7 @@ func TestParseCallExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.Identifier, Value: "func"},
-				{Type: token_type.LeftParen, Value: "("},
-				{Type: token_type.Number, Value: "42"},
-				{Type: token_type.RightParen, Value: ")"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "func(42)",
 			expectedExpr: []ast.Expr{
 				ast.CallExpr{
 					Kind:   ast_types.CallExpr,
@@ -246,15 +207,7 @@ func TestParseCallExpr(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			input: []token_type.Token{
-				{Type: token_type.Identifier, Value: "add"},
-				{Type: token_type.LeftParen, Value: "("},
-				{Type: token_type.Number, Value: "2"},
-				{Type: token_type.Comma, Value: ","},
-				{Type: token_type.Number, Value: "3"},
-				{Type: token_type.RightParen, Value: ")"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "add(2, 3)",
 			expectedExpr: []ast.Expr{
 				ast.CallExpr{
 					Kind:   ast_types.CallExpr,
@@ -277,11 +230,7 @@ func TestParseNegativeAndPositiveExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.Plus, Value: "+"},
-				{Type: token_type.Number, Value: "5"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "+5",
 			expectedExpr: []ast.Expr{
 				ast.UnaryExpr{
 					Kind:     ast_types.UnaryExpr,
@@ -293,11 +242,7 @@ func TestParseNegativeAndPositiveExpr(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			input: []token_type.Token{
-				{Type: token_type.Minus, Value: "-"},
-				{Type: token_type.Number, Value: "10"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "-10",
 			expectedExpr: []ast.Expr{
 				ast.UnaryExpr{
 					Kind:     ast_types.UnaryExpr,
@@ -318,12 +263,7 @@ func TestParseExponentialExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.Number, Value: "2"},
-				{Type: token_type.BinaryOperator, Value: "**"},
-				{Type: token_type.Number, Value: "3"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "2 ** 3",
 			expectedExpr: []ast.Expr{
 				ast.BinaryExpr{
 					Kind:     ast_types.BinaryExpr,
@@ -344,12 +284,7 @@ func TestParseAdditiveExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.Number, Value: "5"},
-				{Type: token_type.Plus, Value: "+"},
-				{Type: token_type.Number, Value: "3"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "5 + 3",
 			expectedExpr: []ast.Expr{
 				ast.BinaryExpr{
 					Kind:     ast_types.BinaryExpr,
@@ -361,12 +296,7 @@ func TestParseAdditiveExpr(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			input: []token_type.Token{
-				{Type: token_type.Number, Value: "10"},
-				{Type: token_type.Minus, Value: "-"},
-				{Type: token_type.Number, Value: "7"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "10 - 7",
 			expectedExpr: []ast.Expr{
 				ast.BinaryExpr{
 					Kind:     ast_types.BinaryExpr,
@@ -387,20 +317,7 @@ func TestParseArrowFunctionExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.LeftParen, Value: "("},
-				{Type: token_type.Identifier, Value: "x"},
-				{Type: token_type.Comma, Value: ","},
-				{Type: token_type.Identifier, Value: "y"},
-				{Type: token_type.RightParen, Value: ")"},
-				{Type: token_type.Arrow, Value: "=>"},
-				{Type: token_type.LeftBrace, Value: "{"},
-				{Type: token_type.Number, Value: "x"},
-				{Type: token_type.Plus, Value: "+"},
-				{Type: token_type.Number, Value: "y"},
-				{Type: token_type.RightBrace, Value: "}"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "(x,y)=>{x+y}",
 			expectedExpr: []ast.Expr{
 				ast.ArrowFunctionExpr{
 					Kind: ast_types.ArrowFunctionExpr,
@@ -425,20 +342,7 @@ func TestParseObjectExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.LeftBrace, Value: "{"},
-				{Type: token_type.Identifier, Value: "name"},
-				{Type: token_type.Colon, Value: ":"},
-				{Type: token_type.DoubleQoute, Value: "\""},
-				{Type: token_type.DoubleQoute, Value: "John"},
-				{Type: token_type.DoubleQoute, Value: "\""},
-				{Type: token_type.Comma, Value: ","},
-				{Type: token_type.Identifier, Value: "age"},
-				{Type: token_type.Colon, Value: ":"},
-				{Type: token_type.Number, Value: "30"},
-				{Type: token_type.RightBrace, Value: "}"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "{name: \"John\", age: 30 }",
 			expectedExpr: []ast.Expr{
 				ast.ObjectLiteral{
 					Kind: ast_types.ObjectLiteral,
@@ -468,12 +372,7 @@ func TestParseComparisonExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.Number, Value: "5"},
-				{Type: token_type.Less, Value: "<"},
-				{Type: token_type.Number, Value: "10"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "5 < 10",
 			expectedExpr: []ast.Expr{
 				ast.BinaryExpr{
 					Kind:     ast_types.BinaryExpr,
@@ -485,12 +384,7 @@ func TestParseComparisonExpr(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			input: []token_type.Token{
-				{Type: token_type.Number, Value: "20"},
-				{Type: token_type.Greater, Value: ">"},
-				{Type: token_type.Number, Value: "15"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "20 > 15",
 			expectedExpr: []ast.Expr{
 				ast.BinaryExpr{
 					Kind:     ast_types.BinaryExpr,
@@ -511,12 +405,7 @@ func TestParseEqualityExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.Number, Value: "5"},
-				{Type: token_type.Equals, Value: "=="},
-				{Type: token_type.Number, Value: "5"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "5 == 5",
 			expectedExpr: []ast.Expr{
 				ast.BinaryExpr{
 					Kind:     ast_types.BinaryExpr,
@@ -528,12 +417,7 @@ func TestParseEqualityExpr(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			input: []token_type.Token{
-				{Type: token_type.BooleanLiteral, Value: "true"},
-				{Type: token_type.NotEqual, Value: "!="},
-				{Type: token_type.BooleanLiteral, Value: "false"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "true != false",
 			expectedExpr: []ast.Expr{
 				ast.BinaryExpr{
 					Kind:     ast_types.BinaryExpr,
@@ -554,12 +438,7 @@ func TestParseLogicalAndExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.BooleanLiteral, Value: "true"},
-				{Type: token_type.And, Value: "&&"},
-				{Type: token_type.BooleanLiteral, Value: "false"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "true && false",
 			expectedExpr: []ast.Expr{
 				ast.LogicalExpr{
 					Kind:     ast_types.LogicalExpr,
@@ -571,14 +450,7 @@ func TestParseLogicalAndExpr(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			input: []token_type.Token{
-				{Type: token_type.BooleanLiteral, Value: "true"},
-				{Type: token_type.And, Value: "&&"},
-				{Type: token_type.BooleanLiteral, Value: "true"},
-				{Type: token_type.And, Value: "&&"},
-				{Type: token_type.BooleanLiteral, Value: "true"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "true && true && true",
 			expectedExpr: []ast.Expr{
 				ast.LogicalExpr{
 					Kind: ast_types.LogicalExpr,
@@ -604,12 +476,7 @@ func TestParseLogicalOrExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.BooleanLiteral, Value: "true"},
-				{Type: token_type.Or, Value: "||"},
-				{Type: token_type.BooleanLiteral, Value: "false"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "true || false",
 			expectedExpr: []ast.Expr{
 				ast.LogicalExpr{
 					Kind:     ast_types.LogicalExpr,
@@ -621,14 +488,7 @@ func TestParseLogicalOrExpr(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			input: []token_type.Token{
-				{Type: token_type.BooleanLiteral, Value: "true"},
-				{Type: token_type.Or, Value: "||"},
-				{Type: token_type.BooleanLiteral, Value: "true"},
-				{Type: token_type.Or, Value: "||"},
-				{Type: token_type.BooleanLiteral, Value: "false"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "true || true || false",
 			expectedExpr: []ast.Expr{
 				ast.LogicalExpr{
 					Kind: ast_types.LogicalExpr,
@@ -654,14 +514,7 @@ func TestParseTernaryExpr(t *testing.T) {
 
 	tests := []ParserTest{
 		{
-			input: []token_type.Token{
-				{Type: token_type.BooleanLiteral, Value: "true"},
-				{Type: token_type.QuestionMark, Value: "?"},
-				{Type: token_type.Number, Value: "10"},
-				{Type: token_type.Colon, Value: ":"},
-				{Type: token_type.Number, Value: "5"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "true ? 10 : 5",
 			expectedExpr: []ast.Expr{
 				ast.ConditionalExpr{
 					Kind:       ast_types.ConditionalExpr,
@@ -673,18 +526,7 @@ func TestParseTernaryExpr(t *testing.T) {
 			expectedErr: nil,
 		},
 		{
-			input: []token_type.Token{
-				{Type: token_type.Number, Value: "5"},
-				{Type: token_type.QuestionMark, Value: "?"},
-				{Type: token_type.Identifier, Value: "x"},
-				{Type: token_type.Colon, Value: ":"},
-				{Type: token_type.Identifier, Value: "y"},
-				{Type: token_type.QuestionMark, Value: "?"},
-				{Type: token_type.Number, Value: "10"},
-				{Type: token_type.Colon, Value: ":"},
-				{Type: token_type.Number, Value: "20"},
-				{Type: token_type.EOF, Value: "EndOfFile"},
-			},
+			input: "5 ? x : y ? 10 : 20",
 			expectedExpr: []ast.Expr{
 				ast.ConditionalExpr{
 					Kind:      ast_types.ConditionalExpr,
