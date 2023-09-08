@@ -326,7 +326,18 @@ func TestParseArrowFunctionExpr(t *testing.T) {
 						{Kind: ast_types.Identifier, Symbol: "y"},
 					},
 					Body: []ast.Stmt{
-						nil, nil,
+						ast.BinaryExpr{
+							Kind: ast_types.BinaryExpr,
+							Left: ast.Identifier{
+								Kind:   ast_types.Identifier,
+								Symbol: "x",
+							},
+							Right: ast.Identifier{
+								Kind:   ast_types.Identifier,
+								Symbol: "y",
+							},
+							Operator: "+",
+						},
 					},
 				},
 			},
