@@ -189,8 +189,6 @@ func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
 				return nil, err
 			}
 
-			p.expect(token_type.Colon, compilerErrors.ErrSyntaxExpectedColon)
-
 			body, err := p.parseSwitchBodyStmt()
 
 			if err != nil {
