@@ -726,7 +726,7 @@ The less than or equal to operator compares two values and returns true if the v
 
 ### Data structures
 
-Data structures are fundamental tools used in computer science and programming to organize and manipulate data efficiently. They provide a way to store and manage data in a structured format, enabling operations such as insertion, devarion, searching, and sorting. There are various types of data structures, each with its own characteristics and uses.
+Data structures are fundamental tools used in computer science and programming to organize and manipulate data efficiently. They provide a way to store and manage data in a structured format, enabling operations such as insertion, deletion, searching, and sorting. There are various types of data structures, each with its own characteristics and uses.
 
 #### arrays
 
@@ -843,7 +843,7 @@ Primitive data types refer to basic or fundamental types of data that are built-
 
 #### string
 
-A string is a data type used to represent a sequence of characters. It can include varters, numbers, symbols, and whitespace. In most programming languages, strings are typically enclosed within single quotes ('') or double quotes (""). For example:
+A string is a data type used to represent a sequence of characters. It can include letters, numbers, symbols, and whitespace. In most programming languages, strings are typically enclosed within single quotes ('') or double quotes (""). For example:
 
 ```js
 "This is a string"
@@ -1069,7 +1069,7 @@ toLowerCase("WORLD") // This will return "world"
 
 #### `capitalize()`
 
-The `capitalize` function is used to capitalize the first varter of a string.
+The `capitalize` function is used to capitalize the first letters of a string.
 
 Example of use:
 
