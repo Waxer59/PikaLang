@@ -156,7 +156,7 @@ This form encloses the code block within curly braces immediately after the cond
 Example:
 ``` js
 if (x > 5) {
-    print("x is greater than 5");
+    print("x is greater than 5")
 }
 ```
 
@@ -166,7 +166,7 @@ This form omits the parentheses around the condition and directly includes the c
 Example:
 ```js
 if x > 5 {
-    print("x is greater than 5");
+    print("x is greater than 5")
 }
 ```
 
@@ -176,9 +176,9 @@ The 'else' statement follows an 'if' statement and is used to specify a block of
 Example:
 ```js
 if (x > 5) {
-    print("x is greater than 5");
+    print("x is greater than 5")
 } else {
-    print("x is not greater than 5");
+    print("x is not greater than 5")
 }
 ```
 
@@ -191,9 +191,9 @@ This form encloses the code block within curly braces immediately after the cond
 Example:
 ```js
 if (x > 5) {
-    print("x is greater than 5");
+    print("x is greater than 5")
 } else if (x < 5) {
-    print("x is less than 5");
+    print("x is less than 5")
 }
 ```
 
@@ -203,9 +203,9 @@ This form omits the parentheses around the condition and directly includes the c
 Example:
 ```js
 if (x > 5) {
-    print("x is greater than 5");
+    print("x is greater than 5")
 } else if x < 5 {
-    print("x is less than 5");
+    print("x is less than 5")
 }
 ```
 
@@ -219,7 +219,7 @@ Example:
 
 ```rs
 fn add(x, y) {
-  return x + y;
+  return x + y
 }
 ```
 
@@ -231,12 +231,12 @@ Example usage:
 
 ```rs
 fn main() {
-  var result = add(3, 4);
-  print(result); // Output: 7
+  var result = add(3, 4)
+  print(result) // Output: 7
 }
 
 fn add(x, y) {
-  return x + y;
+  return x + y
 }
 ```
 
@@ -340,7 +340,7 @@ This is a multi-line comment.
 It can span multiple lines.
 */
 
-var x = 10;
+var x = 10
 ```
 
 > Remember that comments are for humans reading the code, so write clear and concise comments that enhance code readability and maintainability.
@@ -726,7 +726,7 @@ The less than or equal to operator compares two values and returns true if the v
 
 ### Data structures
 
-Data structures are fundamental tools used in computer science and programming to organize and manipulate data efficiently. They provide a way to store and manage data in a structured format, enabling operations such as insertion, deletion, searching, and sorting. There are various types of data structures, each with its own characteristics and uses.
+Data structures are fundamental tools used in computer science and programming to organize and manipulate data efficiently. They provide a way to store and manage data in a structured format, enabling operations such as insertion, devarion, searching, and sorting. There are various types of data structures, each with its own characteristics and uses.
 
 #### arrays
 
@@ -739,8 +739,8 @@ In Pikalang, arrays can be declared using square brackets `[]` and the desired l
 Example of array declaration:
 
 ```rs
-let numbers = [1, 2, 3, 4, 5];
-let fruits = ["apple", "banana", "orange"];
+var numbers = [1, 2, 3, 4, 5]
+var fruits = ["apple", "banana", "orange"]
 ```
 
 In the example above, we declared an array named `numbers` with five elements and an array named `fruits` with three elements.
@@ -764,12 +764,12 @@ You can access individual elements in an array by specifying their index within 
 Example of accessing array elements:
 
 ```rs
-let numbers = [1, 2, 3, 4, 5];
-print(numbers[0]); // Output: 1
-print(numbers[2]); // Output: 3
+var numbers = [1, 2, 3, 4, 5]
+print(numbers[0]) // Output: 1
+print(numbers[2]) // Output: 3
 
-let fruits = ["apple", "banana", "orange"];
-print(fruits[1]); // Output: banana
+var fruits = ["apple", "banana", "orange"]
+print(fruits[1]) // Output: banana
 ```
 
 In the example above, we accessed the first element of the `numbers` array (`numbers[0]`) and the second element of the `fruits` array (`fruits[1]`).
@@ -781,9 +781,9 @@ You can modify the value of an element in an array by assigning a new value to a
 Example of modifying array elements:
 
 ```rs
-let numbers = [1, 2, 3, 4, 5];
-numbers[2] = 10;
-print(numbers); // Output: [1, 2, 10, 4, 5]
+var numbers = [1, 2, 3, 4, 5]
+numbers[2] = 10
+print(numbers) // Output: [1, 2, 10, 4, 5]
 ```
 
 In the example above, we modified the value of the third element in the `numbers` array from 3 to 10.
@@ -795,9 +795,9 @@ The length of an array is the number of elements it contains. In Pikalang, you c
 Example of getting the array length:
 
 ```rs
-let numbers = [1, 2, 3, 4, 5];
-let length = len(numbers);
-print(length); // Output: 5
+var numbers = [1, 2, 3, 4, 5]
+var length = len(numbers)
+print(length) // Output: 5
 ```
 
 In the example above, we used the `len()` function to get the length of the `numbers` array, which is 5.
@@ -826,15 +826,15 @@ The properties in an object can be any valid string, and the values can be of an
 To access the properties of an object, you can use dot notation `object.property` or bracket notation `object['property']`. Here's an example:
 
 ```js
-print(object.property1); // Access a property using dot notation
-print(object['property2']); // Access a property using bracket notation
+print(object.property1) // Access a property using dot notation
+print(object['property2']) // Access a property using bracket notation
 ```
 
 You can also modify or add properties to an object at any time:
 
 ```js
-object.property1 = newValue; // Modify the value of an existing property
-object.newProperty = newValue; // Add a new property to the object
+object.property1 = newValue // Modify the value of an existing property
+object.newProperty = newValue // Add a new property to the object
 ```
 
 ### Primitive data types
@@ -843,7 +843,7 @@ Primitive data types refer to basic or fundamental types of data that are built-
 
 #### string
 
-A string is a data type used to represent a sequence of characters. It can include letters, numbers, symbols, and whitespace. In most programming languages, strings are typically enclosed within single quotes ('') or double quotes (""). For example:
+A string is a data type used to represent a sequence of characters. It can include varters, numbers, symbols, and whitespace. In most programming languages, strings are typically enclosed within single quotes ('') or double quotes (""). For example:
 
 ```js
 "This is a string"
@@ -1069,7 +1069,7 @@ toLowerCase("WORLD") // This will return "world"
 
 #### `capitalize()`
 
-The `capitalize` function is used to capitalize the first letter of a string.
+The `capitalize` function is used to capitalize the first varter of a string.
 
 Example of use:
 
