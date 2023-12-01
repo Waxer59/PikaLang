@@ -1069,7 +1069,7 @@ toLowerCase("WORLD") // This will return "world"
 
 #### `capitalize()`
 
-The `capitalize` function is used to capitalize the first letters of a string.
+The `capitalize` function is used to capitalize the first letter of a string.
 
 Example of use:
 
