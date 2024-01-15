@@ -11,14 +11,14 @@ import (
 var ParseFns = map[string]NativeFunction{
 	"string": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
 		if len(args) < 1 {
-			return interpreter_makers.MK_String("")
+			return interpreter_makers.MkString("")
 		}
 
 		switch args[0].GetType() {
 		case interpreter_env.Null:
-			return interpreter_makers.MK_String("null")
+			return interpreter_makers.MkString("null")
 		case interpreter_env.Object:
-			return interpreter_makers.MK_String("object")
+			return interpreter_makers.MkString("object")
 		case interpreter_env.Array:
 			arr := args[0].GetValue().([]interpreter_env.RuntimeValue)
 			s := "["
@@ -29,28 +29,28 @@ var ParseFns = map[string]NativeFunction{
 				}
 			}
 			s += "]"
-			return interpreter_makers.MK_String(s)
+			return interpreter_makers.MkString(s)
 		default:
 			s := fmt.Sprintf("%v", args[0].GetValue())
-			return interpreter_makers.MK_String(s)
+			return interpreter_makers.MkString(s)
 		}
 	},
 	"num": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
 		if len(args) < 1 {
-			return interpreter_makers.MK_NaN()
+			return interpreter_makers.MkNan()
 		}
 
 		i, err := strconv.ParseFloat(args[0].GetValue().(string), 64)
 
 		if err != nil {
-			return interpreter_makers.MK_NaN()
+			return interpreter_makers.MkNan()
 		}
 
-		return interpreter_makers.MK_Number(i)
+		return interpreter_makers.MkNumber(i)
 	},
 	"bool": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
 		if len(args) < 1 {
-			return interpreter_makers.MK_Boolean(false)
+			return interpreter_makers.MkBoolean(false)
 		}
 
 		result := false
@@ -67,6 +67,6 @@ var ParseFns = map[string]NativeFunction{
 			result = true
 		}
 
-		return interpreter_makers.MK_Boolean(result)
+		return interpreter_makers.MkBoolean(result)
 	},
 }

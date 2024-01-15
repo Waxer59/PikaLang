@@ -55,7 +55,7 @@ func GetFunctionName(caller ast.CallExpr, env interpreter_env.Environment) (stri
 }
 
 func EvaluateBodyStmt(body []ast.Stmt, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
-	var lastEvaluated interpreter_env.RuntimeValue = interpreter_makers.MK_Null()
+	var lastEvaluated interpreter_env.RuntimeValue = interpreter_makers.MkNull()
 
 	for _, statement := range body {
 		eval, err := Evaluate(statement, env)

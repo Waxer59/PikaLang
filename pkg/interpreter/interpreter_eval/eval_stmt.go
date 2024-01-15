@@ -12,7 +12,7 @@ import (
 )
 
 func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
-	var value interpreter_env.RuntimeValue = interpreter_makers.MK_Null()
+	var value interpreter_env.RuntimeValue = interpreter_makers.MkNull()
 
 	if variableDeclaration.Value != nil {
 		eval, err := Evaluate(variableDeclaration.Value, env)
@@ -29,7 +29,7 @@ func evalVariableDeclaration(variableDeclaration ast.VariableDeclaration, env in
 
 func evalReturnStatement(declaration ast.ReturnStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 
-	var returnValue interpreter_env.RuntimeValue = interpreter_makers.MK_Null()
+	var returnValue interpreter_env.RuntimeValue = interpreter_makers.MkNull()
 
 	if declaration.Argument != nil {
 		eval, err := Evaluate(declaration.Argument, env)
@@ -81,11 +81,11 @@ func evalForStatement(declaration ast.ForStatement, env interpreter_env.Environm
 	return nil, nil
 }
 
-func evalBreakStatement(declaration ast.BreakStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+func evalBreakStatement() (interpreter_env.RuntimeValue, error) {
 	return nil, errors.New(compilerErrors.ErrLoopsBreakNotInLoop)
 }
 
-func evalContinueStatement(declaration ast.ContinueStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+func evalContinueStatement() (interpreter_env.RuntimeValue, error) {
 	return nil, errors.New(compilerErrors.ErrLoopsContinueNotInLoop)
 }
 
@@ -115,7 +115,7 @@ func evalWhileStatement(declaration ast.WhileStatement, env interpreter_env.Envi
 		testVal = EvaluateTruthyFalsyValues(testEval.GetValue())
 	}
 
-	return interpreter_makers.MK_Null(), nil
+	return interpreter_makers.MkNull(), nil
 }
 
 func evalSwitchStatement(declaration ast.SwitchStatement, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
