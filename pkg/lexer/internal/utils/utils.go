@@ -1,12 +1,10 @@
-package lexer
+package utils
 
 import (
+	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
+	"golang.org/x/exp/slices"
 	"strconv"
 	"strings"
-
-	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
-
-	"golang.org/x/exp/slices"
 )
 
 func IsSkippable(char rune) bool {
@@ -14,7 +12,7 @@ func IsSkippable(char rune) bool {
 }
 
 func NextChar(src *[]rune) string {
-	if len(*src) <= 0 {
+	if len(*src) <= 0 || src == nil {
 		return ""
 	}
 
@@ -43,6 +41,24 @@ func ExtractNum(src []rune) (string, []rune) {
 	}
 
 	return num, src
+}
+
+func ExtractString(src []rune) (string, []rune) {
+	if len(src) <= 0 {
+		return "", src
+	}
+
+	var str string
+	for len(src) > 0 && src[0] != '"' {
+		if src[0] == '\\' {
+			NextChar(&src) // consume '\'
+			str += NextChar(&src)
+		} else {
+			str += NextChar(&src)
+		}
+	}
+
+	return str, src
 }
 
 /*  FirstReturn: String extracted

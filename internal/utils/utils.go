@@ -1,13 +1,12 @@
 package utils
 
 import (
-	"io/ioutil"
-
 	"github.com/inancgumus/screen"
+	"os"
 )
 
 func ScanFile(filePath string) (string, error) {
-	content, err := ioutil.ReadFile(filePath)
+	content, err := os.ReadFile(filePath)
 	if err != nil {
 		return "", err
 	}

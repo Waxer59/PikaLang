@@ -54,11 +54,9 @@ const (
 	Semicolon    // ;
 	Comma        // ,
 	Dot          // .
-	DoubleQoute  // "
-	SingleQoute  // '
+	DoubleQuote  // "
+	SingleQuote  // '
 	QuestionMark // ?
-	Minus        // +
-	Plus         // -
 
 	// Comparison operators
 	EqualEqual   // ==

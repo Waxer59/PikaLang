@@ -1,4 +1,4 @@
-package interpreter_nativeFns
+package nativeFns
 
 import (
 	"fmt"
@@ -15,17 +15,20 @@ var ConsoleFns = map[string]NativeFunction{
 			fmt.Println("")
 		}
 
-		return interpreter_makers.MK_Null()
+		return interpreter_makers.MkNull()
 	},
 	"prompt": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
 		if len(args) < 1 {
-			return interpreter_makers.MK_String("")
+			return interpreter_makers.MkString("")
 		}
 
 		fmt.Print(args[0].GetValue())
 		var input string
-		fmt.Scanln(&input)
-		return interpreter_makers.MK_String(input)
+		_, err := fmt.Scanln(&input)
+		if err != nil {
+			return nil
+		}
+		return interpreter_makers.MkString(input)
 	},
 }
 

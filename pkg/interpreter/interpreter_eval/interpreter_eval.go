@@ -16,17 +16,17 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 	case ast_types.Identifier:
 		return evalIdentifier(astNode.(ast.Identifier), env)
 	case ast_types.NumericLiteral:
-		return interpreter_makers.MK_Number(astNode.(ast.NumericLiteral).Value), nil
+		return interpreter_makers.MkNumber(astNode.(ast.NumericLiteral).Value), nil
 	case ast_types.ObjectLiteral:
 		return evalObjectExpr(astNode.(ast.ObjectLiteral), env)
 	case ast_types.NullLiteral:
-		return interpreter_makers.MK_Null(), nil
+		return interpreter_makers.MkNull(), nil
 	case ast_types.BooleanLiteral:
-		return interpreter_makers.MK_Boolean(astNode.(ast.BooleanLiteral).Value), nil
+		return interpreter_makers.MkBoolean(astNode.(ast.BooleanLiteral).Value), nil
 	case ast_types.StringLiteral:
-		return interpreter_makers.MK_String(astNode.(ast.StringLiteral).Value), nil
+		return interpreter_makers.MkString(astNode.(ast.StringLiteral).Value), nil
 	case ast_types.NaNLiteral:
-		return interpreter_makers.MK_NaN(), nil
+		return interpreter_makers.MkNan(), nil
 	case ast_types.ArrayLiteral:
 		return evalArrayExpr(astNode.(ast.ArrayLiteral), env)
 
@@ -48,7 +48,7 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 	case ast_types.UpdateExpr:
 		return evalUpdateExpr(astNode.(ast.UpdateExpr), env)
 	case ast_types.ArrowFunctionExpr:
-		return evalArrowFunctionExpr(astNode.(ast.ArrowFunctionExpr), env)
+		return evalArrowFunctionExpr(astNode.(ast.ArrowFunctionExpr))
 
 	// STATEMENTS
 	case ast_types.Program:
@@ -66,9 +66,9 @@ func Evaluate(astNode ast.Stmt, env interpreter_env.Environment) (interpreter_en
 	case ast_types.WhileStatement:
 		return evalWhileStatement(astNode.(ast.WhileStatement), env)
 	case ast_types.BreakStatement:
-		return evalBreakStatement(astNode.(ast.BreakStatement), env)
+		return evalBreakStatement()
 	case ast_types.ContinueStatement:
-		return evalContinueStatement(astNode.(ast.ContinueStatement), env)
+		return evalContinueStatement()
 	case ast_types.ForStatement:
 		return evalForStatement(astNode.(ast.ForStatement), env)
 

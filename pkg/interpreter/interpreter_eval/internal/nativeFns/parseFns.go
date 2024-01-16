@@ -1,4 +1,4 @@
-package interpreter_nativeFns
+package nativeFns
 
 import (
 	"fmt"
@@ -8,17 +8,36 @@ import (
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
 )
 
+func EvaluateTruthyFalsyValues(runtime interpreter_env.RuntimeValue) bool {
+	val := runtime.GetValue()
+	result := true
+	switch runtime.GetType() {
+	case interpreter_env.Boolean:
+		result = val.(bool)
+	case interpreter_env.Null:
+		result = false
+	case interpreter_env.Number:
+		result = val != 0
+	case interpreter_env.Array:
+		result = len(val.([]interpreter_env.RuntimeValue)) > 0
+	case interpreter_env.String:
+		result = len(val.(string)) > 0
+	}
+
+	return result
+}
+
 var ParseFns = map[string]NativeFunction{
 	"string": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
 		if len(args) < 1 {
-			return interpreter_makers.MK_String("")
+			return interpreter_makers.MkString("")
 		}
 
 		switch args[0].GetType() {
 		case interpreter_env.Null:
-			return interpreter_makers.MK_String("null")
+			return interpreter_makers.MkString("null")
 		case interpreter_env.Object:
-			return interpreter_makers.MK_String("object")
+			return interpreter_makers.MkString("object")
 		case interpreter_env.Array:
 			arr := args[0].GetValue().([]interpreter_env.RuntimeValue)
 			s := "["
@@ -29,44 +48,32 @@ var ParseFns = map[string]NativeFunction{
 				}
 			}
 			s += "]"
-			return interpreter_makers.MK_String(s)
+			return interpreter_makers.MkString(s)
 		default:
 			s := fmt.Sprintf("%v", args[0].GetValue())
-			return interpreter_makers.MK_String(s)
+			return interpreter_makers.MkString(s)
 		}
 	},
 	"num": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
 		if len(args) < 1 {
-			return interpreter_makers.MK_NaN()
+			return interpreter_makers.MkNan()
 		}
 
 		i, err := strconv.ParseFloat(args[0].GetValue().(string), 64)
 
 		if err != nil {
-			return interpreter_makers.MK_NaN()
+			return interpreter_makers.MkNan()
 		}
 
-		return interpreter_makers.MK_Number(i)
+		return interpreter_makers.MkNumber(i)
 	},
 	"bool": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
 		if len(args) < 1 {
-			return interpreter_makers.MK_Boolean(false)
+			return interpreter_makers.MkBoolean(false)
 		}
 
-		result := false
-		switch v := args[0].GetValue().(type) {
-		case bool:
-			result = v
-		case int, float64, float32:
-			result = v != 0.0
-		case string:
-			result = v != ""
-		case nil:
-			result = false
-		default:
-			result = true
-		}
+		result := EvaluateTruthyFalsyValues(args[0])
 
-		return interpreter_makers.MK_Boolean(result)
+		return interpreter_makers.MkBoolean(result)
 	},
 }

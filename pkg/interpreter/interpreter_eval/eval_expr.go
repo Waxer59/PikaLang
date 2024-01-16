@@ -3,6 +3,7 @@ package interpreter_eval
 import (
 	"errors"
 	"fmt"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_eval/internal/nativeFns"
 	"math"
 
 	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
@@ -11,8 +12,6 @@ import (
 
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
-	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_utils"
-
 	"golang.org/x/exp/slices"
 )
 
@@ -33,7 +32,7 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 		return nil, err
 	}
 
-	nativeFn, isNativeFn := interpreter_utils.IsNativeFunction(fnName)
+	nativeFn, isNativeFn := IsNativeFunction(fnName)
 
 	if isNativeFn {
 		result := nativeFn(args, env)
@@ -52,20 +51,23 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 	paramsNumber := len(function.Params)
 
 	if paramsNumber > len(args) {
-		return nil, errors.New(compilerErrors.ErrNotEnoughArguments + ": " + fnName)
+		return nil, errors.New(compilerErrors.ErrNotEnoughArguments + fnName)
 	} else if paramsNumber < len(args) {
-		return nil, errors.New(compilerErrors.ErrTooManyArguments + ": " + fnName)
+		return nil, errors.New(compilerErrors.ErrTooManyArguments + fnName)
 	}
 
 	// Create the variables for the function arguments
 	for idx, arg := range function.Params {
-		scope.DeclareVar(arg.Symbol, args[idx], false)
+		_, err := scope.DeclareVar(arg.Symbol, args[idx], false)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// Evaluate the function body line by line
 	for _, statement := range function.Body {
 		eval, err := Evaluate(statement, scope)
-		if err != nil && err.Error() == compilerErrors.ErrReturn { // Return statement
+		if err.Error() == compilerErrors.ErrReturn { // Return statement
 			return eval, nil
 		}
 		if err != nil {
@@ -73,102 +75,94 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 		}
 	}
 
-	return interpreter_makers.MK_Null(), nil
+	return interpreter_makers.MkNull(), nil
 }
 
 func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
 	property := expr.Property
 
 	evalObj, err := Evaluate(expr.Object, env)
+
 	if err != nil {
 		return nil, err
 	}
 
 	valObj := evalObj.GetValue()
-	if expr.Computed {
-		evalProperty, err := Evaluate(property, env)
+
+	if !expr.Computed {
+		valProperty := fmt.Sprint(property.(ast.Identifier).Symbol)
+		val, ok := valObj.(map[string]interpreter_env.RuntimeValue)[valProperty]
+
+		// If the property doesn't exist return null
+		if !ok {
+			return interpreter_makers.MkNull(), nil
+		}
+		return val, nil
+	}
+
+	evalProperty, err := Evaluate(property, env)
+
+	if err != nil {
+		return nil, err
+	}
+
+	parseIndex := func(idx int, length int) (int, error) {
+		isNegative := idx < 0
+
+		if isNegative {
+			idx = length + idx
+		}
+
+		isOutOfBounds := idx < 0 || idx > length
+
+		if isOutOfBounds {
+			return 0, errors.New(compilerErrors.ErrInvalidIndex)
+		}
+		if idx >= length {
+			return 0, errors.New(compilerErrors.ErrIndexNotFound)
+		}
+
+		return idx, nil
+	}
+
+	switch obj := valObj.(type) {
+	case []interpreter_env.RuntimeValue:
+		if evalProperty.GetType() != interpreter_env.Number {
+			return nil, errors.New(compilerErrors.ErrInvalidIndex)
+		}
+		number := evalProperty.GetValue().(float64)
+
+		idx, err := parseIndex(int(number), len(obj))
+
 		if err != nil {
 			return nil, err
 		}
-		switch obj := valObj.(type) {
-		case []interpreter_env.RuntimeValue:
-			if evalProperty.GetType() != interpreter_env.Number {
-				return nil, errors.New(compilerErrors.ErrInvalidIndex)
-			}
-			number := evalProperty.GetValue().(float64)
 
-			if math.Mod(number, 1) != 0 { // Check if is a float number
-				return nil, errors.New(compilerErrors.ErrInvalidIndex)
-			}
-
-			idx := int(number)
-
-			isNegative := idx < 0
-
-			if isNegative {
-				idx = len(obj) + idx
-			}
-
-			isNegativeOutOfBounds := (idx < 0 || idx >= len(obj)) && isNegative
-
-			if isNegativeOutOfBounds {
-				return nil, errors.New(compilerErrors.ErrInvalidIndex)
-			}
-
-			if idx >= len(obj) {
-				return nil, errors.New(compilerErrors.ErrIndexNotFound)
-			}
-
-			val := obj[idx]
-			return val, nil
-		case string:
-			if evalProperty.GetType() != interpreter_env.Number {
-				return nil, errors.New(compilerErrors.ErrInvalidIndex)
-			}
-			number := evalProperty.GetValue().(float64)
-
-			if math.Mod(number, 1) != 0 { // Check if is a float number
-				return nil, errors.New(compilerErrors.ErrInvalidIndex)
-			}
-
-			idx := int(number)
-
-			isNegative := idx < 0
-
-			if isNegative {
-				idx = len(obj) + idx
-			}
-
-			isNegativeOutOfBounds := (idx < 0 || idx >= len(obj)) && isNegative
-
-			if isNegativeOutOfBounds {
-				return nil, errors.New(compilerErrors.ErrInvalidIndex)
-			}
-
-			if idx >= len(obj) {
-				return nil, errors.New(compilerErrors.ErrIndexNotFound)
-			}
-
-			val := obj[idx]
-			return interpreter_makers.MK_String(string(val)), nil
-		case map[string]interpreter_env.RuntimeValue:
-			valProperty := fmt.Sprint(evalProperty.GetValue())
-			if _, ok := obj[valProperty]; ok {
-				return obj[valProperty], nil
-			} else {
-				return nil, errors.New(compilerErrors.ErrPropertyNotFound)
-			}
-		default:
-			return nil, errors.New(compilerErrors.ErrIndexNotFound)
+		val := obj[idx]
+		return val, nil
+	case string:
+		if evalProperty.GetType() != interpreter_env.Number {
+			return nil, errors.New(compilerErrors.ErrInvalidIndex)
 		}
-	}
+		number := evalProperty.GetValue().(float64)
 
-	valProperty := fmt.Sprint(property.(ast.Identifier).Symbol)
-	val, ok := valObj.(map[string]interpreter_env.RuntimeValue)[valProperty]
-	if !ok {
+		idx, err := parseIndex(int(number), len(obj))
+
+		if err != nil {
+			return nil, err
+		}
+
+		val := obj[idx]
+		return interpreter_makers.MkString(string(val)), nil
+	case map[string]interpreter_env.RuntimeValue:
+		valProperty := fmt.Sprint(evalProperty.GetValue())
+		if _, ok := obj[valProperty]; ok {
+			return obj[valProperty], nil
+		}
 		return nil, errors.New(compilerErrors.ErrPropertyNotFound)
 	}
-	return val, nil
+
+	return nil, errors.New(compilerErrors.ErrIndexNotFound)
 }
 
 func evalArrayExpr(arrayExpr ast.ArrayLiteral, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
@@ -199,7 +193,7 @@ func evalArrayExpr(arrayExpr ast.ArrayLiteral, env interpreter_env.Environment) 
 	return arr, nil
 }
 
-func evalArrowFunctionExpr(funcExpr ast.ArrowFunctionExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
+func evalArrowFunctionExpr(funcExpr ast.ArrowFunctionExpr) (interpreter_env.RuntimeValue, error) {
 
 	arrowFn := interpreter_env.FunctionVal{
 		Type:           interpreter_env.ArrowFunction,
@@ -342,7 +336,7 @@ func evalAssignment(assignment ast.AssigmentExpr, env interpreter_env.Environmen
 
 			if idx >= len(objVal.Elements) {
 				for i := len(objVal.Elements); i <= idx; i++ {
-					objVal.Elements = append(objVal.Elements, interpreter_makers.MK_Null())
+					objVal.Elements = append(objVal.Elements, interpreter_makers.MkNull())
 				}
 			}
 
@@ -369,7 +363,7 @@ func evalConditionalExpr(conditionalExpr ast.ConditionalExpr, env interpreter_en
 		return nil, err
 	}
 
-	val := EvaluateTruthyFalsyValues(evalCondition.GetValue())
+	val := nativeFns.EvaluateTruthyFalsyValues(evalCondition)
 
 	if val {
 		return Evaluate(conditionalExpr.Consequent, env)
@@ -379,7 +373,7 @@ func evalConditionalExpr(conditionalExpr ast.ConditionalExpr, env interpreter_en
 }
 
 func evalStringBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
-	var result string = ""
+	result := ""
 	valLhs, okLhs := lhs.(interpreter_env.StringVal)
 	valRhs, okRhs := rhs.(interpreter_env.StringVal)
 	if !okLhs || !okRhs {
@@ -390,7 +384,7 @@ func evalStringBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs
 		result = valLhs.Value + valRhs.Value
 	}
 
-	return interpreter_makers.MK_String(result), nil
+	return interpreter_makers.MkString(result), nil
 }
 
 func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
@@ -424,7 +418,7 @@ func evaluateNumericBinaryExpr(operator string, lhs interpreter_env.RuntimeValue
 		result = math.Pow(valLhs.Value, valRhs.Value)
 	}
 
-	return interpreter_makers.MK_Number(result), nil
+	return interpreter_makers.MkNumber(result), nil
 }
 
 func evalLogicalExpr(logicalExpr ast.LogicalExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
@@ -441,8 +435,8 @@ func evalLogicalExpr(logicalExpr ast.LogicalExpr, env interpreter_env.Environmen
 		return nil, err
 	}
 
-	valLhs := EvaluateTruthyFalsyValues(evalLhs.GetValue())
-	valRhs := EvaluateTruthyFalsyValues(evalRhs.GetValue())
+	valLhs := nativeFns.EvaluateTruthyFalsyValues(evalLhs)
+	valRhs := nativeFns.EvaluateTruthyFalsyValues(evalRhs)
 
 	switch logicalExpr.Operator {
 	case "&&":
@@ -451,7 +445,7 @@ func evalLogicalExpr(logicalExpr ast.LogicalExpr, env interpreter_env.Environmen
 		result = valLhs || valRhs
 	}
 
-	return interpreter_makers.MK_Boolean(result), nil
+	return interpreter_makers.MkBoolean(result), nil
 }
 
 func evalUnaryExpr(expr ast.UnaryExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
@@ -462,12 +456,12 @@ func evalUnaryExpr(expr ast.UnaryExpr, env interpreter_env.Environment) (interpr
 		return nil, err
 	}
 
-	boolVal := EvaluateTruthyFalsyValues(eval.GetValue())
+	boolVal := nativeFns.EvaluateTruthyFalsyValues(eval)
 
 	switch expr.Operator {
 	case "!":
 		result = !boolVal
-		return interpreter_makers.MK_Boolean(result), nil
+		return interpreter_makers.MkBoolean(result), nil
 	case "+":
 		if eval.GetType() != interpreter_env.Number {
 			return nil, errors.New(compilerErrors.ErrSyntaxUnaryInvalidUnaryExpr)
@@ -476,7 +470,7 @@ func evalUnaryExpr(expr ast.UnaryExpr, env interpreter_env.Environment) (interpr
 		if !ok {
 			return nil, errors.New(compilerErrors.ErrSyntaxUnaryInvalidUnaryExpr)
 		}
-		return interpreter_makers.MK_Number(result), nil
+		return interpreter_makers.MkNumber(result), nil
 	case "-":
 		if eval.GetType() != interpreter_env.Number {
 			return nil, errors.New(compilerErrors.ErrSyntaxUnaryInvalidUnaryExpr)
@@ -485,9 +479,9 @@ func evalUnaryExpr(expr ast.UnaryExpr, env interpreter_env.Environment) (interpr
 		if !ok {
 			return nil, errors.New(compilerErrors.ErrSyntaxUnaryInvalidUnaryExpr)
 		}
-		return interpreter_makers.MK_Number(-result), nil
+		return interpreter_makers.MkNumber(-result), nil
 	default:
-		return interpreter_makers.MK_Null(), nil
+		return interpreter_makers.MkNull(), nil
 	}
 }
 
@@ -506,7 +500,7 @@ func evalUpdateExpr(expr ast.UpdateExpr, env interpreter_env.Environment) (inter
 
 	switch op {
 	case "++":
-		num, err := env.AssignVar(identifier, interpreter_makers.MK_Number(eval.GetValue().(float64)+1))
+		num, err := env.AssignVar(identifier, interpreter_makers.MkNumber(eval.GetValue().(float64)+1))
 
 		if err != nil {
 			return nil, err
@@ -518,7 +512,7 @@ func evalUpdateExpr(expr ast.UpdateExpr, env interpreter_env.Environment) (inter
 
 		return eval, nil
 	case "--":
-		num, err := env.AssignVar(identifier, interpreter_makers.MK_Number(eval.GetValue().(float64)-1))
+		num, err := env.AssignVar(identifier, interpreter_makers.MkNumber(eval.GetValue().(float64)-1))
 
 		if err != nil {
 			return nil, err
@@ -535,8 +529,7 @@ func evalUpdateExpr(expr ast.UpdateExpr, env interpreter_env.Environment) (inter
 }
 
 func evalComparisonBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
-	var result bool = false
-
+	var result = false
 	numValLhs, _ := lhs.(interpreter_env.NumberVal)
 	numValRhs, _ := rhs.(interpreter_env.NumberVal)
 
@@ -554,7 +547,7 @@ func evalComparisonBinaryExpr(operator string, lhs interpreter_env.RuntimeValue,
 	case ">=":
 		result = numValLhs.Value >= numValRhs.Value
 	}
-	return interpreter_makers.MK_Boolean(result), nil
+	return interpreter_makers.MkBoolean(result), nil
 }
 
 func evalBinaryExpr(binop ast.BinaryExpr, env interpreter_env.Environment) (interpreter_env.RuntimeValue, error) {
@@ -586,5 +579,5 @@ func evalBinaryExpr(binop ast.BinaryExpr, env interpreter_env.Environment) (inte
 		return eval, err
 	}
 
-	return interpreter_makers.MK_Null(), nil
+	return interpreter_makers.MkNull(), nil
 }

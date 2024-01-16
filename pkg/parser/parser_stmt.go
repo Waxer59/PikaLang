@@ -2,7 +2,6 @@ package parser
 
 import (
 	"errors"
-
 	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
 	"github.com/Waxer59/PikaLang/pkg/ast"
 	"github.com/Waxer59/PikaLang/pkg/ast/ast_types"
@@ -57,7 +56,10 @@ func (p *Parser) parseForStatement() (ast.Stmt, error) {
 		}
 	}
 
-	p.expect(token_type.Semicolon, compilerErrors.ErrSyntaxExpectedSemicolon)
+	_, err = p.expect(token_type.Semicolon, compilerErrors.ErrSyntaxExpectedSemicolon)
+	if err != nil {
+		return nil, err
+	}
 
 	if p.at().Type != token_type.Semicolon {
 		test, err = p.parseExpr()
@@ -66,7 +68,10 @@ func (p *Parser) parseForStatement() (ast.Stmt, error) {
 		}
 	}
 
-	p.expect(token_type.Semicolon, compilerErrors.ErrSyntaxExpectedSemicolon)
+	_, err = p.expect(token_type.Semicolon, compilerErrors.ErrSyntaxExpectedSemicolon)
+	if err != nil {
+		return nil, err
+	}
 
 	if p.at().Type != token_type.Semicolon {
 		update, err = p.parseExpr()
@@ -177,7 +182,10 @@ func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
 	var defaultStmt ast.CaseStatement
 	condition := arg
 
-	p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
+	_, err = p.expect(token_type.LeftBrace, compilerErrors.ErrSyntaxExpectedLeftBrace)
+	if err != nil {
+		return nil, err
+	}
 
 	for p.at().Type != token_type.RightBrace && p.notEOF() {
 		if p.at().Type == token_type.Case {
@@ -203,7 +211,10 @@ func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
 
 		if p.at().Type == token_type.Default {
 			p.subtract() // consume 'default'
-			p.expect(token_type.Colon, compilerErrors.ErrSyntaxExpectedColon)
+			_, err := p.expect(token_type.Colon, compilerErrors.ErrSyntaxExpectedColon)
+			if err != nil {
+				return nil, err
+			}
 			body, err := p.parseSwitchBodyStmt()
 
 			if err != nil {
@@ -218,7 +229,10 @@ func (p *Parser) parseSwitchStatement() (ast.Stmt, error) {
 		}
 	}
 
-	p.expect(token_type.RightBrace, compilerErrors.ErrSyntaxExpectedRightBrace)
+	_, err = p.expect(token_type.RightBrace, compilerErrors.ErrSyntaxExpectedRightBrace)
+	if err != nil {
+		return nil, err
+	}
 
 	return ast.SwitchStatement{
 		Kind:         ast_types.SwitchStatement,
@@ -303,7 +317,11 @@ func (p *Parser) parseElseIfStatement() ([]ast.ElseIfStatement, error) {
 func (p *Parser) parseFnDeclaration() (ast.Stmt, error) {
 	p.subtract() // consume 'fn'
 
-	name := p.expect(token_type.Identifier, compilerErrors.ErrFuncExpectedIdentifer)
+	name, err := p.expect(token_type.Identifier, compilerErrors.ErrFuncExpectedIdentifer)
+
+	if err != nil {
+		return nil, err
+	}
 
 	params, err := p.parseFunctionArgs()
 
@@ -327,7 +345,14 @@ func (p *Parser) parseFnDeclaration() (ast.Stmt, error) {
 
 func (p *Parser) parseVarConstDeclaration() (ast.Stmt, error) {
 	isConstant := p.subtract().Type == token_type.Const
-	identifier := p.expect(token_type.Identifier, compilerErrors.ErrVariableExpectedIdentifierNameFollowingConstOrVar).Value
+
+	identifierToken, err := p.expect(token_type.Identifier, compilerErrors.ErrVariableExpectedIdentifierNameFollowingConstOrVar)
+
+	if err != nil {
+		return nil, err
+	}
+
+	identifier := identifierToken.Value
 
 	if p.at().Type != token_type.Equals {
 		if isConstant {
@@ -342,7 +367,10 @@ func (p *Parser) parseVarConstDeclaration() (ast.Stmt, error) {
 		}, nil
 	}
 
-	p.expect(token_type.Equals, compilerErrors.ErrSyntaxExpectedAsignation)
+	_, err = p.expect(token_type.Equals, compilerErrors.ErrSyntaxExpectedAssignation)
+	if err != nil {
+		return nil, err
+	}
 
 	expr, err := p.parseExpr()
 
