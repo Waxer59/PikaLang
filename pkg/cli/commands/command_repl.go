@@ -15,7 +15,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func SetUpRepl(app *cli.App) *cli.Command {
+func SetUpRepl() *cli.Command {
 	replCommand := &cli.Command{
 		Name:   "repl",
 		Usage:  "Start the repl",
@@ -33,14 +33,19 @@ func SetUpRepl(app *cli.App) *cli.Command {
 }
 
 func startRepl(cCtx *cli.Context) error {
-	parser := parser.New()
+	p := parser.New()
 	env := interpreter_env.New(nil)
 
 	isAstActivated := cCtx.Bool("ast")
 
 	for {
 		c := color.New(color.FgBlue).Add(color.Bold)
-		c.Print("Pika > ")
+		_, err := c.Print("Pika > ")
+
+		if err != nil {
+			return err
+		}
+
 		scanner := bufio.NewScanner(os.Stdin)
 
 		scanner.Scan()
@@ -54,7 +59,7 @@ func startRepl(cCtx *cli.Context) error {
 			continue
 		}
 
-		program, err := parser.ProduceAST(code)
+		program, err := p.ProduceAST(code)
 
 		if isAstActivated {
 			fmt.Println(program)

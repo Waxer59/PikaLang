@@ -2,10 +2,10 @@ package interpreter_eval
 
 import (
 	"errors"
-
 	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
 	"github.com/Waxer59/PikaLang/pkg/ast"
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_eval/internal/nativeFns"
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
 
 	"golang.org/x/exp/slices"
@@ -39,7 +39,7 @@ func evalReturnStatement(declaration ast.ReturnStatement, env interpreter_env.En
 		returnValue = eval
 	}
 
-	// Throw a error to stop the execution
+	// Throw an error to stop the execution
 	return returnValue, errors.New(compilerErrors.ErrReturn)
 }
 
@@ -56,7 +56,7 @@ func evalForStatement(declaration ast.ForStatement, env interpreter_env.Environm
 			if err != nil {
 				return eval, err
 			}
-			testVal := EvaluateTruthyFalsyValues(eval.GetValue())
+			testVal := nativeFns.EvaluateTruthyFalsyValues(eval)
 			if !testVal {
 				break
 			}
@@ -95,7 +95,7 @@ func evalWhileStatement(declaration ast.WhileStatement, env interpreter_env.Envi
 		return nil, err
 	}
 
-	testVal := EvaluateTruthyFalsyValues(testEval.GetValue())
+	testVal := nativeFns.EvaluateTruthyFalsyValues(testEval)
 
 	for testVal {
 		eval, err := EvaluateBodyStmt(declaration.Body, env)
@@ -112,7 +112,7 @@ func evalWhileStatement(declaration ast.WhileStatement, env interpreter_env.Envi
 			return eval, err
 		}
 
-		testVal = EvaluateTruthyFalsyValues(testEval.GetValue())
+		testVal = nativeFns.EvaluateTruthyFalsyValues(testEval)
 	}
 
 	return interpreter_makers.MkNull(), nil
@@ -159,7 +159,7 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 		return nil, err
 	}
 
-	val := EvaluateTruthyFalsyValues(conditionRawValue.GetValue())
+	val := nativeFns.EvaluateTruthyFalsyValues(conditionRawValue)
 
 	if err != nil {
 		return nil, err
@@ -186,7 +186,7 @@ func evalIfStatement(declaration ast.IfStatement, env interpreter_env.Environmen
 			return nil, err
 		}
 
-		val := EvaluateTruthyFalsyValues(conditionRawValue.GetValue())
+		val := nativeFns.EvaluateTruthyFalsyValues(conditionRawValue)
 
 		if val {
 			eval, err := EvaluateBodyStmt(elseIfStatement.Body, env)

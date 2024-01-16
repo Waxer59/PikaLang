@@ -6,7 +6,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func SetUpHelpCommand(app *cli.App) *cli.Command {
+func SetUpHelpCommand() *cli.Command {
 	helpCommand := &cli.Command{
 		Name:  "help",
 		Usage: "Show help",

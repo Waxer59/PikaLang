@@ -27,8 +27,8 @@ func New() error {
 
 func setUp(app *cli.App) {
 	app.Commands = []*cli.Command{
-		commands.SetUpRunCommand(app),
-		commands.SetUpHelpCommand(app),
-		commands.SetUpRepl(app),
+		commands.SetUpRunCommand(),
+		commands.SetUpHelpCommand(),
+		commands.SetUpRepl(),
 	}
 }

@@ -1,4 +1,4 @@
-package interpreter_nativeFns
+package nativeFns
 
 import (
 	"fmt"
@@ -7,6 +7,25 @@ import (
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
 )
+
+func EvaluateTruthyFalsyValues(runtime interpreter_env.RuntimeValue) bool {
+	val := runtime.GetValue()
+	result := true
+	switch runtime.GetType() {
+	case interpreter_env.Boolean:
+		result = val.(bool)
+	case interpreter_env.Null:
+		result = false
+	case interpreter_env.Number:
+		result = val != 0
+	case interpreter_env.Array:
+		result = len(val.([]interpreter_env.RuntimeValue)) > 0
+	case interpreter_env.String:
+		result = len(val.(string)) > 0
+	}
+
+	return result
+}
 
 var ParseFns = map[string]NativeFunction{
 	"string": func(args []interpreter_env.RuntimeValue, env interpreter_env.Environment) interpreter_env.RuntimeValue {
@@ -53,19 +72,7 @@ var ParseFns = map[string]NativeFunction{
 			return interpreter_makers.MkBoolean(false)
 		}
 
-		result := false
-		switch v := args[0].GetValue().(type) {
-		case bool:
-			result = v
-		case int, float64, float32:
-			result = v != 0.0
-		case string:
-			result = v != ""
-		case nil:
-			result = false
-		default:
-			result = true
-		}
+		result := EvaluateTruthyFalsyValues(args[0])
 
 		return interpreter_makers.MkBoolean(result)
 	},

@@ -3,6 +3,7 @@ package interpreter_eval
 import (
 	"errors"
 	"fmt"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_eval/internal/nativeFns"
 	"math"
 
 	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
@@ -11,8 +12,6 @@ import (
 
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
-	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_utils"
-
 	"golang.org/x/exp/slices"
 )
 
@@ -33,7 +32,7 @@ func evalCallExpr(expr ast.CallExpr, env interpreter_env.Environment) (interpret
 		return nil, err
 	}
 
-	nativeFn, isNativeFn := interpreter_utils.IsNativeFunction(fnName)
+	nativeFn, isNativeFn := IsNativeFunction(fnName)
 
 	if isNativeFn {
 		result := nativeFn(args, env)
@@ -93,8 +92,10 @@ func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (inter
 	if !expr.Computed {
 		valProperty := fmt.Sprint(property.(ast.Identifier).Symbol)
 		val, ok := valObj.(map[string]interpreter_env.RuntimeValue)[valProperty]
+
+		// If the property doesn't exist return null
 		if !ok {
-			return nil, errors.New(compilerErrors.ErrPropertyNotFound)
+			return interpreter_makers.MkNull(), nil
 		}
 		return val, nil
 	}
@@ -105,6 +106,25 @@ func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (inter
 		return nil, err
 	}
 
+	parseIndex := func(idx int, length int) (int, error) {
+		isNegative := idx < 0
+
+		if isNegative {
+			idx = length + idx
+		}
+
+		isOutOfBounds := idx < 0 || idx > length
+
+		if isOutOfBounds {
+			return 0, errors.New(compilerErrors.ErrInvalidIndex)
+		}
+		if idx >= length {
+			return 0, errors.New(compilerErrors.ErrIndexNotFound)
+		}
+
+		return idx, nil
+	}
+
 	switch obj := valObj.(type) {
 	case []interpreter_env.RuntimeValue:
 		if evalProperty.GetType() != interpreter_env.Number {
@@ -112,26 +132,10 @@ func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (inter
 		}
 		number := evalProperty.GetValue().(float64)
 
-		if math.Mod(number, 1) != 0 { // Check if is a float number
-			return nil, errors.New(compilerErrors.ErrInvalidIndex)
-		}
+		idx, err := parseIndex(int(number), len(obj))
 
-		idx := int(number)
-
-		isNegative := idx < 0
-
-		if isNegative {
-			idx = len(obj) + idx
-		}
-
-		isNegativeOutOfBounds := (idx < 0 || idx >= len(obj)) && isNegative
-
-		if isNegativeOutOfBounds {
-			return nil, errors.New(compilerErrors.ErrInvalidIndex)
-		}
-
-		if idx >= len(obj) {
-			return nil, errors.New(compilerErrors.ErrIndexNotFound)
+		if err != nil {
+			return nil, err
 		}
 
 		val := obj[idx]
@@ -142,26 +146,10 @@ func evalMemberExpr(expr ast.MemberExpr, env interpreter_env.Environment) (inter
 		}
 		number := evalProperty.GetValue().(float64)
 
-		if math.Mod(number, 1) != 0 { // Check if is a float number
-			return nil, errors.New(compilerErrors.ErrInvalidIndex)
-		}
+		idx, err := parseIndex(int(number), len(obj))
 
-		idx := int(number)
-
-		isNegative := idx < 0
-
-		if isNegative {
-			idx = len(obj) + idx
-		}
-
-		isNegativeOutOfBounds := (idx < 0 || idx >= len(obj)) && isNegative
-
-		if isNegativeOutOfBounds {
-			return nil, errors.New(compilerErrors.ErrInvalidIndex)
-		}
-
-		if idx >= len(obj) {
-			return nil, errors.New(compilerErrors.ErrIndexNotFound)
+		if err != nil {
+			return nil, err
 		}
 
 		val := obj[idx]
@@ -375,7 +363,7 @@ func evalConditionalExpr(conditionalExpr ast.ConditionalExpr, env interpreter_en
 		return nil, err
 	}
 
-	val := EvaluateTruthyFalsyValues(evalCondition.GetValue())
+	val := nativeFns.EvaluateTruthyFalsyValues(evalCondition)
 
 	if val {
 		return Evaluate(conditionalExpr.Consequent, env)
@@ -447,8 +435,8 @@ func evalLogicalExpr(logicalExpr ast.LogicalExpr, env interpreter_env.Environmen
 		return nil, err
 	}
 
-	valLhs := EvaluateTruthyFalsyValues(evalLhs.GetValue())
-	valRhs := EvaluateTruthyFalsyValues(evalRhs.GetValue())
+	valLhs := nativeFns.EvaluateTruthyFalsyValues(evalLhs)
+	valRhs := nativeFns.EvaluateTruthyFalsyValues(evalRhs)
 
 	switch logicalExpr.Operator {
 	case "&&":
@@ -468,7 +456,7 @@ func evalUnaryExpr(expr ast.UnaryExpr, env interpreter_env.Environment) (interpr
 		return nil, err
 	}
 
-	boolVal := EvaluateTruthyFalsyValues(eval.GetValue())
+	boolVal := nativeFns.EvaluateTruthyFalsyValues(eval)
 
 	switch expr.Operator {
 	case "!":
@@ -541,8 +529,7 @@ func evalUpdateExpr(expr ast.UpdateExpr, env interpreter_env.Environment) (inter
 }
 
 func evalComparisonBinaryExpr(operator string, lhs interpreter_env.RuntimeValue, rhs interpreter_env.RuntimeValue) (interpreter_env.RuntimeValue, error) {
-	var result bool = false
-
+	var result = false
 	numValLhs, _ := lhs.(interpreter_env.NumberVal)
 	numValRhs, _ := rhs.(interpreter_env.NumberVal)
 

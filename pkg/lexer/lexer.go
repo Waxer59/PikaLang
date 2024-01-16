@@ -2,15 +2,15 @@ package lexer
 
 import (
 	"errors"
-
 	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
+	"github.com/Waxer59/PikaLang/pkg/lexer/internal/utils"
 	"github.com/Waxer59/PikaLang/pkg/lexer/token_type"
 )
 
 func Tokenize(input string) ([]token_type.Token, error) {
-	tokens := []token_type.Token{}
+	var tokens []token_type.Token
 	src := []rune(input)
-	substract := func(i int) rune {
+	subtract := func(i int) rune {
 		if len(src) <= 0 {
 			return 0
 		}
@@ -30,25 +30,25 @@ func Tokenize(input string) ([]token_type.Token, error) {
 		tokenChar := src[0]
 
 		// Check if token is skippable
-		if IsSkippable(tokenChar) {
-			substract(1)
+		if utils.IsSkippable(tokenChar) {
+			subtract(1)
 			continue
 		}
 
 		// Check for number
-		if IsInt(tokenChar) {
-			num, rest := ExtractNum(src)
+		if utils.IsInt(tokenChar) {
+			num, rest := utils.ExtractNum(src)
 			tokens = append(tokens, token_type.Token{Type: token_type.Number, Value: num})
 			src = rest
 			continue
 		}
 
 		// Check for alpha
-		if IsAlpha(tokenChar) {
-			alpha, rest := ExtractIdentifier(src)
+		if utils.IsAlpha(tokenChar) {
+			alpha, rest := utils.ExtractIdentifier(src)
 			alphaType := token_type.Identifier
 
-			if keyword, ok := IsKeyword(alpha); ok {
+			if keyword, ok := utils.IsKeyword(alpha); ok {
 				alphaType = keyword
 			}
 
@@ -62,13 +62,13 @@ func Tokenize(input string) ([]token_type.Token, error) {
 		switch tokenChar {
 		case '+':
 			if nextChar() == '=' {
-				substract(2) // consume ' += '
+				subtract(2) // consume ' += '
 				tokens = append(tokens, token_type.Token{Type: token_type.PlusEquals, Value: string(tokenChar) + "="})
 				continue
 			}
 
 			if nextChar() == '+' {
-				substract(2) // consume ' ++ '
+				subtract(2) // consume ' ++ '
 				tokens = append(tokens, token_type.Token{Type: token_type.Increment, Value: "++"})
 				continue
 			}
@@ -76,20 +76,20 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 		case '%':
 			if nextChar() == '=' {
-				substract(2) // consume ' %= '
+				subtract(2) // consume ' %= '
 				tokens = append(tokens, token_type.Token{Type: token_type.ModuleEquals, Value: string(tokenChar) + "="})
 				continue
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 		case '-':
 			if nextChar() == '=' {
-				substract(2) // consume ' -= '
+				subtract(2) // consume ' -= '
 				tokens = append(tokens, token_type.Token{Type: token_type.MinusEquals, Value: string(tokenChar) + "="})
 				continue
 			}
 
 			if nextChar() == '-' {
-				substract(2) // consume ' -- '
+				subtract(2) // consume ' -- '
 				tokens = append(tokens, token_type.Token{Type: token_type.Decrement, Value: "--"})
 				continue
 			}
@@ -97,15 +97,15 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
 		case '*':
 			if nextChar() == '=' {
-				substract(2) // consume ' *= '
+				subtract(2) // consume ' *= '
 				tokens = append(tokens, token_type.Token{Type: token_type.TimesEquals, Value: string(tokenChar) + "="})
 				continue
 			}
 
 			if nextChar() == '*' { // Check for power
-				substract(2) // consume ' ** '
+				subtract(2) // consume ' ** '
 				if src[0] == '=' {
-					substract(1) // advance '='
+					subtract(1) // advance '='
 					tokens = append(tokens, token_type.Token{Type: token_type.PowerEquals, Value: "**="})
 					continue
 				}
@@ -117,24 +117,24 @@ func Tokenize(input string) ([]token_type.Token, error) {
 		case '/':
 			switch nextChar() {
 			case '/':
-				substract(2) // consume ' // '
+				subtract(2) // consume ' // '
 				for len(src) > 0 && src[0] != '\n' {
-					substract(1)
+					subtract(1)
 					if len(src) <= 0 {
 						break
 					}
 				}
 			case '*':
-				substract(2) // consume /*
+				subtract(2) // consume /*
 				for len(src) > 0 && src[0] != '*' && nextChar() != '/' {
-					substract(1)
+					subtract(1)
 					if len(src) <= 1 { // if the comment is not terminated
-						return nil, errors.New(string(compilerErrors.ErrSyntaxUnterminatedMultilineComment))
+						return nil, errors.New(compilerErrors.ErrSyntaxUnterminatedMultilineComment)
 					}
 				}
-				substract(2) // consume */
+				subtract(2) // consume */
 			case '=':
-				substract(2) // consume '/='
+				subtract(2) // consume '/='
 				tokens = append(tokens, token_type.Token{Type: token_type.DivideEquals, Value: "/="})
 			default:
 				tokens = append(tokens, token_type.Token{Type: token_type.BinaryOperator, Value: string(tokenChar)})
@@ -142,11 +142,11 @@ func Tokenize(input string) ([]token_type.Token, error) {
 		case '=':
 			switch nextChar() {
 			case '=':
-				substract(2) // consume '=='
+				subtract(2) // consume '=='
 				tokens = append(tokens, token_type.Token{Type: token_type.EqualEqual, Value: "=="})
 				continue
 			case '>':
-				substract(2) // consume '=>'
+				subtract(2) // consume '=>'
 				tokens = append(tokens, token_type.Token{Type: token_type.Arrow, Value: "=>"})
 				continue
 			default:
@@ -154,21 +154,21 @@ func Tokenize(input string) ([]token_type.Token, error) {
 			}
 		case '!':
 			if nextChar() == '=' {
-				substract(2) // consume '!='
+				subtract(2) // consume '!='
 				tokens = append(tokens, token_type.Token{Type: token_type.NotEqual, Value: "!="})
 				continue
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.Bang, Value: string(tokenChar)})
 		case '>':
 			if nextChar() == '=' {
-				substract(2) // consume '>='
+				subtract(2) // consume '>='
 				tokens = append(tokens, token_type.Token{Type: token_type.GreaterEqual, Value: ">="})
 				continue
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.Greater, Value: string(tokenChar)})
 		case '<':
 			if nextChar() == '=' {
-				substract(2) // consume '<='
+				subtract(2) // consume '<='
 				tokens = append(tokens, token_type.Token{Type: token_type.LessEqual, Value: "<="})
 				continue
 			}
@@ -194,45 +194,39 @@ func Tokenize(input string) ([]token_type.Token, error) {
 		case ':':
 			tokens = append(tokens, token_type.Token{Type: token_type.Colon, Value: string(tokenChar)})
 		case '.':
-			if IsInt(nextChar()) { // Check for decimal numbers as .123 == 0.123
-				num, rest := ExtractNum(src)
+			if utils.IsInt(nextChar()) { // Check for decimal numbers as .123 == 0.123
+				num, rest := utils.ExtractNum(src)
 				tokens = append(tokens, token_type.Token{Type: token_type.Number, Value: num})
 				src = rest
 				continue
 			}
 			tokens = append(tokens, token_type.Token{Type: token_type.Dot, Value: string(tokenChar)})
 		case '"':
-			tokens = append(tokens, token_type.Token{Type: token_type.DoubleQoute, Value: string(tokenChar)}) // Append double qoute
-			substract(1)
+			tokens = append(tokens, token_type.Token{Type: token_type.DoubleQuote, Value: string(tokenChar)})
 
-			var str string
-			for len(src) > 0 && src[0] != '"' {
-				if src[0] == '\\' {
-					substract(1)
-					str += string(substract(1))
-					continue
-				}
-				str += string(substract(1))
+			if utils.IsAlpha(nextChar()) {
+				subtract(1) // consume '"'
+				str, rest := utils.ExtractString(src)
+				tokens = append(tokens, token_type.Token{Type: token_type.StringLiteral, Value: str})
+				src = rest
+				continue
 			}
-
-			tokens = append(tokens, token_type.Token{Type: token_type.StringLiteral, Value: str})
-			tokens = append(tokens, token_type.Token{Type: token_type.DoubleQoute, Value: string(tokenChar)})
 		case '\'':
-			tokens = append(tokens, token_type.Token{Type: token_type.SingleQoute, Value: string(tokenChar)})
+			tokens = append(tokens, token_type.Token{Type: token_type.SingleQuote, Value: string(tokenChar)})
 		case '|':
 			if nextChar() == '|' {
-				substract(2) // consume '||'
+				subtract(2) // consume '||'
 				tokens = append(tokens, token_type.Token{Type: token_type.Or, Value: "||"})
 			}
 		case '&':
 			if nextChar() == '&' {
-				substract(2) // consume '&&'
+				subtract(2) // consume '&&'
 				tokens = append(tokens, token_type.Token{Type: token_type.And, Value: "&&"})
 			}
 		default:
 			tokens = append(tokens, token_type.Token{Type: token_type.Identifier, Value: string(tokenChar)})
 		}
-		substract(1)
+		subtract(1)
 	}
 	tokens = append(tokens, token_type.Token{Type: token_type.EOF, Value: "EndOfFile"})
 	return tokens, nil

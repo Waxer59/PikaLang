@@ -2,29 +2,12 @@ package interpreter_eval
 
 import (
 	"errors"
-
 	compilerErrors "github.com/Waxer59/PikaLang/internal/errors"
 	"github.com/Waxer59/PikaLang/pkg/ast"
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_env"
+	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_eval/internal/nativeFns"
 	"github.com/Waxer59/PikaLang/pkg/interpreter/interpreter_makers"
 )
-
-func EvaluateTruthyFalsyValues(val any) bool {
-	switch v := val.(type) {
-	case bool:
-		return v
-	case int, float64, float32:
-		return v != 0.0
-	case string:
-		return v != ""
-	case nil:
-		return false
-	case []ast.Expr:
-		return len(v) != 0
-	default:
-		return true
-	}
-}
 
 func GetFunctionName(caller ast.CallExpr, env interpreter_env.Environment) (string, error) {
 	switch caller.Caller.(type) {
@@ -66,4 +49,14 @@ func EvaluateBodyStmt(body []ast.Stmt, env interpreter_env.Environment) (interpr
 	}
 
 	return lastEvaluated, nil
+}
+
+/*
+ * First return value is the function itself.
+ * Second return value is true if the function exists.
+ */
+func IsNativeFunction(name string) (nativeFns.NativeFunction, bool) {
+	function, ok := nativeFns.NativeFunctions[name]
+
+	return function, ok
 }

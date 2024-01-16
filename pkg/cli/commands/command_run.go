@@ -18,7 +18,7 @@ import (
 
 const DEFAULT_FILE_NAME = "main.pk"
 
-func SetUpRunCommand(app *cli.App) *cli.Command {
+func SetUpRunCommand() *cli.Command {
 	runCommand := cli.Command{
 		Name:   "run",
 		Usage:  "Run a file",
@@ -60,9 +60,9 @@ func runApp(cCtx *cli.Context) error {
 		return cli.Exit(err.Error(), int(exitCodes.FileReadError))
 	}
 
-	parser := parser.New()
+	p := parser.New()
 
-	program, err := parser.ProduceAST(src)
+	program, err := p.ProduceAST(src)
 
 	if err != nil {
 		return fmt.Errorf(err.Error())

@@ -1,4 +1,4 @@
-package interpreter_nativeFns
+package nativeFns
 
 import (
 	"fmt"
